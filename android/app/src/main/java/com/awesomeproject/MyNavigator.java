@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.awesomeproject.contract.Navigator;
 import com.awesomeproject.util.StrUtil;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.UiThreadUtil;
@@ -197,6 +199,16 @@ public class MyNavigator extends MyReactModule implements Navigator {
         applyStack();
       }
     }
+  }
+
+  @ReactMethod
+  public void stack(final Promise p) {
+    handler().post(new Runnable() {
+      @Override
+      public void run() {
+        p.resolve(Arguments.fromArray(stack.toArray(new String[stack.size()])));
+      }
+    });
   }
 
   @ReactMethod
