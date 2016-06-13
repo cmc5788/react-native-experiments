@@ -6,11 +6,10 @@ import android.graphics.Color;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class MyAppRoot extends FrameLayout {
@@ -62,16 +61,8 @@ public class MyAppRoot extends FrameLayout {
 
     TextView tv;
     addView(tv = new TextView(getContext()));
-    tv.setLayoutParams(new LayoutParams(MATCH_PARENT, MATCH_PARENT));
-    tv.setGravity(Gravity.CENTER);
+    tv.setLayoutParams(new LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER));
     tv.setText("I am an empty root view.\nYou shouldn't see me.");
-
-    setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        navigator.navigate(HomePageView.TAG, 1, null);
-      }
-    });
 
     navigator.setRoot(this);
   }

@@ -1,21 +1,29 @@
-import InitApp from './init';
+import Init from './init';
 import Navigator from './MyNavigator';
 
-InitApp({
-  emptyView: 'HomePageView',
+const app = {
 
-  init: () => {
+  init() {
     console.log('got init');
   },
 
-  pause: () => {
+  pause() {
     console.log('got pause');
     Navigator.stack().then((stack) => {
       console.log(`got stack ${JSON.stringify(stack)}`);
     });
   },
-  
-  resume: () => {
+
+  resume() {
     console.log('got resume');
+  },
+
+  emptyView: 'HomePageView',
+
+  viewPresenters: {
+    'HomePageView': () => require('./HomePagePresenter')
   }
-});
+
+};
+
+Init(app);

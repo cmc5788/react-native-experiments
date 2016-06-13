@@ -16,6 +16,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.UiThreadUtil;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -59,10 +60,15 @@ public class MyNavigator extends MyReactModule implements Navigator {
   // -------------------
 
   private Map<String, ViewFactory> viewFactories;
+  private JSEventDispatcher eventDispatcher;
 
   private void injectDeps() {
-    viewFactories = MyApp.injector(getReactApplicationContext()).viewFactoriesFor(this);
+    MyInjector inject = MyApp.injector(getReactApplicationContext());
+    viewFactories = inject.viewFactoriesFor(this);
+    eventDispatcher = inject.eventDispatcherFor(this);
   }
+
+  // -------------------
 
   private final LinkedList<String> stack = new LinkedList<>();
   private boolean needsApplyStack;
@@ -244,10 +250,12 @@ public class MyNavigator extends MyReactModule implements Navigator {
       Log.e(TAG, "Aborting restore: activity dead, dying, or dormant.");
       return;
     }
-    String stackStr = prefs(activity).getString("stack", null);
-    if (stackStr == null) return;
+
     stack.clear();
-    stack.addAll(StrUtil.<LinkedList<String>>serializableFromStr(stackStr));
+    String stackStr = prefs(activity).getString("stack", null);
+    if (stackStr != null) {
+      stack.addAll(StrUtil.<LinkedList<String>>serializableFromStr(stackStr));
+    }
 
     if (stack.isEmpty()) {
       if (emptyTag == null) {
@@ -296,6 +304,13 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
     if (oldTopView != null) root.removeView((View) oldTopView);
 
+    // Dispatch the event. TODO - need before and after anim events?
+
+    // TODO - onDestroyView event needs to be triggered from somewhere. Here?
+
+    WritableMap args = Arguments.createMap();
+    args.putString("tag", topTag);
+    eventDispatcher.dispatch("onInitView", args);
     Log.e(TAG, "APPLY STACK: " + Arrays.toString(stack.toArray()));
   }
 

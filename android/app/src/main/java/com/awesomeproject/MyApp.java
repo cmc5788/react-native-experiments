@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import com.awesomeproject.MyNavigator.ViewFactory;
+import com.facebook.react.LiteReactInstanceManager;
 import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class MyApp extends Application implements MyInjector {
   // Injectable scoped singletons
   private volatile Scoped<MyReactPackage> reactPackage;
   private volatile Scoped<MyNavigator> myNavigator;
+  private volatile Scoped<JSEventDispatcher> eventDispatcher;
 
   @NonNull
   public MyInjector injector() {
@@ -42,6 +44,13 @@ public class MyApp extends Application implements MyInjector {
     return _myReactPackage();
   }
 
+  @NonNull
+  @Override
+  public JSEventDispatcher eventDispatcherFor(MainActivity activity,
+      LiteReactInstanceManager instMgr) {
+    return _eventDispatcher(instMgr);
+  }
+
   @Override
   public MyNavigator navigatorFor(MyReactPackage reactPackage,
       ReactApplicationContext reactAppContext) {
@@ -58,6 +67,16 @@ public class MyApp extends Application implements MyInjector {
     HashMap<String, ViewFactory> m = new HashMap<>();
     m.put(HomePageView.TAG, HomePageView.factory());
     return m;
+  }
+
+  @Override
+  public JSEventDispatcher eventDispatcherFor(MyNavigator navigator) {
+    return _eventDispatcher(null);
+  }
+
+  @Override
+  public JSEventDispatcher eventDispatcherFor(HomePageView homePageView) {
+    return _eventDispatcher(null);
   }
 
   // Lazy init scoped injectables with DCL
@@ -89,5 +108,22 @@ public class MyApp extends Application implements MyInjector {
       }
     }
     return mn.val;
+  }
+
+  private JSEventDispatcher _eventDispatcher(LiteReactInstanceManager instMgr) {
+    Scoped<JSEventDispatcher> ed = eventDispatcher;
+    if (ed == null || ed.scope != scopeCounter) {
+      synchronized (this) {
+        ed = eventDispatcher;
+        if (ed == null || ed.scope != scopeCounter) {
+          if (instMgr == null) {
+            throw new IllegalStateException("cannot init eventDispatcher without instMgr");
+          }
+          eventDispatcher = ed = //
+              new Scoped<>((JSEventDispatcher) new MyEventDispatcher(instMgr), scopeCounter);
+        }
+      }
+    }
+    return ed.val;
   }
 }

@@ -1,15 +1,11 @@
 package com.awesomeproject;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
 import com.facebook.react.LiteAppCompatReactActivity;
 import com.facebook.react.LiteReactInstanceManager;
 import com.facebook.react.ReactInstanceManager.ReactInstanceEventListener;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.shell.MainReactPackage;
 import java.util.Arrays;
 import java.util.List;
@@ -17,30 +13,27 @@ import java.util.List;
 public class MainActivity extends LiteAppCompatReactActivity implements UiInteractable {
 
   private MyReactPackage myReactPackage;
+  private JSEventDispatcher myEventDispatcher;
 
-  private void beginNewScopeAndInjectDeps() {
+  private void beginNewScopeAndInjectReactPackage() {
     MyInjector inject = MyApp.injector(this);
     inject.beginNewScope();
     myReactPackage = inject.reactPackageFor(this);
   }
 
+  private void injectEventDispatcher() {
+    MyInjector inject = MyApp.injector(this);
+    myEventDispatcher = inject.eventDispatcherFor(this, reactInstanceManager);
+  }
+
   private LiteReactInstanceManager reactInstanceManager;
   private boolean isPausedOrPausing;
   private boolean navigatorRestored;
-  //private MyAppRoot appRoot;
 
   @Override
   public boolean isUiInteractable() {
     return !isPausedOrPausing && !isFinishing();
   }
-
-  //@NonNull
-  //public MyAppRoot appRoot() {
-  //  if (appRoot == null) {
-  //    throw new NullPointerException("appRoot is null.");
-  //  }
-  //  return appRoot;
-  //}
 
   /**
    * Returns the name of the main component registered from JavaScript.
@@ -71,12 +64,14 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
 
   @Override
   protected LiteReactInstanceManager createReactInstanceManager() {
-    return reactInstanceManager = super.createReactInstanceManager();
+    reactInstanceManager = super.createReactInstanceManager();
+    injectEventDispatcher();
+    return reactInstanceManager;
   }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    beginNewScopeAndInjectDeps();
+    beginNewScopeAndInjectReactPackage();
     super.onCreate(savedInstanceState);
     reactInstanceManager.addReactInstanceEventListener(reactInstanceEventListener);
   }
@@ -85,16 +80,11 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
       reactInstanceEventListener = new ReactInstanceEventListener() {
     @Override
     public void onReactContextInitialized(ReactContext context) {
-      // Crashes
-      //appRoot = (MyAppRoot) findViewById(MyAppRoot.ID());
-      //if (appRoot == null) {
-      //  throw new IllegalStateException("Couldn't find root! Did JS Component render it?");
-      //}
       if (!navigatorRestored) {
         myReactPackage.navigator().restore();
         navigatorRestored = true;
       }
-      emitEvent("onAppInit", null);
+      myEventDispatcher.dispatch("onAppInit", null);
     }
   };
 
@@ -102,7 +92,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   protected void onResume() {
     super.onResume();
     isPausedOrPausing = false;
-    emitEvent("onAppResume", null);
+    myEventDispatcher.dispatch("onAppResume", null);
   }
 
   @Override
@@ -111,7 +101,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
       myReactPackage.navigator().save();
     }
     isPausedOrPausing = true;
-    emitEvent("onAppPause", null);
+    myEventDispatcher.dispatch("onAppPause", null);
     super.onPause();
   }
 
@@ -125,17 +115,6 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   public void onBackPressed() {
     if (myReactPackage.navigatorReady() && navigatorRestored) {
       myReactPackage.navigator()._goBack();
-    }
-  }
-
-  private void emitEvent(@NonNull String name, @Nullable Object data) {
-    try {
-      if (reactInstanceManager == null) return;
-      ReactContext rc = reactInstanceManager.getCurrentReactContext();
-      if (rc == null) return;
-      rc.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(name, data);
-    } catch (Exception e) {
-      Log.e("MainActivity", "emitEvent err", e);
     }
   }
 }
