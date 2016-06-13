@@ -92,6 +92,7 @@ public class MyApp extends Application implements MyInjector {
   }
 
   // Lazy init scoped injectables with DCL
+  // TODO - too much boilerplate; put DCL idiom into Scoped impl instead, dropping immutability?
 
   private MyReactPackage _myReactPackage() {
     Scoped<MyReactPackage> mrp = reactPackage;
