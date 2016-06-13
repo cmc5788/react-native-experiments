@@ -1,4 +1,4 @@
-package com.awesomeproject;
+package com.facebook.react;
 
 import android.content.Intent;
 import android.os.Build;
@@ -10,23 +10,19 @@ import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.facebook.common.logging.FLog;
-import com.facebook.react.LifecycleState;
-import com.facebook.react.ReactInstanceManager;
-import com.facebook.react.ReactPackage;
-import com.facebook.react.ReactRootView;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import java.util.List;
 import javax.annotation.Nullable;
 
-public abstract class AppCompatReactActivity extends AppCompatActivity
+public abstract class LiteAppCompatReactActivity extends AppCompatActivity
     implements DefaultHardwareBackBtnHandler {
 
   private static final String REDBOX_PERMISSION_MESSAGE =
       "Overlay permissions needs to be granted in order for react native apps to run in dev mode";
 
-  private @Nullable ReactInstanceManager mReactInstanceManager;
-  private @Nullable ReactRootView mReactRootView;
+  private @Nullable LiteReactInstanceManager mReactInstanceManager;
+  private @Nullable LiteReactRootView mReactRootView;
   private LifecycleState mLifecycleState = LifecycleState.BEFORE_RESUME;
   private boolean mDoRefresh = false;
 
@@ -42,12 +38,10 @@ public abstract class AppCompatReactActivity extends AppCompatActivity
     return "index.android.bundle";
   }
 
-  ;
-
   /**
    * Returns a custom path of the bundle file. This is used in cases the bundle should be loaded
    * from a custom path. By default it is loaded from Android assets, from a path specified
-   * by {@link getBundleAssetName}.
+   * by {@link #getBundleAssetName}.
    * e.g. "file://sdcard/myapp_cache/index.android.bundle"
    */
   protected
@@ -102,8 +96,8 @@ public abstract class AppCompatReactActivity extends AppCompatActivity
   /**
    * A subclass may override this method if it needs to use a custom instance.
    */
-  protected ReactInstanceManager createReactInstanceManager() {
-    ReactInstanceManager.Builder builder = ReactInstanceManager.builder()
+  protected LiteReactInstanceManager createReactInstanceManager() {
+    LiteReactInstanceManager.Builder builder = LiteReactInstanceManager.liteBuilder()
         .setApplication(getApplication())
         .setJSMainModuleName(getJSMainModuleName())
         .setUseDeveloperSupport(getUseDeveloperSupport())
@@ -127,8 +121,8 @@ public abstract class AppCompatReactActivity extends AppCompatActivity
   /**
    * A subclass may override this method if it needs to use a custom {@link ReactRootView}.
    */
-  protected ReactRootView createRootView() {
-    return new ReactRootView(this);
+  protected LiteReactRootView createRootView() {
+    return new LiteReactRootView(this);
   }
 
   @Override

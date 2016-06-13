@@ -3,7 +3,9 @@ package com.awesomeproject;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.facebook.react.ReactInstanceManager;
+import android.util.Log;
+import com.facebook.react.LiteAppCompatReactActivity;
+import com.facebook.react.LiteReactInstanceManager;
 import com.facebook.react.ReactInstanceManager.ReactInstanceEventListener;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.ReactContext;
@@ -12,21 +14,33 @@ import com.facebook.react.shell.MainReactPackage;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatReactActivity implements UiInteractable {
+public class MainActivity extends LiteAppCompatReactActivity implements UiInteractable {
 
   private MyReactPackage myReactPackage;
 
-  private void injectDeps() {
-    myReactPackage = ((MyApp) getApplication()).injector().myReactPackage(this);
+  private void beginNewScopeAndInjectDeps() {
+    MyInjector inject = MyApp.injector(this);
+    inject.beginNewScope();
+    myReactPackage = inject.reactPackageFor(this);
   }
 
-  private ReactInstanceManager reactInstanceManager;
+  private LiteReactInstanceManager reactInstanceManager;
   private boolean isPausedOrPausing;
+  private boolean navigatorRestored;
+  //private MyAppRoot appRoot;
 
   @Override
   public boolean isUiInteractable() {
     return !isPausedOrPausing && !isFinishing();
   }
+
+  //@NonNull
+  //public MyAppRoot appRoot() {
+  //  if (appRoot == null) {
+  //    throw new NullPointerException("appRoot is null.");
+  //  }
+  //  return appRoot;
+  //}
 
   /**
    * Returns the name of the main component registered from JavaScript.
@@ -34,7 +48,7 @@ public class MainActivity extends AppCompatReactActivity implements UiInteractab
    */
   @Override
   protected String getMainComponentName() {
-    return "AwesomeProject";
+    return "MainComponent";
   }
 
   /**
@@ -56,13 +70,13 @@ public class MainActivity extends AppCompatReactActivity implements UiInteractab
   }
 
   @Override
-  protected ReactInstanceManager createReactInstanceManager() {
+  protected LiteReactInstanceManager createReactInstanceManager() {
     return reactInstanceManager = super.createReactInstanceManager();
   }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    injectDeps();
+    beginNewScopeAndInjectDeps();
     super.onCreate(savedInstanceState);
     reactInstanceManager.addReactInstanceEventListener(reactInstanceEventListener);
   }
@@ -71,6 +85,15 @@ public class MainActivity extends AppCompatReactActivity implements UiInteractab
       reactInstanceEventListener = new ReactInstanceEventListener() {
     @Override
     public void onReactContextInitialized(ReactContext context) {
+      // Crashes
+      //appRoot = (MyAppRoot) findViewById(MyAppRoot.ID());
+      //if (appRoot == null) {
+      //  throw new IllegalStateException("Couldn't find root! Did JS Component render it?");
+      //}
+      if (!navigatorRestored) {
+        myReactPackage.navigator().restore();
+        navigatorRestored = true;
+      }
       emitEvent("onAppInit", null);
     }
   };
@@ -84,6 +107,9 @@ public class MainActivity extends AppCompatReactActivity implements UiInteractab
 
   @Override
   protected void onPause() {
+    if (myReactPackage.navigatorReady() && navigatorRestored) {
+      myReactPackage.navigator().save();
+    }
     isPausedOrPausing = true;
     emitEvent("onAppPause", null);
     super.onPause();
@@ -91,9 +117,15 @@ public class MainActivity extends AppCompatReactActivity implements UiInteractab
 
   @Override
   protected void onDestroy() {
-    emitEvent("onAppDestroy", null);
     super.onDestroy();
     reactInstanceManager.removeReactInstanceEventListener(reactInstanceEventListener);
+  }
+
+  @Override
+  public void onBackPressed() {
+    if (myReactPackage.navigatorReady() && navigatorRestored) {
+      myReactPackage.navigator()._goBack();
+    }
   }
 
   private void emitEvent(@NonNull String name, @Nullable Object data) {
@@ -102,7 +134,8 @@ public class MainActivity extends AppCompatReactActivity implements UiInteractab
       ReactContext rc = reactInstanceManager.getCurrentReactContext();
       if (rc == null) return;
       rc.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(name, data);
-    } catch (Exception ignored) {
+    } catch (Exception e) {
+      Log.e("MainActivity", "emitEvent err", e);
     }
   }
 }

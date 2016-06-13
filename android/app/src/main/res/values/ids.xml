@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <item type="id"
+      name="initial_app_root_id"/>
+  <item type="id"
+      name="initial_home_page_view_id"/>
+</resources>

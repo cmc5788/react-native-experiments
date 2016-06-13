@@ -11,7 +11,6 @@ import {
   Text,
   View
 } from 'react-native';
-import Shared from './shared';
 
 class AwesomeProject extends Component {
   render() {
@@ -21,7 +20,7 @@ class AwesomeProject extends Component {
           Welcome to React Native!
         </Text>
         <Text style={styles.instructions}>
-          To get started, edit {Shared()} index.ios.js
+          To get started, edit index.ios.js
         </Text>
         <Text style={styles.instructions}>
           Press Cmd+R to reload,{'\n'}

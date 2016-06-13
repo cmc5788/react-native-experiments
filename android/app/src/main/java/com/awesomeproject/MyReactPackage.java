@@ -11,19 +11,24 @@ import java.util.List;
 
 public class MyReactPackage implements ReactPackage {
 
-  @NonNull private final MyNavigator navigator;
+  private MyNavigator navigator;
 
-  public MyReactPackage(@NonNull MyNavigator myNavigator) {
-    this.navigator = myNavigator;
+  public MyReactPackage() {
+  }
+
+  public boolean navigatorReady() {
+    return navigator != null;
   }
 
   @NonNull
   public MyNavigator navigator() {
+    if (navigator == null) throw new NullPointerException("navigator is null.");
     return navigator;
   }
 
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+    navigator = MyApp.injector(reactContext).navigatorFor(this, reactContext);
     return Collections.<NativeModule>singletonList(navigator);
   }
 
