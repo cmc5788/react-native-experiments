@@ -25,9 +25,8 @@ project.xcworkspace
 # Android/IJ
 #
 keystore.properties
-debug.keystore
-release.keystore
-.iml
+*.keystore
+*.iml
 .idea
 .gradle
 local.properties
