@@ -15,6 +15,12 @@ public class MyReactPackage implements ReactPackage {
   private MyNavigator navigator;
   private JSEventReceiver eventReceiver;
 
+  private void injectDepsWithReactContext(ReactApplicationContext reactContext) {
+    MyInjector inject = MyApp.injector(reactContext);
+    navigator = inject.navigatorFor(this, reactContext);
+    eventReceiver = inject.eventReceiverFor(this, reactContext);
+  }
+
   public MyReactPackage() {
   }
 
@@ -36,9 +42,7 @@ public class MyReactPackage implements ReactPackage {
 
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-    MyInjector inject = MyApp.injector(reactContext);
-    navigator = inject.navigatorFor(this, reactContext);
-    eventReceiver = inject.eventReceiverFor(this, reactContext);
+    injectDepsWithReactContext(reactContext);
     return Arrays.<NativeModule>asList(navigator, eventReceiver);
   }
 
