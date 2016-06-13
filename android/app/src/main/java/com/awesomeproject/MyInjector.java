@@ -22,7 +22,12 @@ public interface MyInjector {
 
   MyNavigator navigatorFor(MyReactPackage reactPackage, ReactApplicationContext reactAppContext);
 
+  JSEventReceiver eventReceiverFor( //
+      MyReactPackage reactPackage, ReactApplicationContext reactAppContext);
+
   MyNavigator navigatorFor(MyAppRoot appRoot);
+
+  JSEventReceiver eventReceiverFor(MyAppRoot appRoot);
 
   Map<String, MyNavigator.ViewFactory> viewFactoriesFor(MyNavigator navigator);
 

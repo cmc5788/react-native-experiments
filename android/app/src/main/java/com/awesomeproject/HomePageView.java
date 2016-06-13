@@ -5,19 +5,22 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
 import com.awesomeproject.MyNavigator.NavigableView;
 import com.awesomeproject.MyNavigator.ViewFactory;
+import com.facebook.react.bridge.ReadableMap;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class HomePageView extends FrameLayout implements NavigableView {
+public class HomePageView extends FrameLayout implements NavigableView, JSViewEventTarget {
 
   public static final String TAG = "HomePageView";
 
@@ -99,5 +102,17 @@ public class HomePageView extends FrameLayout implements NavigableView {
     assertOnUiThread();
     if (id != ID) throw new IllegalArgumentException("not my id!");
     super.setId(id);
+  }
+
+  @Override
+  public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
+    if (args != null && args.hasKey("setButtonColor")) {
+      getChildAt(0).setBackgroundColor(Color.parseColor(args.getString("setButtonColor")));
+    }
+  }
+
+  @Override
+  public boolean respondsToTag(@NonNull String viewTag) {
+    return TAG.equals(viewTag);
   }
 }

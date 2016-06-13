@@ -2,8 +2,6 @@ package com.awesomeproject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -43,14 +41,6 @@ public class MyNavigator extends MyReactModule implements Navigator {
   private static final String FORWARD = "FORWARD";
   private static final String REPLACE = "REPLACE";
   private static final String BACKWARD = "BACKWARD";
-
-  private static class HandlerHolder {
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
-  }
-
-  private static Handler handler() {
-    return HandlerHolder.HANDLER;
-  }
 
   @NonNull
   private static SharedPreferences prefs(@NonNull MainActivity activity) {

@@ -4,15 +4,20 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
+import com.facebook.react.bridge.ReadableMap;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class MyAppRoot extends FrameLayout {
+public class MyAppRoot extends FrameLayout implements JSViewEventTarget {
 
   // We have to use this bizarre "ID tracking" system since React wants to assign view IDs to
   // certain views based on its own internal logic. This should be safe for now; eventually we
@@ -26,9 +31,11 @@ public class MyAppRoot extends FrameLayout {
   }
 
   private MyNavigator navigator;
+  private JSEventReceiver eventReceiver;
 
   private void injectDeps() {
     navigator = MyApp.injector(getContext()).navigatorFor(this);
+    eventReceiver = MyApp.injector(getContext()).eventReceiverFor(this);
   }
 
   public MyAppRoot(Context context) {
@@ -65,6 +72,7 @@ public class MyAppRoot extends FrameLayout {
     tv.setText("I am an empty root view.\nYou shouldn't see me.");
 
     navigator.setRoot(this);
+    eventReceiver.setViewEventReceiver(this);
   }
 
   @Override
@@ -72,5 +80,21 @@ public class MyAppRoot extends FrameLayout {
     assertOnUiThread();
     ID = id;
     super.setId(id);
+  }
+
+  @Override
+  public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
+    for (int i = 0; i < getChildCount(); i++) {
+      View child = getChildAt(i);
+      if (child instanceof JSViewEventTarget && //
+          ((JSViewEventTarget) child).respondsToTag(viewTag)) {
+        ((JSViewEventTarget) child).receiveViewEvent(viewTag, args);
+      }
+    }
+  }
+
+  @Override
+  public boolean respondsToTag(@NonNull String viewTag) {
+    return true; // respond to all tags since we dispatch them
   }
 }

@@ -25,6 +25,7 @@ public class MyApp extends Application implements MyInjector {
   // Injectable scoped singletons
   private volatile Scoped<MyReactPackage> reactPackage;
   private volatile Scoped<MyNavigator> myNavigator;
+  private volatile Scoped<JSEventReceiver> eventReceiver;
   private volatile Scoped<JSEventDispatcher> eventDispatcher;
 
   @NonNull
@@ -58,8 +59,19 @@ public class MyApp extends Application implements MyInjector {
   }
 
   @Override
+  public JSEventReceiver eventReceiverFor(MyReactPackage reactPackage,
+      ReactApplicationContext reactAppContext) {
+    return _eventReceiver(reactAppContext);
+  }
+
+  @Override
   public MyNavigator navigatorFor(MyAppRoot appRoot) {
     return _myNavigator(null);
+  }
+
+  @Override
+  public JSEventReceiver eventReceiverFor(MyAppRoot appRoot) {
+    return _eventReceiver(null);
   }
 
   @Override
@@ -108,6 +120,22 @@ public class MyApp extends Application implements MyInjector {
       }
     }
     return mn.val;
+  }
+
+  private JSEventReceiver _eventReceiver(ReactApplicationContext reactAppContext) {
+    Scoped<JSEventReceiver> er = eventReceiver;
+    if (er == null || er.scope != scopeCounter) {
+      synchronized (this) {
+        er = eventReceiver;
+        if (er == null || er.scope != scopeCounter) {
+          if (reactAppContext == null) {
+            throw new IllegalStateException("cannot init eventReceiver without reactAppContext");
+          }
+          eventReceiver = er = new Scoped<>(new JSEventReceiver(reactAppContext), scopeCounter);
+        }
+      }
+    }
+    return er.val;
   }
 
   private JSEventDispatcher _eventDispatcher(LiteReactInstanceManager instMgr) {
