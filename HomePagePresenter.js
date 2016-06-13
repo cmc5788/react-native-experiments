@@ -1,8 +1,7 @@
 import {
   DeviceEventEmitter
 } from 'react-native';
-import Sender from './ViewEventSender';
-import Navigator from './MyNavigator';
+import nav from './MyNavigator';
 
 let buttonClickedSub;
 
@@ -12,20 +11,17 @@ const wait = (time) => new Promise((resolve) => {
   }, time);
 });
 
-const presenter = {
+const presenter = (tag, view) => ({
 
   buttonClicked(evt) {
     console.log('HomePagePresenter buttonClicked');
-    Sender.sendToView(
-        'HomePageView', { setButtonColor: '#0000FF' }) // BLUE
+    view.send({ setButtonColor: '#0000FF' }) // BLUE
       .then(() => wait(3000))
-      .then(() => Sender.sendToView(
-        'HomePageView', { setButtonColor: '#00FF00' })) // GREEN
+      .then(() => view.send({ setButtonColor: '#00FF00' })) // GREEN
       .then(() => wait(3000))
-      .then(() => Sender.sendToView(
-        'HomePageView', { setButtonColor: '#FF00FF' })) // MAGENTA
+      .then(() => view.send({ setButtonColor: '#FF00FF' })) // MAGENTA
       .then(() => wait(3000))
-      .then(() => Navigator.goBack());
+      .then(() => nav.goBack());
   },
 
   init() {
@@ -40,6 +36,6 @@ const presenter = {
     buttonClickedSub = null;
   }
 
-};
+});
 
 module.exports = presenter;

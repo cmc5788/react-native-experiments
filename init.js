@@ -14,6 +14,7 @@ module.exports = (appPresenter) =>
   render = () => React.createElement(MyAppRoot, { style: { flex: 1 } })
 
   componentWillMount = () => {
+
     DeviceEventEmitter.addListener('onAppInit', (evt) => {
       if (!appPresenter.emptyView) throw new Error('emptyView required.');
       Navigator.empty(appPresenter.emptyView);
@@ -33,7 +34,9 @@ module.exports = (appPresenter) =>
     DeviceEventEmitter.addListener('onInitView', (evt) => {
       if (appPresenter.viewPresenters) {
         if (appPresenter.viewPresenters[evt.tag]) {
-          activePresenters[evt.tag] = appPresenter.viewPresenters[evt.tag]();
+          activePresenters[evt.tag] =
+            appPresenter.viewPresenters[evt.tag]()(
+              evt.tag, require('./ViewEventSender')(evt.tag));
           activePresenters[evt.tag].init();
         }
       }
