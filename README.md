@@ -11,3 +11,7 @@ Experiment with making React Native apps more Native and less React.
 3. It would be nice to have a framework that's light on the React and heavy on the Native. It should utilize modern MVP architecture on the native side, facilitated by the JS only where necessary to bolster the architecture by sharing logic judiciously.
 
 4. That's it for now.
+
+## TODO
+
+1. So far, only the Android source contains anything but the React sample project. Polish up first pass at contracts on Android, then investigate iOS implementation.
