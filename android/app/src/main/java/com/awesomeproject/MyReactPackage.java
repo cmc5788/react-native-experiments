@@ -17,6 +17,9 @@ public class MyReactPackage implements ReactPackage {
 
   private void injectDepsWithReactContext(ReactApplicationContext reactContext) {
     MyInjector inject = MyApp.injector(reactContext);
+    if (navigator != null && !BuildConfig.DEBUG) {
+      throw new IllegalStateException("injectDepsWithReactContext called twice.");
+    }
     navigator = inject.navigatorFor(this, reactContext);
     eventReceiver = inject.eventReceiverFor(this, reactContext);
   }

@@ -1,6 +1,7 @@
 package com.awesomeproject;
 
 import android.os.Bundle;
+import android.util.Log;
 import com.facebook.react.LiteAppCompatReactActivity;
 import com.facebook.react.LiteReactInstanceManager;
 import com.facebook.react.ReactInstanceManager.ReactInstanceEventListener;
@@ -11,6 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends LiteAppCompatReactActivity implements UiInteractable {
+
+  public static final String TAG = "MainActivity";
 
   private MyReactPackage myReactPackage;
   private JSEventDispatcher myEventDispatcher;
@@ -70,9 +73,10 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   }
 
   @Override
-  public void onCreate(Bundle savedInstanceState) {
+  public void onCreate(Bundle savedState) {
+    Log.d(TAG, String.format("onCreate(%d) savedInstanceState=%s", hashCode(), savedState));
     beginNewScopeAndInjectReactPackage();
-    super.onCreate(savedInstanceState);
+    super.onCreate(savedState);
     reactInstanceManager.addReactInstanceEventListener(reactInstanceEventListener);
   }
 
@@ -80,9 +84,14 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
       reactInstanceEventListener = new ReactInstanceEventListener() {
     @Override
     public void onReactContextInitialized(ReactContext context) {
+      Log.d(TAG, String.format("onReactContextInitialized(%d)", MainActivity.this.hashCode()));
       if (!navigatorRestored) {
         myReactPackage.navigator().restore();
         navigatorRestored = true;
+      } else if (BuildConfig.DEBUG) {
+        android.os.Process.killProcess(android.os.Process.myPid());
+      } else {
+        throw new IllegalStateException("onReactContextInitialized called twice.");
       }
       myEventDispatcher.dispatch("onAppInit", null);
     }
@@ -90,6 +99,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
 
   @Override
   protected void onResume() {
+    Log.d(TAG, String.format("onResume(%d)", hashCode()));
     super.onResume();
     isPausedOrPausing = false;
     myEventDispatcher.dispatch("onAppResume", null);
@@ -97,6 +107,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
 
   @Override
   protected void onPause() {
+    Log.d(TAG, String.format("onPause(%d)", hashCode()));
     if (myReactPackage.navigatorReady() && navigatorRestored) {
       myReactPackage.navigator().save();
     }
@@ -107,12 +118,14 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
 
   @Override
   protected void onDestroy() {
+    Log.d(TAG, String.format("onDestroy(%d)", hashCode()));
     super.onDestroy();
     reactInstanceManager.removeReactInstanceEventListener(reactInstanceEventListener);
   }
 
   @Override
   public void onBackPressed() {
+    Log.d(TAG, String.format("onBackPressed(%d)", hashCode()));
     if (myReactPackage.navigatorReady() && navigatorRestored) {
       myReactPackage.navigator().goBack();
     }
