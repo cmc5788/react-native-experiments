@@ -72,7 +72,7 @@ public class MyAppRoot extends FrameLayout implements JSViewEventTarget {
     tv.setText("I am an empty root view.\nYou shouldn't see me.");
 
     navigator.setRoot(this);
-    eventReceiver.setViewEventReceiver(this);
+    eventReceiver.setViewEventTarget(this);
   }
 
   @Override

@@ -25,7 +25,7 @@ public class JSEventReceiver extends MyReactModule {
     super(reactContext);
   }
 
-  public void setViewEventReceiver(JSViewEventTarget viewEventTarget) {
+  public void setViewEventTarget(JSViewEventTarget viewEventTarget) {
     assertOnUiThread();
     this.viewEventTarget = viewEventTarget;
   }
