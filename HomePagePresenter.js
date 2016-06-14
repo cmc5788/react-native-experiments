@@ -1,9 +1,10 @@
+'use strict';
+
 import {
   DeviceEventEmitter
 } from 'react-native';
+import vp from './ViewPresenter';
 import nav from './MyNavigator';
-
-let buttonClickedSub;
 
 const wait = (time) => new Promise((resolve) => {
   setTimeout(() => {
@@ -11,9 +12,9 @@ const wait = (time) => new Promise((resolve) => {
   }, time);
 });
 
-const presenter = (tag, view) => ({
+module.exports = (tag, view) => vp((me) => ({
 
-  buttonClicked(evt) {
+  buttonClicked: (evt) => {
     console.log('HomePagePresenter buttonClicked');
     view.send({ setButtonColor: '#0000FF' }) // BLUE
       .then(() => wait(3000))
@@ -26,18 +27,16 @@ const presenter = (tag, view) => ({
         console.log(`goBack went back? ${JSON.stringify(wentBack)}`));
   },
 
-  init() {
+  init: () => {
     console.log('HomePagePresenter init');
-    buttonClickedSub = DeviceEventEmitter.addListener(
-      'HomePageView.ButtonClicked', this.buttonClicked);
+    me.buttonClickedSub = DeviceEventEmitter.addListener(
+      'HomePageView.ButtonClicked', me.buttonClicked);
   },
 
-  destroy() {
+  destroy: () => {
     console.log('HomePagePresenter destroy');
-    buttonClickedSub && buttonClickedSub.remove();
-    buttonClickedSub = null;
+    me.buttonClickedSub && me.buttonClickedSub.remove();
+    me.buttonClickedSub = null;
   }
 
-});
-
-module.exports = presenter;
+}));
