@@ -162,10 +162,22 @@ public class MyNavigator extends MyReactModule implements Navigator {
       return;
     }
 
-    stack.remove(stack.size() - 1);
+    String poppedTag = stack.remove(stack.size() - 1);
 
     if (stack.isEmpty()) {
-      activity.invokeDefaultOnBackPressed();
+      NavigableView oldTopView = findFirstNavigableView();
+      if (oldTopView != null && oldTopView.matchesNavTag(poppedTag)) {
+        dispatchDestroy(poppedTag);
+      }
+      handler().post(new Runnable() {
+        @Override
+        public void run() {
+          MainActivity activity = activity();
+          if (activity != null) {
+            activity.invokeDefaultOnBackPressed();
+          }
+        }
+      });
     } else {
       applyStack();
     }
@@ -294,16 +306,19 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
     root.addView(newTopView, -1, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
 
-    if (oldTopView != null) root.removeView((View) oldTopView);
-
     // Dispatch the event. TODO - need before and after anim events?
 
-    // TODO - onDestroyView event needs to be triggered from somewhere. Here?
+    dispatchInit(topTag);
 
-    WritableMap args = Arguments.createMap();
-    args.putString("tag", topTag);
-    eventDispatcher.dispatch("onInitView", args);
     Log.e(TAG, "APPLY STACK: " + Arrays.toString(stack.toArray()));
+
+    if (oldTopView != null) {
+      root.removeView((View) oldTopView);
+
+      // TODO - onDestroyView, does it make sense here?
+
+      dispatchDestroy(topTag);
+    }
   }
 
   @Nullable
@@ -315,5 +330,17 @@ public class MyNavigator extends MyReactModule implements Navigator {
       }
     }
     return null;
+  }
+
+  private void dispatchInit(String tag) {
+    WritableMap args = Arguments.createMap();
+    args.putString("tag", tag);
+    eventDispatcher.dispatch("onInitView", args);
+  }
+
+  private void dispatchDestroy(String tag) {
+    WritableMap args = Arguments.createMap();
+    args.putString("tag", tag);
+    eventDispatcher.dispatch("onDestroyView", args);
   }
 }
