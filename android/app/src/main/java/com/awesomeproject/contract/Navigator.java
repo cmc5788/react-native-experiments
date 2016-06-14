@@ -8,7 +8,7 @@ public interface Navigator {
 
   // TODO set(target, dir, meta)
 
-  void goBack();
+  boolean goBack();
 
   void save();
 

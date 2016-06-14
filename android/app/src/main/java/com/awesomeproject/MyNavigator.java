@@ -138,28 +138,28 @@ public class MyNavigator extends MyReactModule implements Navigator {
     applyStack();
   }
 
-  @Override
   @ReactMethod
-  public void goBack() {
+  public void goBack(final Promise p) {
     handler().post(new Runnable() {
       @Override
       public void run() {
-        _goBack();
+        p.resolve(goBack());
       }
     });
   }
 
-  /*package*/ void _goBack() {
+  @Override
+  public boolean goBack() {
     assertOnUiThread();
     MainActivity activity = activity();
     if (activity == null || !activity.isUiInteractable()) {
       Log.i(TAG, "Aborting goBack: activity dead, dying, or dormant.");
-      return;
+      return false;
     }
 
     if (stack.isEmpty()) {
       Log.i(TAG, "Aborting goBack: empty stack.");
-      return;
+      return false;
     }
 
     String poppedTag = stack.remove(stack.size() - 1);
@@ -178,14 +178,16 @@ public class MyNavigator extends MyReactModule implements Navigator {
           }
         }
       });
-    } else {
-      applyStack();
+      return false;
     }
+
+    applyStack();
+    return true;
   }
 
   @ReactMethod
   public void empty(final String tag) {
-    UiThreadUtil.runOnUiThread(new Runnable() {
+    handler().post(new Runnable() {
       @Override
       public void run() {
         _empty(tag);

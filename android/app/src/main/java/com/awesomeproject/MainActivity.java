@@ -114,7 +114,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   @Override
   public void onBackPressed() {
     if (myReactPackage.navigatorReady() && navigatorRestored) {
-      myReactPackage.navigator()._goBack();
+      myReactPackage.navigator().goBack();
     }
   }
 }

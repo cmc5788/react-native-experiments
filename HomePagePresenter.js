@@ -21,7 +21,9 @@ const presenter = (tag, view) => ({
       .then(() => wait(3000))
       .then(() => view.send({ setButtonColor: '#FF00FF' })) // MAGENTA
       .then(() => wait(3000))
-      .then(() => nav.goBack());
+      .then(() => nav.goBack())
+      .then((wentBack) =>
+        console.log(`goBack went back? ${JSON.stringify(wentBack)}`));
   },
 
   init() {
