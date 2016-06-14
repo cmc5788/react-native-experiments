@@ -37,6 +37,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
   // -------------------
 
+  // TODO - actually use these constants, or drop them if they prove to not be useful.
   private static final String TAG = "MyNavigator";
   private static final String FORWARD = "FORWARD";
   private static final String REPLACE = "REPLACE";
