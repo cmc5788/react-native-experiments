@@ -73,6 +73,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
   /*package*/ void setRoot(@NonNull ViewGroup root) {
     if (this.root != null) {
+      // TODO - safely bypasss this assert for debugging so React can hotload JS
       throw new IllegalStateException("must only set appRoot once.");
     }
     this.root = root;
