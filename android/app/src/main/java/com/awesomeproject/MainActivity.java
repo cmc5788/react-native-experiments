@@ -21,9 +21,9 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
     myReactPackage = inject.reactPackageFor(this);
   }
 
-  private void injectEventDispatcher() {
+  private void injectEventDispatcherWithInstanceManager(LiteReactInstanceManager instMgr) {
     MyInjector inject = MyApp.injector(this);
-    myEventDispatcher = inject.eventDispatcherFor(this, reactInstanceManager);
+    myEventDispatcher = inject.eventDispatcherFor(this, instMgr);
   }
 
   private LiteReactInstanceManager reactInstanceManager;
@@ -65,7 +65,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   @Override
   protected LiteReactInstanceManager createReactInstanceManager() {
     reactInstanceManager = super.createReactInstanceManager();
-    injectEventDispatcher();
+    injectEventDispatcherWithInstanceManager(reactInstanceManager);
     return reactInstanceManager;
   }
 
