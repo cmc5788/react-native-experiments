@@ -15,3 +15,5 @@ Experiment with making React Native apps more Native and less React.
 ## TODO
 
 1. So far, only the Android source contains anything but the React sample project. Polish up first pass at contracts on Android, then investigate iOS implementation.
+
+2. Obviously, need a lot of cleanup (re: naming). Everything at this stage is prototyped ad-hoc to get a working feel for the setup.
