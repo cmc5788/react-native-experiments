@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import MyAppRoot from './MyAppRoot';
 import Navigator from './MyNavigator';
+import BuildPresenter from './BuildPresenter';
 
 module.exports = (appPresenter) =>
   AppRegistry.registerComponent('MainComponent', () =>
@@ -34,9 +35,9 @@ module.exports = (appPresenter) =>
     DeviceEventEmitter.addListener('onInitView', (evt) => {
       if (appPresenter.viewPresenters) {
         if (appPresenter.viewPresenters[evt.tag]) {
-          activePresenters[evt.tag] =
-            appPresenter.viewPresenters[evt.tag]()(
-              evt.tag, require('./ViewEventSender')(evt.tag));
+          const presenterCtor = appPresenter.viewPresenters[evt.tag]();
+          activePresenters[evt.tag] = BuildPresenter(
+            presenterCtor, evt.tag, require('./ViewEventSender')(evt.tag));
           activePresenters[evt.tag].init();
         }
       }

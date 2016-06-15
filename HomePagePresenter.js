@@ -3,7 +3,6 @@
 import {
   DeviceEventEmitter
 } from 'react-native';
-import vp from './ViewPresenter';
 import nav from './MyNavigator';
 
 const wait = (time) => new Promise((resolve) => {
@@ -12,31 +11,33 @@ const wait = (time) => new Promise((resolve) => {
   }, time);
 });
 
-module.exports = (tag, view) => vp((me) => ({
+function HomePagePresenter() {
 
-  buttonClicked: (evt) => {
+  this.buttonClicked = (evt) => {
     console.log('HomePagePresenter buttonClicked');
-    view.send({ setButtonColor: '#0000FF' }) // BLUE
+    this.view.send({ setButtonColor: '#0000FF' }) // BLUE
       .then(() => wait(3000))
-      .then(() => view.send({ setButtonColor: '#00FF00' })) // GREEN
+      .then(() => this.view.send({ setButtonColor: '#00FF00' })) // GREEN
       .then(() => wait(3000))
-      .then(() => view.send({ setButtonColor: '#FF00FF' })) // MAGENTA
+      .then(() => this.view.send({ setButtonColor: '#FF00FF' })) // MAGENTA
       .then(() => wait(3000))
       .then(() => nav.goBack())
       .then((wentBack) =>
         console.log(`goBack went back? ${JSON.stringify(wentBack)}`));
-  },
+  };
 
-  init: () => {
+  this.init = () => {
     console.log('HomePagePresenter init');
-    me.buttonClickedSub = DeviceEventEmitter.addListener(
-      'HomePageView.ButtonClicked', me.buttonClicked);
-  },
+    this.buttonClickedSub = DeviceEventEmitter.addListener(
+      'HomePageView.ButtonClicked', this.buttonClicked);
+  };
 
-  destroy: () => {
+  this.destroy = () => {
     console.log('HomePagePresenter destroy');
-    me.buttonClickedSub && me.buttonClickedSub.remove();
-    me.buttonClickedSub = null;
+    this.buttonClickedSub && console.log('HomePagePresenter remove sub');
+    this.buttonClickedSub && this.buttonClickedSub.remove();
+    this.buttonClickedSub = null;
   }
+}
 
-}));
+module.exports = HomePagePresenter;
