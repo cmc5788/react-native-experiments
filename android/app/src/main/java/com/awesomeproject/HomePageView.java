@@ -16,6 +16,7 @@ import com.awesomeproject.MyNavigator.NavigableView;
 import com.awesomeproject.MyNavigator.ViewFactory;
 import com.awesomeproject.layout.FrameLayouts;
 import com.awesomeproject.layout.LinearLayouts;
+import com.awesomeproject.layout.Spaces;
 import com.awesomeproject.layout.TextViews;
 import com.facebook.react.bridge.ReadableMap;
 
@@ -56,7 +57,7 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
   }
 
   // -----
-  // BOILERPLATE
+  // BOILERPLATE ... stuff we can abstract away later
 
   public HomePageView(Context context) {
     super(context);
@@ -86,49 +87,8 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
 
   private void init() {
     setId(ID);
-
     injectDeps();
-
-    setBackgroundColor(Color.WHITE);
-
-    /*
-    <FrameLayout
-      layout_width=match
-      layout_height=match
-      >
-      <TextView
-       @+id=asdasd
-      layout_width=wrap
-      layout_height=wrap
-      layout_gravity=center
-       text=blahblah
-       onclick=blah
-      />
-    </FrameLayout>
-     */
-
-    FrameLayouts.builder() //
-        .layoutParams(FrameLayouts.params().matchParent())
-
-        .child(LinearLayouts.builder()
-            .layoutParams(FrameLayouts.params().matchParent())
-            .orientation(VERTICAL)
-            .gravity(CENTER)
-
-            .child(TextViews.builder()
-                .id(R.id.home_page_text_id)
-                .layoutParams(LinearLayouts.params().wrapContent())
-                .text("I am the Home Page")
-                .onClick(onBtnClick))
-            .endChild()
-
-            .child(TextViews.builder()
-                .layoutParams(LinearLayouts.params().wrapContent())
-                .text("I am just some text"))
-            .endChild())
-
-        .endChild() //
-        .applyOnto(this);
+    buildLayout();
   }
 
   @Override
@@ -154,6 +114,45 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
 
   // -----
   // REAL CODE ... ?
+
+  private void buildLayout() {
+    FrameLayouts.build() //
+        .layoutParams(FrameLayouts.params().matchParent()) //
+        .bgColorInt(Color.WHITE)
+
+        .child(LinearLayouts.build()
+            .layoutParams(FrameLayouts.params().matchParent())
+            .orientation(VERTICAL)
+            .gravity(CENTER)
+
+            .child(Spaces.buildVertSpace(1)) //
+
+            .child(TextViews.build()
+                .id(R.id.home_page_text_id)
+                .layoutParams(LinearLayouts.params().wrapContent())
+                .text("I am the Home Page")
+                .onClick(onBtnClick) //
+            ) //
+
+            .child(Spaces.buildVertSpace(1)) //
+
+            .child(TextViews.build()
+                .layoutParams(LinearLayouts.params().wrapContent())
+                .text("I am just some text") //
+            ) //
+
+            .child(Spaces.buildVertSpace(1)) //
+
+            .child(TextViews.build()
+                .layoutParams(LinearLayouts.params().wrapContent())
+                .text("I am just some more text") //
+            ) //
+
+            .child(Spaces.buildVertSpace(1)) //
+        )
+
+        .applyOnto(this);
+  }
 
   private final OnClickListener onBtnClick = new OnClickListener() {
     @Override

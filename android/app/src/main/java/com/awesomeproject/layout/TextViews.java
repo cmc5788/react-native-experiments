@@ -2,7 +2,7 @@ package com.awesomeproject.layout;
 
 public final class TextViews {
 
-  public static TextViewBuilder builder() {
+  public static TextViewBuilder build() {
     return new TextViewBuilder();
   }
 }

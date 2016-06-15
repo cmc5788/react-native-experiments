@@ -2,7 +2,7 @@ package com.awesomeproject.layout;
 
 public final class LinearLayouts {
 
-  public static LinearLayoutBuilder builder() {
+  public static LinearLayoutBuilder build() {
     return new LinearLayoutBuilder();
   }
 

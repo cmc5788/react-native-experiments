@@ -171,7 +171,7 @@ public abstract class LiteReactInstanceManager extends ReactInstanceManager {
       }
 
       return new LiteReactInstanceManagerImpl(Assertions.assertNotNull(mApplication,
-          "Application property has not been set with this builder"), mCurrentActivity,
+          "Application property has not been set with this build"), mCurrentActivity,
           mDefaultHardwareBackBtnHandler, mJSBundleFile, mJSMainModuleName, mPackages,
           mUseDeveloperSupport, mBridgeIdleDebugListener,
           Assertions.assertNotNull(mInitialLifecycleState, "Initial lifecycle state was not set"),

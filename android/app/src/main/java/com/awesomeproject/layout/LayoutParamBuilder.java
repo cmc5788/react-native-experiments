@@ -9,11 +9,17 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public abstract class LayoutParamBuilder< //
     LPB extends LayoutParamBuilder, LP extends ViewGroup.LayoutParams> {
 
+  private static final int NO_DIM = Integer.MIN_VALUE;
+
   private LP lps;
 
   @NonNull
   protected LP lps() {
-    if (lps == null) lps = createEmptyLayoutParams();
+    if (lps == null) {
+      lps = createEmptyLayoutParams();
+      lps.width = NO_DIM;
+      lps.height = NO_DIM;
+    }
     return lps;
   }
 
@@ -62,7 +68,7 @@ public abstract class LayoutParamBuilder< //
 
   @NonNull
   public LP build() {
-    if (lps().width == 0 || lps().height == 0) {
+    if (lps().width == NO_DIM || lps().height == NO_DIM) {
       throw new IllegalArgumentException("Requires width and height.");
     }
     return lps();

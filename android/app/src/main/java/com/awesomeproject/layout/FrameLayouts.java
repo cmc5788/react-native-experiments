@@ -2,7 +2,7 @@ package com.awesomeproject.layout;
 
 public final class FrameLayouts {
 
-  public static FrameLayoutBuilder builder() {
+  public static FrameLayoutBuilder build() {
     return new FrameLayoutBuilder();
   }
 

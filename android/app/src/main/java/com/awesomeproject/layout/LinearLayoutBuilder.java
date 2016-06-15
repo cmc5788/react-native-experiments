@@ -21,7 +21,7 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
       return this;
     }
 
-    public LinearLayoutParamBuilder weight(int w) {
+    public LinearLayoutParamBuilder weight(float w) {
       lps().weight = w;
       return this;
     }

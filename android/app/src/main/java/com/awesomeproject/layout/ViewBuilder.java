@@ -1,5 +1,8 @@
 package com.awesomeproject.layout;
 
+import android.content.res.Resources;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -11,7 +14,12 @@ public abstract class ViewBuilder<VB extends ViewBuilder, V extends View> {
 
   private LayoutParamBuilder lpb;
   private List<ViewBuilder> children;
+
   private int id = View.NO_ID;
+
+  private int bgColorResId = View.NO_ID;
+  private int bgColorInt = Integer.MIN_VALUE;
+
   private View.OnClickListener onClick;
 
   @NonNull
@@ -29,14 +37,20 @@ public abstract class ViewBuilder<VB extends ViewBuilder, V extends View> {
     return (VB) this;
   }
 
-  public VB endChild() {
-    // no-op, just for prettiness
+  public VB id(@IdRes int id) {
+    this.id = id;
     //noinspection unchecked
     return (VB) this;
   }
 
-  public VB id(@IdRes int id) {
-    this.id = id;
+  public VB bgColor(@ColorRes int bgColorResId) {
+    this.bgColorResId = bgColorResId;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB bgColorInt(@ColorInt int bgColorInt) {
+    this.bgColorInt = bgColorInt;
     //noinspection unchecked
     return (VB) this;
   }
@@ -51,10 +65,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder, V extends View> {
     if (lpb == null) throw reqArg("layout params");
 
     V v = createView(root);
-
-    if (id != View.NO_ID) v.setId(id);
-
-    if (onClick != null) v.setOnClickListener(onClick);
+    applyProps(v);
 
     boolean isViewGroup = (v instanceof ViewGroup);
 
@@ -77,17 +88,32 @@ public abstract class ViewBuilder<VB extends ViewBuilder, V extends View> {
   public void applyOnto(V v) {
     if (!(v instanceof ViewGroup)) throw reqArg("applyOnto: ViewGroup");
     if (lpb == null) throw reqArg("layout params");
+
     ViewGroup vg = (ViewGroup) v;
-
-    if (id != View.NO_ID) vg.setId(id);
-
-    if (onClick != null) vg.setOnClickListener(onClick);
+    applyProps(v);
 
     for (ViewBuilder child : children) {
       child.buildInto(vg);
     }
 
     vg.setLayoutParams(lpb.build());
+  }
+
+  @SuppressWarnings("deprecation")
+  private void applyProps(View v) {
+    Resources res = v.getResources();
+
+    if (id != View.NO_ID) v.setId(id);
+
+    if (bgColorResId != View.NO_ID) {
+      v.setBackgroundColor(res.getColor(bgColorResId));
+    } else if (bgColorInt != Integer.MIN_VALUE) {
+      v.setBackgroundColor(bgColorInt);
+    }
+
+    if (onClick != null) {
+      v.setOnClickListener(onClick);
+    }
   }
 
   private List<ViewBuilder> children() {
