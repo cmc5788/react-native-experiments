@@ -3,5 +3,7 @@
   <item type="id"
       name="initial_app_root_id"/>
   <item type="id"
-      name="initial_home_page_view_id"/>
+      name="home_page_view_id"/>
+  <item type="id"
+      name="home_page_text_id"/>
 </resources>

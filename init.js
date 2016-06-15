@@ -6,6 +6,7 @@ import {
 import MyAppRoot from './MyAppRoot';
 import Navigator from './MyNavigator';
 import BuildPresenter from './BuildPresenter';
+import ViewEventSender from './ViewEventSender';
 
 module.exports = (appPresenter) =>
   AppRegistry.registerComponent('MainComponent', () =>
@@ -37,7 +38,7 @@ module.exports = (appPresenter) =>
         if (appPresenter.viewPresenters[evt.tag]) {
           const presenterCtor = appPresenter.viewPresenters[evt.tag]();
           activePresenters[evt.tag] = BuildPresenter(
-            presenterCtor, evt.tag, require('./ViewEventSender')(evt.tag));
+            presenterCtor, evt.tag, ViewEventSender(evt.tag));
           activePresenters[evt.tag].init();
         }
       }

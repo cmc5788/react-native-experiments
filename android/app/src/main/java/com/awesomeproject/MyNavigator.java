@@ -13,6 +13,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
@@ -219,6 +220,19 @@ public class MyNavigator extends MyReactModule implements Navigator {
       @Override
       public void run() {
         p.resolve(Arguments.fromArray(stack.toArray(new String[stack.size()])));
+      }
+    });
+  }
+
+  // TODO - just testing, remove this.
+  @ReactMethod
+  public void recvJson(final ReadableMap json, final Promise p) {
+    handler().post(new Runnable() {
+      @Override
+      public void run() {
+        Log.e(TAG, "Got JSON from JS: servicesDisabled = " +
+            json.getMap("APP").getBoolean("servicesDisabled"));
+        p.resolve(null);
       }
     });
   }
