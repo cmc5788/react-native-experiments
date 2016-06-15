@@ -8,16 +8,16 @@ import android.widget.TextView;
 
 public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView> {
 
-  private CharSequence text;
-  @StringRes private int textResId = View.NO_ID;
+  private CharSequence textCharSeq;
+  @StringRes private int text = View.NO_ID;
 
-  public TextViewBuilder text(CharSequence text) {
+  public TextViewBuilder text(@StringRes int text) {
     this.text = text;
     return this;
   }
 
-  public TextViewBuilder text(@StringRes int textResId) {
-    this.textResId = textResId;
+  public TextViewBuilder text(CharSequence textCharSeq) {
+    this.textCharSeq = textCharSeq;
     return this;
   }
 
@@ -25,10 +25,10 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView> {
   @Override
   protected TextView createView(ViewGroup root) {
     TextView tv = new TextView(root.getContext());
-    if (text != null) {
+    if (text != View.NO_ID) {
       tv.setText(text);
-    } else if (textResId != View.NO_ID) {
-      tv.setText(textResId);
+    } else if (textCharSeq != null) {
+      tv.setText(textCharSeq);
     }
     return tv;
   }

@@ -13,7 +13,7 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
     @NonNull
     @Override
     protected LinearLayout.LayoutParams createEmptyLayoutParams() {
-      return new LinearLayout.LayoutParams(0, 0);
+      return new LinearLayout.LayoutParams(EMPTY, EMPTY);
     }
 
     public LinearLayoutParamBuilder gravity(int g) {

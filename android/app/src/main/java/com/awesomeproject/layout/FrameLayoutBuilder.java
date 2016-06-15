@@ -12,7 +12,7 @@ public class FrameLayoutBuilder extends ViewBuilder<FrameLayoutBuilder, FrameLay
     @NonNull
     @Override
     protected FrameLayout.LayoutParams createEmptyLayoutParams() {
-      return new FrameLayout.LayoutParams(0, 0);
+      return new FrameLayout.LayoutParams(EMPTY, EMPTY);
     }
 
     public FrameLayoutParamBuilder gravity(int g) {

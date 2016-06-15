@@ -20,8 +20,10 @@ import com.awesomeproject.layout.Spaces;
 import com.awesomeproject.layout.TextViews;
 import com.facebook.react.bridge.ReadableMap;
 
+import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
 import static android.widget.LinearLayout.VERTICAL;
+import static com.awesomeproject.R.id.home_page_text_id;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class HomePageView extends FrameLayout implements NavigableView, JSViewEventTarget {
@@ -118,37 +120,37 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
   private void buildLayout() {
     FrameLayouts.build() //
         .layoutParams(FrameLayouts.params().matchParent()) //
-        .bgColorInt(Color.WHITE)
+        .bgColorInt(WHITE)
 
         .child(LinearLayouts.build()
             .layoutParams(FrameLayouts.params().matchParent())
             .orientation(VERTICAL)
             .gravity(CENTER)
 
-            .child(Spaces.buildVertSpace(1)) //
+            .child(Spaces.buildVSpace(1)) //
 
             .child(TextViews.build()
-                .id(R.id.home_page_text_id)
+                .id(home_page_text_id)
                 .layoutParams(LinearLayouts.params().wrapContent())
                 .text("I am the Home Page")
                 .onClick(onBtnClick) //
             ) //
 
-            .child(Spaces.buildVertSpace(1)) //
+            .child(Spaces.buildVSpace(1)) //
 
             .child(TextViews.build()
                 .layoutParams(LinearLayouts.params().wrapContent())
                 .text("I am just some text") //
             ) //
 
-            .child(Spaces.buildVertSpace(1)) //
+            .child(Spaces.buildVSpace(1)) //
 
             .child(TextViews.build()
                 .layoutParams(LinearLayouts.params().wrapContent())
                 .text("I am just some more text") //
             ) //
 
-            .child(Spaces.buildVertSpace(1)) //
+            .child(Spaces.buildVSpace(1)) //
         )
 
         .applyOnto(this);
@@ -162,6 +164,6 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
   };
 
   private void setBtnColor(@ColorInt int color) {
-    findViewById(R.id.home_page_text_id).setBackgroundColor(color);
+    findViewById(home_page_text_id).setBackgroundColor(color);
   }
 }
