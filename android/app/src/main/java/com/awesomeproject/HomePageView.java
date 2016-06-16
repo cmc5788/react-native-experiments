@@ -24,6 +24,7 @@ import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
 import static android.widget.LinearLayout.VERTICAL;
 import static com.awesomeproject.R.id.home_page_text_id;
+import static com.awesomeproject.R.id.home_page_view_id;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class HomePageView extends FrameLayout implements NavigableView, JSViewEventTarget {
@@ -33,7 +34,7 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
 
   public static final String TAG = "HomePageView";
 
-  public static final int ID = R.id.home_page_view_id;
+  public static final int ID = home_page_view_id;
 
   private static class FactoryHolder {
     private static final ViewFactory<HomePageView> FACTORY = new ViewFactory<HomePageView>() {

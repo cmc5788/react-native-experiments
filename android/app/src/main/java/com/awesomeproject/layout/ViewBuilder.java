@@ -75,10 +75,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder, V extends View> {
     }
 
     if (isViewGroup) {
-      ViewGroup vg = (ViewGroup) v;
-      for (ViewBuilder child : children) {
-        child.buildInto(vg);
-      }
+      buildChildren((ViewGroup) v);
     }
 
     root.addView(v);
@@ -92,9 +89,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder, V extends View> {
     ViewGroup vg = (ViewGroup) v;
     applyProps(v);
 
-    for (ViewBuilder child : children) {
-      child.buildInto(vg);
-    }
+    buildChildren(vg);
 
     vg.setLayoutParams(lpb.build());
   }
@@ -113,6 +108,12 @@ public abstract class ViewBuilder<VB extends ViewBuilder, V extends View> {
 
     if (onClick != null) {
       v.setOnClickListener(onClick);
+    }
+  }
+
+  private void buildChildren(ViewGroup vg) {
+    for (ViewBuilder child : children) {
+      child.buildInto(vg);
     }
   }
 
