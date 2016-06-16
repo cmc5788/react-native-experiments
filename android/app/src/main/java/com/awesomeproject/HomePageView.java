@@ -17,7 +17,6 @@ import com.awesomeproject.MyNavigator.ViewFactory;
 import com.awesomeproject.layout.CustomTextView;
 import com.awesomeproject.layout.FrameLayouts;
 import com.awesomeproject.layout.LinearLayouts;
-import com.awesomeproject.layout.Spaces;
 import com.awesomeproject.layout.TextViews;
 import com.facebook.react.bridge.ReadableMap;
 
@@ -131,7 +130,7 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
             .orientation(VERTICAL)
             .gravity(CENTER)
 
-            .child(Spaces.buildVSpace(1)) //
+            .child(LinearLayouts.vSpace(1)) //
 
             .child(TextViews.build()
                 .id(home_page_text_id)
@@ -140,28 +139,28 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
                 .onClick(onBtnClick) //
             ) //
 
-            .child(Spaces.buildVSpace(1)) //
+            .child(LinearLayouts.vSpace(1)) //
 
             .child(TextViews.build()
                 .layoutParams(LinearLayouts.params().wrapContent())
                 .text("I am just some text") //
             ) //
 
-            .child(Spaces.buildVSpace(1)) //
+            .child(LinearLayouts.vSpace(1)) //
 
             .child(LinearLayouts.build()
                 .layoutParams(LinearLayouts.params().matchWidth())
                 .orientation(HORIZONTAL)
                 .gravity(CENTER)
 
-                .child(Spaces.buildHSpace(1)) //
+                .child(LinearLayouts.hSpace(1)) //
 
                 .child(TextViews.build()
                     .layoutParams(LinearLayouts.params().wrapContent())
                     .text("COL1") //
                 ) //
 
-                .child(Spaces.buildHSpace(1.5f)) //
+                .child(LinearLayouts.hSpace(1.5f)) //
 
                 .child(CustomTextView.build()
                     .layoutParams(LinearLayouts.params().wrapContent())
@@ -169,17 +168,17 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
                     .text("COL2") //
                 ) //
 
-                .child(Spaces.buildHSpace(1.5f)) //
+                .child(LinearLayouts.hSpace(1.5f)) //
 
                 .child(TextViews.build()
                     .layoutParams(LinearLayouts.params().wrapContent())
                     .text("COL3") //
                 ) //
 
-                .child(Spaces.buildHSpace(1)) //
+                .child(LinearLayouts.hSpace(1)) //
             )
 
-            .child(Spaces.buildVSpace(1)) //
+            .child(LinearLayouts.vSpace(1)) //
         )
 
         .applyOnto(this);

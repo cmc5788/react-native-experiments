@@ -29,10 +29,8 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   private List<ViewBuilder> children;
 
   private int id = View.NO_ID;
-
   private int bgColorResId = View.NO_ID;
   private int bgColorInt = Integer.MIN_VALUE;
-
   private View.OnClickListener onClick;
 
   private Map<String, Prop<? super V, ?>> props;

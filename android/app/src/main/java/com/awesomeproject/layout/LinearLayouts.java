@@ -12,6 +12,16 @@ public final class LinearLayouts {
     return new LinearLayoutBuilder();
   }
 
+  public static SpaceBuilder vSpace(float weight) {
+    return new SpaceBuilder().layoutParams(
+        LinearLayouts.params().height(0).width(1).weight(weight));
+  }
+
+  public static SpaceBuilder hSpace(float weight) {
+    return new SpaceBuilder().layoutParams(
+        LinearLayouts.params().height(1).width(0).weight(weight));
+  }
+
   public static LinearLayoutBuilder.LinearLayoutParamBuilder params() {
     return new LinearLayoutBuilder.LinearLayoutParamBuilder();
   }
