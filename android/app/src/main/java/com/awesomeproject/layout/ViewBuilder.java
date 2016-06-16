@@ -221,8 +221,8 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       buildChildren((ViewGroup) v);
     }
 
-    root.addView(v);
     v.setLayoutParams(lpb.build());
+    root.addView(v);
   }
 
   public void applyOnto(V v) {

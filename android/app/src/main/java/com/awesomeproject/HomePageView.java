@@ -15,7 +15,6 @@ import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
 import com.awesomeproject.MyNavigator.NavigableView;
 import com.awesomeproject.MyNavigator.ViewFactory;
 import com.awesomeproject.layout.CustomTextView;
-import com.awesomeproject.layout.FrameLayouts;
 import com.awesomeproject.layout.LinearLayouts;
 import com.awesomeproject.layout.ScrollViews;
 import com.awesomeproject.layout.TextViews;
@@ -27,6 +26,7 @@ import static android.widget.LinearLayout.HORIZONTAL;
 import static android.widget.LinearLayout.VERTICAL;
 import static com.awesomeproject.R.id.home_page_text_id;
 import static com.awesomeproject.R.id.home_page_view_id;
+import static com.awesomeproject.layout.ViewGroups.baseParams;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class HomePageView extends ScrollView implements NavigableView, JSViewEventTarget {
@@ -124,27 +124,30 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
   private void buildLayout() {
     // @formatter:off
     ScrollViews.build()
-        .layoutParams(FrameLayouts.params().matchParent())
+        .layoutParams(baseParams().matchParent())
         .fillViewport(true)
         .bgColorInt(WHITE)
 
-        .child(LinearLayouts.build()
-            .layoutParams(ScrollViews.params().matchParent())
+        .child(
+            LinearLayouts.build()
+            .layoutParams(baseParams().matchParent())
             .orientation(VERTICAL)
             .gravity(CENTER)
 
             .child(LinearLayouts.vSpace(1))
 
-            .child(TextViews.build()
-                .layoutParams(LinearLayouts.params().wrapContent())
+            .child(
+                TextViews.build()
+                .layoutParams(baseParams().wrapContent())
                 .text("I am the Home Page")
             )
 
             .child(LinearLayouts.vSpace(1))
 
-            .child(TextViews.build()
+            .child(
+                TextViews.build()
                 .id(home_page_text_id)
-                .layoutParams(LinearLayouts.params().wrapContent())
+                .layoutParams(baseParams().wrapContent())
                 .vPaddingDp(14).hPaddingDp(10)
                 .bgColorInt(Color.LTGRAY)
                 .text("I am just some text")
@@ -153,30 +156,34 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
 
             .child(LinearLayouts.vSpace(1))
 
-            .child(LinearLayouts.build()
-                .layoutParams(LinearLayouts.params().matchWidth())
+            .child(
+                LinearLayouts.build()
+                .layoutParams(baseParams().matchWidth())
                 .orientation(HORIZONTAL)
                 .gravity(CENTER)
 
                 .child(LinearLayouts.hSpace(1))
 
-                .child(TextViews.build()
-                    .layoutParams(LinearLayouts.params().wrapContent())
+                .child(
+                    TextViews.build()
+                    .layoutParams(baseParams().wrapContent())
                     .text("COL1")
                 )
 
                 .child(LinearLayouts.hSpace(1.5f))
 
-                .child(CustomTextView.build()
-                    .layoutParams(LinearLayouts.params().wrapContent())
+                .child(
+                    CustomTextView.build()
+                    .layoutParams(baseParams().wrapContent())
                     .textClr(Color.GREEN)
                     .text("COL2")
                 )
 
                 .child(LinearLayouts.hSpace(1.5f))
 
-                .child(TextViews.build()
-                    .layoutParams(LinearLayouts.params().wrapContent())
+                .child(
+                    TextViews.build()
+                    .layoutParams(baseParams().wrapContent())
                     .text("COL3")
                 )
 
