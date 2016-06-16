@@ -1,11 +1,51 @@
 package com.awesomeproject.layout;
 
 import android.support.annotation.NonNull;
-import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, LinearLayout> {
+public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, LinearLayout>
+    implements LinearLayouts.LinearLayoutProps<LinearLayoutBuilder> {
+
+  public static final class OrientationProp extends Prop<LinearLayout, Integer> {
+    public static final String NAME = "ORIENTATION";
+
+    @NonNull
+    @Override
+    public String name() {
+      return NAME;
+    }
+
+    @Override
+    public void set(Integer val) {
+      this.val = val;
+    }
+
+    @Override
+    public void apply(@NonNull LinearLayout ll) {
+      if (val != null) ll.setOrientation(val);
+    }
+  }
+
+  public static final class GravityProp extends Prop<LinearLayout, Integer> {
+    public static final String NAME = "GRAVITY";
+
+    @NonNull
+    @Override
+    public String name() {
+      return NAME;
+    }
+
+    @Override
+    public void set(Integer val) {
+      this.val = val;
+    }
+
+    @Override
+    public void apply(@NonNull LinearLayout ll) {
+      if (val != null) ll.setGravity(val);
+    }
+  }
 
   public static class LinearLayoutParamBuilder
       extends LayoutParamBuilder<LinearLayoutParamBuilder, LinearLayout.LayoutParams> {
@@ -27,25 +67,24 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
     }
   }
 
-  private int orientation = LinearLayout.HORIZONTAL;
-  private int gravity = Gravity.NO_GRAVITY;
+  public LinearLayoutBuilder() {
+    regProp(new OrientationProp());
+    regProp(new GravityProp());
+  }
 
   public LinearLayoutBuilder orientation(int orientation) {
-    this.orientation = orientation;
+    setProp(OrientationProp.NAME, orientation);
     return this;
   }
 
   public LinearLayoutBuilder gravity(int gravity) {
-    this.gravity = gravity;
+    setProp(GravityProp.NAME, gravity);
     return this;
   }
 
   @NonNull
   @Override
   protected LinearLayout createView(ViewGroup root) {
-    LinearLayout ll = new LinearLayout(root.getContext());
-    ll.setOrientation(orientation);
-    ll.setGravity(gravity);
-    return ll;
+    return new LinearLayout(root.getContext());
   }
 }

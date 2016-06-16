@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
 import com.awesomeproject.MyNavigator.NavigableView;
 import com.awesomeproject.MyNavigator.ViewFactory;
+import com.awesomeproject.layout.CustomTextView;
 import com.awesomeproject.layout.FrameLayouts;
 import com.awesomeproject.layout.LinearLayouts;
 import com.awesomeproject.layout.Spaces;
@@ -162,9 +163,10 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
 
                 .child(Spaces.buildHSpace(1.5f)) //
 
-                .child(TextViews.build()
+                .child(CustomTextView.build()
                     .layoutParams(LinearLayouts.params().wrapContent())
-                    .text("COL3") //
+                    .textClr(Color.GREEN) //
+                    .text("COL2") //
                 ) //
 
                 .child(Spaces.buildHSpace(1.5f)) //
