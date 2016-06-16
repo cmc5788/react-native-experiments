@@ -37,6 +37,14 @@ public abstract class ViewBuilder<VB extends ViewBuilder, V extends View> {
     return (VB) this;
   }
 
+  public VB children(ViewBuilder... children) {
+    for (ViewBuilder child : children) {
+      children().add(child);
+    }
+    //noinspection unchecked
+    return (VB) this;
+  }
+
   public VB id(@IdRes int id) {
     this.id = id;
     //noinspection unchecked

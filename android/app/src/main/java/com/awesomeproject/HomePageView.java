@@ -22,6 +22,7 @@ import com.facebook.react.bridge.ReadableMap;
 
 import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
+import static android.widget.LinearLayout.HORIZONTAL;
 import static android.widget.LinearLayout.VERTICAL;
 import static com.awesomeproject.R.id.home_page_text_id;
 import static com.awesomeproject.R.id.home_page_view_id;
@@ -146,10 +147,34 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
 
             .child(Spaces.buildVSpace(1)) //
 
-            .child(TextViews.build()
-                .layoutParams(LinearLayouts.params().wrapContent())
-                .text("I am just some more text") //
-            ) //
+            .child(LinearLayouts.build()
+                .layoutParams(LinearLayouts.params().matchWidth())
+                .orientation(HORIZONTAL)
+                .gravity(CENTER)
+
+                .child(Spaces.buildHSpace(1)) //
+
+                .child(TextViews.build()
+                    .layoutParams(LinearLayouts.params().wrapContent())
+                    .text("COL1") //
+                ) //
+
+                .child(Spaces.buildHSpace(1.5f)) //
+
+                .child(TextViews.build()
+                    .layoutParams(LinearLayouts.params().wrapContent())
+                    .text("COL3") //
+                ) //
+
+                .child(Spaces.buildHSpace(1.5f)) //
+
+                .child(TextViews.build()
+                    .layoutParams(LinearLayouts.params().wrapContent())
+                    .text("COL3") //
+                ) //
+
+                .child(Spaces.buildHSpace(1)) //
+            )
 
             .child(Spaces.buildVSpace(1)) //
         )

@@ -66,6 +66,20 @@ public abstract class LayoutParamBuilder< //
     return (LPB) this;
   }
 
+  public LPB matchWidth() {
+    lps().width = MATCH_PARENT;
+    lps().height = WRAP_CONTENT;
+    //noinspection unchecked
+    return (LPB) this;
+  }
+
+  public LPB matchHeight() {
+    lps().width = WRAP_CONTENT;
+    lps().height = MATCH_PARENT;
+    //noinspection unchecked
+    return (LPB) this;
+  }
+
   @NonNull
   public LP build() {
     if (lps().width == EMPTY || lps().height == EMPTY) {
