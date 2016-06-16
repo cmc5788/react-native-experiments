@@ -122,9 +122,10 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
   // REAL CODE ... ?
 
   private void buildLayout() {
-    ScrollViews.build() //
-        .layoutParams(FrameLayouts.params().matchParent()) //
-        .fillViewport(true) //
+    // @formatter:off
+    ScrollViews.build()
+        .layoutParams(FrameLayouts.params().matchParent())
+        .fillViewport(true)
         .bgColorInt(WHITE)
 
         .child(LinearLayouts.build()
@@ -132,58 +133,61 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
             .orientation(VERTICAL)
             .gravity(CENTER)
 
-            .child(LinearLayouts.vSpace(1)) //
+            .child(LinearLayouts.vSpace(1))
+
+            .child(TextViews.build()
+                .layoutParams(LinearLayouts.params().wrapContent())
+                .text("I am the Home Page")
+            )
+
+            .child(LinearLayouts.vSpace(1))
 
             .child(TextViews.build()
                 .id(home_page_text_id)
                 .layoutParams(LinearLayouts.params().wrapContent())
-                .text("I am the Home Page")
-                .onClick(onBtnClick) //
-            ) //
+                .vPaddingDp(14).hPaddingDp(10)
+                .bgColorInt(Color.LTGRAY)
+                .text("I am just some text")
+                .onClick(onBtnClick)
+            )
 
-            .child(LinearLayouts.vSpace(1)) //
-
-            .child(TextViews.build()
-                .layoutParams(LinearLayouts.params().wrapContent())
-                .text("I am just some text") //
-            ) //
-
-            .child(LinearLayouts.vSpace(1)) //
+            .child(LinearLayouts.vSpace(1))
 
             .child(LinearLayouts.build()
                 .layoutParams(LinearLayouts.params().matchWidth())
                 .orientation(HORIZONTAL)
                 .gravity(CENTER)
 
-                .child(LinearLayouts.hSpace(1)) //
+                .child(LinearLayouts.hSpace(1))
 
                 .child(TextViews.build()
                     .layoutParams(LinearLayouts.params().wrapContent())
-                    .text("COL1") //
-                ) //
+                    .text("COL1")
+                )
 
-                .child(LinearLayouts.hSpace(1.5f)) //
+                .child(LinearLayouts.hSpace(1.5f))
 
                 .child(CustomTextView.build()
                     .layoutParams(LinearLayouts.params().wrapContent())
-                    .textClr(Color.GREEN) //
-                    .text("COL2") //
-                ) //
+                    .textClr(Color.GREEN)
+                    .text("COL2")
+                )
 
-                .child(LinearLayouts.hSpace(1.5f)) //
+                .child(LinearLayouts.hSpace(1.5f))
 
                 .child(TextViews.build()
                     .layoutParams(LinearLayouts.params().wrapContent())
-                    .text("COL3") //
-                ) //
+                    .text("COL3")
+                )
 
-                .child(LinearLayouts.hSpace(1)) //
+                .child(LinearLayouts.hSpace(1))
             )
 
-            .child(LinearLayouts.vSpace(1)) //
+            .child(LinearLayouts.vSpace(1))
         )
 
-        .applyOnto(this);
+    .applyOnto(this);
+    // @formatter:on
   }
 
   private final OnClickListener onBtnClick = new OnClickListener() {

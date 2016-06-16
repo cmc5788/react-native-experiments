@@ -5,6 +5,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import java.util.ArrayList;
@@ -104,8 +105,59 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     return (VB) this;
   }
 
+  public VB paddingDp(int l, int t, int r, int b) {
+    this.paddingL = dpToPx(l);
+    this.paddingT = dpToPx(t);
+    this.paddingR = dpToPx(r);
+    this.paddingB = dpToPx(b);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB padding(int all) {
+    this.paddingL = this.paddingT = this.paddingR = this.paddingB = all;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB paddingDp(int all) {
+    this.paddingL = this.paddingT = this.paddingR = this.paddingB = dpToPx(all);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB vPadding(int all) {
+    this.paddingT = this.paddingB = all;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB vPaddingDp(int all) {
+    this.paddingT = this.paddingB = dpToPx(all);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB hPadding(int all) {
+    this.paddingL = this.paddingR = all;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB hPaddingDp(int all) {
+    this.paddingL = this.paddingR = dpToPx(all);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
   public VB leftPadding(int l) {
     this.paddingL = l;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB leftPaddingDp(int l) {
+    this.paddingL = dpToPx(l);
     //noinspection unchecked
     return (VB) this;
   }
@@ -116,14 +168,32 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     return (VB) this;
   }
 
+  public VB topPaddingDp(int t) {
+    this.paddingT = dpToPx(t);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
   public VB rightPadding(int r) {
     this.paddingR = r;
     //noinspection unchecked
     return (VB) this;
   }
 
+  public VB rightPaddingDp(int r) {
+    this.paddingR = dpToPx(r);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
   public VB bottomPadding(int b) {
     this.paddingB = b;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB bottomPaddingDp(int b) {
+    this.paddingB = dpToPx(b);
     //noinspection unchecked
     return (VB) this;
   }
@@ -205,5 +275,11 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   protected RuntimeException reqArg(String arg) {
     return new IllegalArgumentException(String.format("%s required.", arg));
+  }
+
+  /*package*/
+  static int dpToPx(float dp) {
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+        Resources.getSystem().getDisplayMetrics());
   }
 }
