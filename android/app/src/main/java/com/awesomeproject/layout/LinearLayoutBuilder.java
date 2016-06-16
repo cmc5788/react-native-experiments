@@ -48,7 +48,7 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
   }
 
   public static class LinearLayoutParamBuilder
-      extends LayoutParamBuilder<LinearLayoutParamBuilder, LinearLayout.LayoutParams> {
+      extends MarginLayoutParamBuilder<LinearLayoutParamBuilder, LinearLayout.LayoutParams> {
 
     @NonNull
     @Override

@@ -10,13 +10,14 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.ScrollView;
 import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
 import com.awesomeproject.MyNavigator.NavigableView;
 import com.awesomeproject.MyNavigator.ViewFactory;
 import com.awesomeproject.layout.CustomTextView;
 import com.awesomeproject.layout.FrameLayouts;
 import com.awesomeproject.layout.LinearLayouts;
+import com.awesomeproject.layout.ScrollViews;
 import com.awesomeproject.layout.TextViews;
 import com.facebook.react.bridge.ReadableMap;
 
@@ -28,7 +29,7 @@ import static com.awesomeproject.R.id.home_page_text_id;
 import static com.awesomeproject.R.id.home_page_view_id;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class HomePageView extends FrameLayout implements NavigableView, JSViewEventTarget {
+public class HomePageView extends ScrollView implements NavigableView, JSViewEventTarget {
 
   // -----
   // STATICS
@@ -121,12 +122,13 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
   // REAL CODE ... ?
 
   private void buildLayout() {
-    FrameLayouts.build() //
+    ScrollViews.build() //
         .layoutParams(FrameLayouts.params().matchParent()) //
+        .fillViewport(true) //
         .bgColorInt(WHITE)
 
         .child(LinearLayouts.build()
-            .layoutParams(FrameLayouts.params().matchParent())
+            .layoutParams(ScrollViews.params().matchParent())
             .orientation(VERTICAL)
             .gravity(CENTER)
 

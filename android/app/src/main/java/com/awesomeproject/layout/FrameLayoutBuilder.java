@@ -7,7 +7,7 @@ import android.widget.FrameLayout;
 public class FrameLayoutBuilder extends ViewBuilder<FrameLayoutBuilder, FrameLayout> {
 
   public static class FrameLayoutParamBuilder
-      extends LayoutParamBuilder<FrameLayoutParamBuilder, FrameLayout.LayoutParams> {
+      extends MarginLayoutParamBuilder<FrameLayoutParamBuilder, FrameLayout.LayoutParams> {
 
     @NonNull
     @Override

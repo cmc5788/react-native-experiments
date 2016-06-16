@@ -31,6 +31,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   private int id = View.NO_ID;
   private int bgColorResId = View.NO_ID;
   private int bgColorInt = Integer.MIN_VALUE;
+  private int paddingL, paddingT, paddingR, paddingB;
   private View.OnClickListener onClick;
 
   private Map<String, Prop<? super V, ?>> props;
@@ -94,6 +95,39 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     return (VB) this;
   }
 
+  public VB padding(int l, int t, int r, int b) {
+    this.paddingL = l;
+    this.paddingT = t;
+    this.paddingR = r;
+    this.paddingB = b;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB leftPadding(int l) {
+    this.paddingL = l;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB topPadding(int t) {
+    this.paddingT = t;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB rightPadding(int r) {
+    this.paddingR = r;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB bottomPadding(int b) {
+    this.paddingB = b;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
   public VB onClick(View.OnClickListener onClick) {
     this.onClick = onClick;
     //noinspection unchecked
@@ -144,6 +178,8 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     } else if (bgColorInt != Integer.MIN_VALUE) {
       v.setBackgroundColor(bgColorInt);
     }
+
+    v.setPadding(paddingL, paddingT, paddingR, paddingB);
 
     if (onClick != null) {
       v.setOnClickListener(onClick);
