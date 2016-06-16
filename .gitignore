@@ -30,6 +30,7 @@ keystore.properties
 .idea
 .gradle
 local.properties
+layout_playground_gitignoreme.xml
 
 # node.js
 #

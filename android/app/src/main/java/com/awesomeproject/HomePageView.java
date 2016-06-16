@@ -57,6 +57,7 @@ public class HomePageView extends FrameLayout implements NavigableView, JSViewEv
   private JSEventDispatcher eventDispatcher;
 
   private void injectDeps() {
+    if (isInEditMode()) return;
     eventDispatcher = MyApp.injector(getContext()).eventDispatcherFor(this);
   }
 
