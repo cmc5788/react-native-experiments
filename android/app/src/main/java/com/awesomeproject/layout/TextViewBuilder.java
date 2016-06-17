@@ -2,6 +2,7 @@ package com.awesomeproject.layout;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.v7.widget.AppCompatTextView;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import java.util.Arrays;
@@ -69,6 +70,6 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
   @NonNull
   @Override
   protected TextView createView(ViewGroup root) {
-    return new TextView(root.getContext());
+    return new AppCompatTextView(root.getContext());
   }
 }
