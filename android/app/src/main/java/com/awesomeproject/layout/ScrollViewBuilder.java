@@ -3,16 +3,16 @@ package com.awesomeproject.layout;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+import java.util.Collections;
+import java.util.Set;
 
 public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView> {
 
   public static class FillViewportProp extends Prop<ScrollView, Boolean> {
-    public static final String NAME = "FILL_VIEWPORT";
+    private static final String NAME = "FILL_VIEWPORT";
 
-    @NonNull
-    @Override
-    public String name() {
-      return NAME;
+    public FillViewportProp() {
+      super(NAME);
     }
 
     @Override
@@ -26,23 +26,20 @@ public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView
     }
   }
 
-  public static class ScrollViewParamBuilder
-      extends MarginLayoutParamBuilder<ScrollViewParamBuilder, ScrollView.LayoutParams> {
+  public static class LayoutGravityProp extends LayoutProp<ScrollView.LayoutParams, Integer> {
 
-    @NonNull
-    @Override
-    protected ScrollView.LayoutParams createEmptyLayoutParams() {
-      return new ScrollView.LayoutParams(EMPTY, EMPTY);
+    public LayoutGravityProp() {
+      super(LayoutParams.GRAVITY);
     }
 
-    public ScrollViewParamBuilder gravity(int g) {
-      lps().gravity = g;
-      return this;
+    @Override
+    public void apply(@NonNull ScrollView.LayoutParams lp, Integer val) {
+      if (val != null) lp.gravity = val;
     }
   }
 
   public ScrollViewBuilder() {
-    regProp(new FillViewportProp());
+    regProps(Collections.singleton(new FillViewportProp()));
   }
 
   public ScrollViewBuilder fillViewport(boolean fillViewport) {
@@ -54,5 +51,17 @@ public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView
   @Override
   protected ScrollView createView(ViewGroup root) {
     return new ScrollView(root.getContext());
+  }
+
+  @NonNull
+  @Override
+  protected ViewGroup.LayoutParams createEmptyLayoutParamsForChild() {
+    return new ScrollView.LayoutParams(0, 0);
+  }
+
+  @Override
+  protected void provideLayoutPropsToChild(@NonNull Set<LayoutProp> layoutProps) {
+    layoutProps.add(new LayoutGravityProp());
+    super.provideLayoutPropsToChild(layoutProps);
   }
 }

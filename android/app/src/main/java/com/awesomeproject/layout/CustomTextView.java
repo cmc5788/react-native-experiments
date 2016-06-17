@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import java.util.Collections;
 
 public class CustomTextView extends TextView {
 
@@ -14,12 +15,10 @@ public class CustomTextView extends TextView {
   }
 
   public static class TextClrProp extends ViewBuilder.Prop<CustomTextView, Integer> {
-    public static final String NAME = "TEXT_CLR";
+    private static final String NAME = "TEXT_CLR";
 
-    @NonNull
-    @Override
-    public String name() {
-      return NAME;
+    public TextClrProp() {
+      super(NAME);
     }
 
     @Override
@@ -40,7 +39,7 @@ public class CustomTextView extends TextView {
 
     public Builder() {
       composePropsFrom(composedBuilder = new TextViewBuilder());
-      regProp(new TextClrProp());
+      regProps(Collections.singleton(new TextClrProp()));
     }
 
     @Override

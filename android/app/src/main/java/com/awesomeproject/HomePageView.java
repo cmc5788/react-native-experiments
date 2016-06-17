@@ -17,6 +17,7 @@ import com.awesomeproject.MyNavigator.ViewFactory;
 import com.awesomeproject.layout.CustomTextView;
 import com.awesomeproject.layout.LinearLayouts;
 import com.awesomeproject.layout.ScrollViews;
+import com.awesomeproject.layout.Spaces;
 import com.awesomeproject.layout.TextViews;
 import com.facebook.react.bridge.ReadableMap;
 
@@ -26,7 +27,6 @@ import static android.widget.LinearLayout.HORIZONTAL;
 import static android.widget.LinearLayout.VERTICAL;
 import static com.awesomeproject.R.id.home_page_text_id;
 import static com.awesomeproject.R.id.home_page_view_id;
-import static com.awesomeproject.layout.ViewGroups.baseParams;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class HomePageView extends ScrollView implements NavigableView, JSViewEventTarget {
@@ -124,73 +124,73 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
   private void buildLayout() {
     // @formatter:off
     ScrollViews.build()
-        .layoutParams(baseParams().matchParent())
+        .matchParent()
         .fillViewport(true)
         .bgColorInt(WHITE)
 
         .child(
             LinearLayouts.build()
-            .layoutParams(baseParams().matchParent())
+            .matchParent()
             .orientation(VERTICAL)
             .gravity(CENTER)
 
-            .child(LinearLayouts.vSpace(1))
+            .child(Spaces.vSpace(1))
 
             .child(
                 TextViews.build()
-                .layoutParams(baseParams().wrapContent())
+                .wrapContent()
                 .text("I am the Home Page")
             )
 
-            .child(LinearLayouts.vSpace(1))
+            .child(Spaces.vSpace(1))
 
             .child(
                 TextViews.build()
                 .id(home_page_text_id)
-                .layoutParams(baseParams().wrapContent())
+                .wrapContent()
                 .vPaddingDp(14).hPaddingDp(10)
                 .bgColorInt(Color.LTGRAY)
                 .text("I am just some text")
                 .onClick(onBtnClick)
             )
 
-            .child(LinearLayouts.vSpace(1))
+            .child(Spaces.vSpace(1))
 
             .child(
                 LinearLayouts.build()
-                .layoutParams(baseParams().matchWidth())
+                .matchWidth()
                 .orientation(HORIZONTAL)
                 .gravity(CENTER)
 
-                .child(LinearLayouts.hSpace(1))
+                .child(Spaces.hSpace(1))
 
                 .child(
                     TextViews.build()
-                    .layoutParams(baseParams().wrapContent())
+                    .wrapContent()
                     .text("COL1")
                 )
 
-                .child(LinearLayouts.hSpace(1.5f))
+                .child(Spaces.hSpace(1.5f))
 
                 .child(
                     CustomTextView.build()
-                    .layoutParams(baseParams().wrapContent())
+                    .wrapContent()
                     .textClr(Color.GREEN)
                     .text("COL2")
                 )
 
-                .child(LinearLayouts.hSpace(1.5f))
+                .child(Spaces.hSpace(1.5f))
 
                 .child(
                     TextViews.build()
-                    .layoutParams(baseParams().wrapContent())
+                    .wrapContent()
                     .text("COL3")
                 )
 
-                .child(LinearLayouts.hSpace(1))
+                .child(Spaces.hSpace(1))
             )
 
-            .child(LinearLayouts.vSpace(1))
+            .child(Spaces.vSpace(1))
         )
 
     .applyOnto(this);

@@ -2,7 +2,7 @@ package com.awesomeproject.layout;
 
 import android.support.annotation.StringRes;
 
-public final class TextViews {
+public class TextViews {
 
   public interface TextViewProps<VB extends ViewBuilder> {
     VB text(@StringRes int text);
@@ -12,5 +12,9 @@ public final class TextViews {
 
   public static TextViewBuilder build() {
     return new TextViewBuilder();
+  }
+
+  protected TextViews() {
+    throw new UnsupportedOperationException();
   }
 }

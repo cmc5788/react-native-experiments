@@ -3,21 +3,19 @@ package com.awesomeproject.layout;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import java.util.Set;
 
 public class FrameLayoutBuilder extends ViewBuilder<FrameLayoutBuilder, FrameLayout> {
 
-  public static class FrameLayoutParamBuilder
-      extends MarginLayoutParamBuilder<FrameLayoutParamBuilder, FrameLayout.LayoutParams> {
+  public static class LayoutGravityProp extends LayoutProp<FrameLayout.LayoutParams, Integer> {
 
-    @NonNull
-    @Override
-    protected FrameLayout.LayoutParams createEmptyLayoutParams() {
-      return new FrameLayout.LayoutParams(EMPTY, EMPTY);
+    public LayoutGravityProp() {
+      super(LayoutParams.GRAVITY);
     }
 
-    public FrameLayoutParamBuilder gravity(int g) {
-      lps().gravity = g;
-      return this;
+    @Override
+    public void apply(@NonNull FrameLayout.LayoutParams lp, Integer val) {
+      if (val != null) lp.gravity = val;
     }
   }
 
@@ -25,5 +23,17 @@ public class FrameLayoutBuilder extends ViewBuilder<FrameLayoutBuilder, FrameLay
   @Override
   protected FrameLayout createView(ViewGroup root) {
     return new FrameLayout(root.getContext());
+  }
+
+  @NonNull
+  @Override
+  protected ViewGroup.LayoutParams createEmptyLayoutParamsForChild() {
+    return new FrameLayout.LayoutParams(0, 0);
+  }
+
+  @Override
+  protected void provideLayoutPropsToChild(@NonNull Set<LayoutProp> layoutProps) {
+    layoutProps.add(new LayoutGravityProp());
+    super.provideLayoutPropsToChild(layoutProps);
   }
 }
