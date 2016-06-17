@@ -14,8 +14,8 @@ import android.widget.ScrollView;
 import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
 import com.awesomeproject.MyNavigator.NavigableView;
 import com.awesomeproject.MyNavigator.ViewFactory;
-import com.awesomeproject.layout.CustomTextView;
 import com.awesomeproject.layout.LinearLayouts;
+import com.awesomeproject.layout.RelativeLayouts;
 import com.awesomeproject.layout.ScrollViews;
 import com.awesomeproject.layout.Spaces;
 import com.awesomeproject.layout.TextViews;
@@ -27,6 +27,11 @@ import static android.widget.LinearLayout.HORIZONTAL;
 import static android.widget.LinearLayout.VERTICAL;
 import static com.awesomeproject.R.id.home_page_text_id;
 import static com.awesomeproject.R.id.home_page_view_id;
+import static com.awesomeproject.layout.LayoutParams.ALIGN_PARENT_LEFT;
+import static com.awesomeproject.layout.LayoutParams.ALIGN_PARENT_RIGHT;
+import static com.awesomeproject.layout.LayoutParams.CENTER_IN_PARENT;
+import static com.awesomeproject.layout.LayoutParams.LEFT_OF;
+import static com.awesomeproject.layout.LayoutParams.RIGHT_OF;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class HomePageView extends ScrollView implements NavigableView, JSViewEventTarget {
@@ -167,7 +172,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
                 .child(
                     TextViews.build()
                     .wrapContent()
-                    .text("COL1")
+                    .text("COL 1")
                 )
 
                 .child(Spaces.hSpace(1.5f))
@@ -176,7 +181,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
                     CustomTextView.build()
                     .wrapContent()
                     .textClr(Color.GREEN)
-                    .text("COL2")
+                    .text("COL 2")
                 )
 
                 .child(Spaces.hSpace(1.5f))
@@ -184,10 +189,61 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
                 .child(
                     TextViews.build()
                     .wrapContent()
-                    .text("COL3")
+                    .text("COL 3")
                 )
 
                 .child(Spaces.hSpace(1))
+            )
+
+            .child(Spaces.vSpace(1))
+
+            .child(
+                RelativeLayouts.build()
+                .matchWidth()
+
+                .child(
+                    TextViews.build()
+                    .wrapContent()
+                    .gravity(CENTER)
+                    .layout(ALIGN_PARENT_LEFT, true)
+                    .layout(LEFT_OF, R.id.home_page_text_left_anchor)
+                    .text("COL ??")
+                )
+
+                .child(
+                    TextViews.build()
+                    .id(R.id.home_page_text_left_anchor)
+                    .wrapContent()
+                    .layout(LEFT_OF, R.id.home_page_text_center_anchor)
+                    .text("COL A")
+                )
+
+                .child(
+                    TextViews.build()
+                    .id(R.id.home_page_text_center_anchor)
+                    .editModeBgColorInt(Color.MAGENTA)
+                    .wrapContent()
+                    .hMarginsDp(16)
+                    .layout(CENTER_IN_PARENT, true)
+                    .text("COL B")
+                )
+
+                .child(
+                    TextViews.build()
+                    .id(R.id.home_page_text_right_anchor)
+                    .wrapContent()
+                    .layout(RIGHT_OF, R.id.home_page_text_center_anchor)
+                    .text("COL C")
+                )
+
+                .child(
+                    TextViews.build()
+                    .wrapContent()
+                    .gravity(CENTER)
+                    .layout(ALIGN_PARENT_RIGHT, true)
+                    .layout(RIGHT_OF, R.id.home_page_text_right_anchor)
+                    .text("COL !!")
+                )
             )
 
             .child(Spaces.vSpace(1))

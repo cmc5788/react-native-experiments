@@ -8,6 +8,8 @@ public class TextViews {
     VB text(@StringRes int text);
 
     VB text(CharSequence textCharSeq);
+
+    VB gravity(int gravity);
   }
 
   public static TextViewBuilder build() {

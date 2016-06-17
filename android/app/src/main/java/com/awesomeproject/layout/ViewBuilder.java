@@ -75,6 +75,8 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   private List<ViewBuilder> children;
 
+  private int editModeBgColorInt = Integer.MIN_VALUE;
+
   private int id = View.NO_ID;
   private int bgColorResId = View.NO_ID;
   private int bgColorInt = Integer.MIN_VALUE;
@@ -171,6 +173,12 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   public VB bgColorInt(@ColorInt int bgColorInt) {
     this.bgColorInt = bgColorInt;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB editModeBgColorInt(@ColorInt int bgColorInt) {
+    this.editModeBgColorInt = bgColorInt;
     //noinspection unchecked
     return (VB) this;
   }
@@ -495,7 +503,9 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
     if (id != View.NO_ID) v.setId(id);
 
-    if (bgColorResId != View.NO_ID) {
+    if (editModeBgColorInt != Integer.MIN_VALUE && v.isInEditMode()) {
+      v.setBackgroundColor(editModeBgColorInt);
+    } else if (bgColorResId != View.NO_ID) {
       v.setBackgroundColor(res.getColor(bgColorResId));
     } else if (bgColorInt != Integer.MIN_VALUE) {
       v.setBackgroundColor(bgColorInt);

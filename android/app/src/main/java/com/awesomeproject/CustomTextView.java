@@ -1,4 +1,4 @@
-package com.awesomeproject.layout;
+package com.awesomeproject;
 
 import android.content.Context;
 import android.support.annotation.ColorInt;
@@ -6,6 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.awesomeproject.layout.TextViewBuilder;
+import com.awesomeproject.layout.TextViews;
+import com.awesomeproject.layout.ViewBuilder;
 import java.util.Collections;
 
 public class CustomTextView extends TextView {
@@ -51,6 +54,12 @@ public class CustomTextView extends TextView {
     @Override
     public Builder text(CharSequence text) {
       composedBuilder.text(text);
+      return this;
+    }
+
+    @Override
+    public Builder gravity(int gravity) {
+      composedBuilder.gravity(gravity);
       return this;
     }
 

@@ -46,11 +46,30 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
     }
   }
 
+  public static class TextGravityProp extends Prop<TextView, Integer> {
+    private static final String NAME = "TEXT_GRAVITY";
+
+    public TextGravityProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void set(Integer val) {
+      this.val = val;
+    }
+
+    @Override
+    public void apply(@NonNull TextView tv) {
+      if (val != null) tv.setGravity(val);
+    }
+  }
+
   public TextViewBuilder() {
     // @formatter:off
     regProps(Arrays.asList(
         new TextResProp(),
-        new TextCharSequenceProp()
+        new TextCharSequenceProp(),
+        new TextGravityProp()
     ));
     // @formatter:on
   }
@@ -64,6 +83,12 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
   @Override
   public TextViewBuilder text(CharSequence text) {
     setProp(TextCharSequenceProp.NAME, text);
+    return this;
+  }
+
+  @Override
+  public TextViewBuilder gravity(int gravity) {
+    setProp(TextGravityProp.NAME, gravity);
     return this;
   }
 
