@@ -35,6 +35,19 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     public abstract void set(T val);
 
     public abstract void apply(@NonNull V v);
+
+    @Override
+    public final boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      Prop<?, ?> prop = (Prop<?, ?>) o;
+      return name.equals(prop.name);
+    }
+
+    @Override
+    public final int hashCode() {
+      return name.hashCode();
+    }
   }
 
   public static abstract class LayoutProp<LP extends ViewGroup.LayoutParams, T> {
@@ -47,7 +60,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     public abstract void apply(@NonNull LP lp, T val);
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
       LayoutProp<?, ?> that = (LayoutProp<?, ?>) o;
@@ -55,7 +68,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
       return name.hashCode();
     }
   }
