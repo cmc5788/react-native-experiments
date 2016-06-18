@@ -19,14 +19,13 @@ import com.awesomeproject.layout.RelativeLayouts;
 import com.awesomeproject.layout.ScrollViews;
 import com.awesomeproject.layout.Spaces;
 import com.awesomeproject.layout.TextViews;
+import com.awesomeproject.layout.Views;
 import com.facebook.react.bridge.ReadableMap;
 
 import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
 import static android.widget.LinearLayout.HORIZONTAL;
 import static android.widget.LinearLayout.VERTICAL;
-import static com.awesomeproject.R.id.home_page_text_id;
-import static com.awesomeproject.R.id.home_page_view_id;
 import static com.awesomeproject.layout.LayoutParams.ALIGN_PARENT_LEFT;
 import static com.awesomeproject.layout.LayoutParams.ALIGN_PARENT_RIGHT;
 import static com.awesomeproject.layout.LayoutParams.CENTER_IN_PARENT;
@@ -36,12 +35,17 @@ import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class HomePageView extends ScrollView implements NavigableView, JSViewEventTarget {
 
+  private static final int TEXT_ID = Views.generateViewId();
+  private static final int TEXT_CENTER_ANCHOR = Views.generateViewId();
+  private static final int TEXT_LEFT_ANCHOR = Views.generateViewId();
+  private static final int TEXT_RIGHT_ANCHOR = Views.generateViewId();
+
   // -----
   // STATICS
 
   public static final String TAG = "HomePageView";
 
-  public static final int ID = home_page_view_id;
+  public static final int ID = Views.generateViewId();
 
   private static class FactoryHolder {
     private static final ViewFactory<HomePageView> FACTORY = new ViewFactory<HomePageView>() {
@@ -151,7 +155,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
 
             .child(
                 TextViews.build()
-                .id(home_page_text_id)
+                .id(TEXT_ID)
                 .wrapContent()
                 .vPaddingDp(14).hPaddingDp(10)
                 .bgColorInt(Color.LTGRAY)
@@ -206,21 +210,21 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
                     .wrapContent()
                     .gravity(CENTER)
                     .layout(ALIGN_PARENT_LEFT, true)
-                    .layout(LEFT_OF, R.id.home_page_text_left_anchor)
+                    .layout(LEFT_OF, TEXT_LEFT_ANCHOR)
                     .text("COL ??")
                 )
 
                 .child(
                     TextViews.build()
-                    .id(R.id.home_page_text_left_anchor)
+                    .id(TEXT_LEFT_ANCHOR)
                     .wrapContent()
-                    .layout(LEFT_OF, R.id.home_page_text_center_anchor)
+                    .layout(LEFT_OF, TEXT_CENTER_ANCHOR)
                     .text("COL A")
                 )
 
                 .child(
                     TextViews.build()
-                    .id(R.id.home_page_text_center_anchor)
+                    .id(TEXT_CENTER_ANCHOR)
                     .editMode().bgColorInt(Color.MAGENTA)
                     .wrapContent()
                     .hMarginsDp(16)
@@ -230,9 +234,9 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
 
                 .child(
                     TextViews.build()
-                    .id(R.id.home_page_text_right_anchor)
+                    .id(TEXT_RIGHT_ANCHOR)
                     .wrapContent()
-                    .layout(RIGHT_OF, R.id.home_page_text_center_anchor)
+                    .layout(RIGHT_OF, TEXT_CENTER_ANCHOR)
                     .text("COL C")
                 )
 
@@ -241,7 +245,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
                     .wrapContent()
                     .gravity(CENTER)
                     .layout(ALIGN_PARENT_RIGHT, true)
-                    .layout(RIGHT_OF, R.id.home_page_text_right_anchor)
+                    .layout(RIGHT_OF, TEXT_RIGHT_ANCHOR)
                     .text("COL !!")
                 )
             )
@@ -261,6 +265,6 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
   };
 
   private void setBtnColor(@ColorInt int color) {
-    findViewById(home_page_text_id).setBackgroundColor(color);
+    findViewById(TEXT_ID).setBackgroundColor(color);
   }
 }

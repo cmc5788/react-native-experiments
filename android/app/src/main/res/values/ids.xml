@@ -2,14 +2,4 @@
 <resources>
   <item type="id"
       name="initial_app_root_id"/>
-  <item type="id"
-      name="home_page_view_id"/>
-  <item type="id"
-      name="home_page_text_id"/>
-  <item type="id"
-      name="home_page_text_center_anchor"/>
-  <item type="id"
-      name="home_page_text_left_anchor"/>
-  <item type="id"
-      name="home_page_text_right_anchor"/>
 </resources>
