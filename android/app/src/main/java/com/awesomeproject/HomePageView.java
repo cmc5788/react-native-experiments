@@ -221,7 +221,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
                 .child(
                     TextViews.build()
                     .id(R.id.home_page_text_center_anchor)
-                    .editModeBgColorInt(Color.MAGENTA)
+                    .editMode().bgColorInt(Color.MAGENTA)
                     .wrapContent()
                     .hMarginsDp(16)
                     .layout(CENTER_IN_PARENT, true)

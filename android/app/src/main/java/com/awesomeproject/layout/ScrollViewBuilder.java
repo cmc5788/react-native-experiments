@@ -16,11 +16,6 @@ public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView
     }
 
     @Override
-    public void set(Boolean val) {
-      this.val = val;
-    }
-
-    @Override
     public void apply(@NonNull ScrollView tv) {
       if (val != null) tv.setFillViewport(val);
     }

@@ -18,11 +18,6 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
     }
 
     @Override
-    public void set(Integer val) {
-      this.val = val;
-    }
-
-    @Override
     public void apply(@NonNull TextView tv) {
       if (val != null) tv.setText(val);
     }
@@ -36,11 +31,6 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
     }
 
     @Override
-    public void set(CharSequence val) {
-      this.val = val;
-    }
-
-    @Override
     public void apply(@NonNull TextView tv) {
       if (val != null) tv.setText(val);
     }
@@ -51,11 +41,6 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
 
     public TextGravityProp() {
       super(NAME);
-    }
-
-    @Override
-    public void set(Integer val) {
-      this.val = val;
     }
 
     @Override

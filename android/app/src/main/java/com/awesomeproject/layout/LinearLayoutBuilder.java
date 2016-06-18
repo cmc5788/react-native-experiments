@@ -17,11 +17,6 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
     }
 
     @Override
-    public void set(Integer val) {
-      this.val = val;
-    }
-
-    @Override
     public void apply(@NonNull LinearLayout ll) {
       if (val != null) ll.setOrientation(val);
     }
@@ -32,11 +27,6 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
 
     public GravityProp() {
       super(NAME);
-    }
-
-    @Override
-    public void set(Integer val) {
-      this.val = val;
     }
 
     @Override

@@ -25,11 +25,6 @@ public class CustomTextView extends TextView {
     }
 
     @Override
-    public void set(Integer val) {
-      this.val = val;
-    }
-
-    @Override
     public void apply(@NonNull CustomTextView tv) {
       if (val != null) tv.setTextClr(val);
     }

@@ -10,6 +10,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static android.util.TypedValue.COMPLEX_UNIT_DIP;
+import static android.util.TypedValue.COMPLEX_UNIT_PX;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -27,14 +30,21 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   public static abstract class Prop<V extends View, T> {
     @NonNull public final String name;
     protected T val;
+    private boolean onlyInEditMode;
 
     public Prop(@NonNull String name) {
       this.name = name;
     }
 
-    public abstract void set(T val);
+    public void set(T val) {
+      this.val = val;
+    }
 
     public abstract void apply(@NonNull V v);
+
+    public void setOnlyInEditMode() {
+      onlyInEditMode = true;
+    }
 
     @Override
     public final boolean equals(Object o) {
@@ -47,6 +57,25 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     @Override
     public final int hashCode() {
       return name.hashCode();
+    }
+  }
+
+  public static abstract class DimProp<V extends View> extends Prop<V, Integer> {
+    private final int type;
+
+    public static String makeName(String name, int type) {
+      return name + "_" + type;
+    }
+
+    public DimProp(@NonNull String name, int type) {
+      super(makeName(name, type));
+      this.type = type;
+    }
+
+    @CallSuper
+    @Override
+    public void apply(@NonNull V v) {
+      if (val != null) val = dimToPx(val, type);
     }
   }
 
@@ -73,15 +102,128 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
+  public static class IdProp extends Prop<View, Integer> {
+    private static final String NAME = "ID";
+
+    public IdProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void apply(@NonNull View v) {
+      if (val != null) v.setId(val);
+    }
+  }
+
+  public static class BgColorResProp extends Prop<View, Integer> {
+    private static final String NAME = "BG_COLOR_RES";
+
+    public BgColorResProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void apply(@NonNull View v) {
+      if (val != null) {
+        //noinspection deprecation
+        v.setBackgroundColor(v.getResources().getColor(val));
+      }
+    }
+  }
+
+  public static class BgColorIntProp extends Prop<View, Integer> {
+    private static final String NAME = "BG_COLOR_INT";
+
+    public BgColorIntProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void apply(@NonNull View v) {
+      if (val != null) v.setBackgroundColor(val);
+    }
+  }
+
+  public static class PaddingLeftProp extends DimProp<View> {
+    private static final String NAME = "PADDING_LEFT";
+
+    public PaddingLeftProp(int type) {
+      super(NAME, type);
+    }
+
+    @Override
+    public void apply(@NonNull View v) {
+      super.apply(v);
+      if (val != null) {
+        v.setPadding(val, v.getPaddingTop(), v.getPaddingRight(), v.getPaddingBottom());
+      }
+    }
+  }
+
+  public static class PaddingTopProp extends DimProp<View> {
+    private static final String NAME = "PADDING_TOP";
+
+    public PaddingTopProp(int type) {
+      super(NAME, type);
+    }
+
+    @Override
+    public void apply(@NonNull View v) {
+      super.apply(v);
+      if (val != null) {
+        v.setPadding(v.getPaddingLeft(), val, v.getPaddingRight(), v.getPaddingBottom());
+      }
+    }
+  }
+
+  public static class PaddingRightProp extends DimProp<View> {
+    private static final String NAME = "PADDING_RIGHT";
+
+    public PaddingRightProp(int type) {
+      super(NAME, type);
+    }
+
+    @Override
+    public void apply(@NonNull View v) {
+      super.apply(v);
+      if (val != null) {
+        v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), val, v.getPaddingBottom());
+      }
+    }
+  }
+
+  public static class PaddingBottomProp extends DimProp<View> {
+    private static final String NAME = "PADDING_BOTTOM";
+
+    public PaddingBottomProp(int type) {
+      super(NAME, type);
+    }
+
+    @Override
+    public void apply(@NonNull View v) {
+      super.apply(v);
+      if (val != null) {
+        v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), val);
+      }
+    }
+  }
+
+  public static class OnClickProp extends Prop<View, View.OnClickListener> {
+    private static final String NAME = "ON_CLICK";
+
+    public OnClickProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void apply(@NonNull View v) {
+      if (val != null) v.setOnClickListener(val);
+    }
+  }
+
   private List<ViewBuilder> children;
 
-  private int editModeBgColorInt = Integer.MIN_VALUE;
-
-  private int id = View.NO_ID;
-  private int bgColorResId = View.NO_ID;
-  private int bgColorInt = Integer.MIN_VALUE;
-  private int paddingL, paddingT, paddingR, paddingB;
-  private View.OnClickListener onClick;
+  private boolean nextPropOnlyInEditMode;
 
   private int layoutWidth = LAYOUT_DIM_EMPTY, layoutHeight = LAYOUT_DIM_EMPTY;
   private int marginL, marginT, marginR, marginB;
@@ -91,6 +233,25 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   private Set<LayoutProp> layoutProps;
 
   private ViewBuilder parent;
+
+  public ViewBuilder() {
+    // @formatter:off
+    regProps(Arrays.asList(
+        new IdProp(),
+        new BgColorResProp(),
+        new BgColorIntProp(),
+        new PaddingLeftProp(COMPLEX_UNIT_PX),
+        new PaddingLeftProp(TypedValue.COMPLEX_UNIT_DIP),
+        new PaddingTopProp(COMPLEX_UNIT_PX),
+        new PaddingTopProp(TypedValue.COMPLEX_UNIT_DIP),
+        new PaddingRightProp(COMPLEX_UNIT_PX),
+        new PaddingRightProp(TypedValue.COMPLEX_UNIT_DIP),
+        new PaddingBottomProp(COMPLEX_UNIT_PX),
+        new PaddingBottomProp(TypedValue.COMPLEX_UNIT_DIP),
+        new OnClickProp()
+    ));
+    // @formatter:on
+  }
 
   @NonNull
   protected abstract V createView(ViewGroup root);
@@ -121,7 +282,12 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   protected <T> VB setProp(@NonNull String name, T val) {
     //noinspection unchecked
-    ((Prop<? super V, T>) props.get(name)).set(val);
+    Prop<? super V, T> prop = (Prop<? super V, T>) props.get(name);
+    if (nextPropOnlyInEditMode) {
+      nextPropOnlyInEditMode = false;
+      prop.setOnlyInEditMode();
+    }
+    prop.set(val);
     //noinspection unchecked
     return (VB) this;
   }
@@ -159,134 +325,134 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     return (VB) this;
   }
 
+  public VB editMode() {
+    this.nextPropOnlyInEditMode = true;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
   public VB id(@IdRes int id) {
-    this.id = id;
+    setProp(IdProp.NAME, id);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB bgColor(@ColorRes int bgColorResId) {
-    this.bgColorResId = bgColorResId;
+    setProp(BgColorResProp.NAME, bgColorResId);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB bgColorInt(@ColorInt int bgColorInt) {
-    this.bgColorInt = bgColorInt;
-    //noinspection unchecked
-    return (VB) this;
-  }
-
-  public VB editModeBgColorInt(@ColorInt int bgColorInt) {
-    this.editModeBgColorInt = bgColorInt;
+    setProp(BgColorIntProp.NAME, bgColorInt);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB padding(int l, int t, int r, int b) {
-    this.paddingL = l;
-    this.paddingT = t;
-    this.paddingR = r;
-    this.paddingB = b;
+    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_PX), l);
+    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_PX), t);
+    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_PX), r);
+    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_PX), b);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB paddingDp(int l, int t, int r, int b) {
-    this.paddingL = dpToPx(l);
-    this.paddingT = dpToPx(t);
-    this.paddingR = dpToPx(r);
-    this.paddingB = dpToPx(b);
+    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_DIP), l);
+    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_DIP), t);
+    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_DIP), r);
+    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_DIP), b);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB padding(int all) {
-    this.paddingL = this.paddingT = this.paddingR = this.paddingB = all;
-    //noinspection unchecked
-    return (VB) this;
+    return this.padding(all, all, all, all);
   }
 
   public VB paddingDp(int all) {
-    this.paddingL = this.paddingT = this.paddingR = this.paddingB = dpToPx(all);
-    //noinspection unchecked
-    return (VB) this;
+    return this.paddingDp(all, all, all, all);
   }
 
   public VB vPadding(int all) {
-    this.paddingT = this.paddingB = all;
+    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_PX), all);
+    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_PX), all);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB vPaddingDp(int all) {
-    this.paddingT = this.paddingB = dpToPx(all);
+    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_DIP), all);
+    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_DIP), all);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB hPadding(int all) {
-    this.paddingL = this.paddingR = all;
+    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_PX), all);
+    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_PX), all);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB hPaddingDp(int all) {
-    this.paddingL = this.paddingR = dpToPx(all);
+    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_DIP), all);
+    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_DIP), all);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB leftPadding(int l) {
-    this.paddingL = l;
+    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_PX), l);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB leftPaddingDp(int l) {
-    this.paddingL = dpToPx(l);
+    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_DIP), l);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB topPadding(int t) {
-    this.paddingT = t;
+    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_PX), t);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB topPaddingDp(int t) {
-    this.paddingT = dpToPx(t);
+    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_DIP), t);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB rightPadding(int r) {
-    this.paddingR = r;
+    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_PX), r);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB rightPaddingDp(int r) {
-    this.paddingR = dpToPx(r);
+    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_DIP), r);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB bottomPadding(int b) {
-    this.paddingB = b;
+    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_PX), b);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB bottomPaddingDp(int b) {
-    this.paddingB = dpToPx(b);
+    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_DIP), b);
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB onClick(View.OnClickListener onClick) {
-    this.onClick = onClick;
+    setProp(OnClickProp.NAME, onClick);
     //noinspection unchecked
     return (VB) this;
   }
@@ -462,8 +628,6 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   // -----------
 
   public void buildInto(ViewGroup root) {
-    //if (lpb == null) throw reqArg("layout params");
-
     V v = createView(root);
     applyProps(v);
 
@@ -478,7 +642,6 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       buildChildren((ViewGroup) v);
     }
 
-    //v.setLayoutParams(lpb.build());
     applyLayoutProps(v);
 
     root.addView(v);
@@ -486,40 +649,22 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   public void applyOnto(V v) {
     if (!(v instanceof ViewGroup)) throw reqArg("applyOnto: ViewGroup");
-    //if (lpb == null) throw reqArg("layout params");
 
     ViewGroup vg = (ViewGroup) v;
     applyProps(v);
 
     buildChildren(vg);
 
-    //vg.setLayoutParams(lpb.build());
     applyLayoutProps(v);
   }
 
   @SuppressWarnings("deprecation")
   private void applyProps(@NonNull V v) {
-    Resources res = v.getResources();
-
-    if (id != View.NO_ID) v.setId(id);
-
-    if (editModeBgColorInt != Integer.MIN_VALUE && v.isInEditMode()) {
-      v.setBackgroundColor(editModeBgColorInt);
-    } else if (bgColorResId != View.NO_ID) {
-      v.setBackgroundColor(res.getColor(bgColorResId));
-    } else if (bgColorInt != Integer.MIN_VALUE) {
-      v.setBackgroundColor(bgColorInt);
-    }
-
-    v.setPadding(paddingL, paddingT, paddingR, paddingB);
-
-    if (onClick != null) {
-      v.setOnClickListener(onClick);
-    }
-
     if (props != null) {
       for (Prop<? super V, ?> p : props.values()) {
-        p.apply(v);
+        if (!p.onlyInEditMode || v.isInEditMode()) {
+          p.apply(v);
+        }
       }
     }
   }
@@ -579,7 +724,11 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   /*package*/
   static int dpToPx(float dp) {
-    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-        Resources.getSystem().getDisplayMetrics());
+    return dimToPx(dp, TypedValue.COMPLEX_UNIT_DIP);
+  }
+
+  /*package*/
+  static int dimToPx(float dim, int type) {
+    return (int) TypedValue.applyDimension(type, dim, Resources.getSystem().getDisplayMetrics());
   }
 }
