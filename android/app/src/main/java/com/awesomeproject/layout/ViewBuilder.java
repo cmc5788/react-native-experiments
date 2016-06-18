@@ -102,6 +102,27 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
+  public static abstract class LayoutDimProp<LP extends ViewGroup.LayoutParams>
+      extends LayoutProp<LP, Integer> {
+    private final int type;
+
+    public static String makeName(String name, int type) {
+      return name + "_" + type;
+    }
+
+    public LayoutDimProp(@NonNull String name, int type) {
+      super(makeName(name, type));
+      this.type = type;
+    }
+
+    public abstract void applyDim(@NonNull LP lp, int val);
+
+    @Override
+    public final void apply(@NonNull LP lp, Integer val) {
+      if (val != null) applyDim(lp, dimToPx(val, type));
+    }
+  }
+
   public static class IdProp extends Prop<View, Integer> {
     private static final String NAME = "ID";
 
@@ -221,12 +242,81 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
+  public static class LayoutWidthProp extends LayoutDimProp<ViewGroup.LayoutParams> {
+
+    public LayoutWidthProp(int type) {
+      super(LayoutParams.WIDTH, type);
+    }
+
+    @Override
+    public void applyDim(@NonNull ViewGroup.LayoutParams lp, int val) {
+      lp.width = val;
+    }
+  }
+
+  public static class LayoutHeightProp extends LayoutDimProp<ViewGroup.LayoutParams> {
+
+    public LayoutHeightProp(int type) {
+      super(LayoutParams.HEIGHT, type);
+    }
+
+    @Override
+    public void applyDim(@NonNull ViewGroup.LayoutParams lp, int val) {
+      lp.height = val;
+    }
+  }
+
+  public static class MarginLeftProp extends LayoutDimProp<ViewGroup.MarginLayoutParams> {
+
+    public MarginLeftProp(int type) {
+      super(LayoutParams.MARGIN_LEFT, type);
+    }
+
+    @Override
+    public void applyDim(@NonNull ViewGroup.MarginLayoutParams lp, int val) {
+      lp.leftMargin = val;
+    }
+  }
+
+  public static class MarginTopProp extends LayoutDimProp<ViewGroup.MarginLayoutParams> {
+
+    public MarginTopProp(int type) {
+      super(LayoutParams.MARGIN_TOP, type);
+    }
+
+    @Override
+    public void applyDim(@NonNull ViewGroup.MarginLayoutParams lp, int val) {
+      lp.topMargin = val;
+    }
+  }
+
+  public static class MarginRightProp extends LayoutDimProp<ViewGroup.MarginLayoutParams> {
+
+    public MarginRightProp(int type) {
+      super(LayoutParams.MARGIN_RIGHT, type);
+    }
+
+    @Override
+    public void applyDim(@NonNull ViewGroup.MarginLayoutParams lp, int val) {
+      lp.rightMargin = val;
+    }
+  }
+
+  public static class MarginBottomProp extends LayoutDimProp<ViewGroup.MarginLayoutParams> {
+
+    public MarginBottomProp(int type) {
+      super(LayoutParams.MARGIN_BOTTOM, type);
+    }
+
+    @Override
+    public void applyDim(@NonNull ViewGroup.MarginLayoutParams lp, int val) {
+      lp.bottomMargin = val;
+    }
+  }
+
   private List<ViewBuilder> children;
 
   private boolean nextPropOnlyInEditMode;
-
-  private int layoutWidth = LAYOUT_DIM_EMPTY, layoutHeight = LAYOUT_DIM_EMPTY;
-  private int marginL, marginT, marginR, marginB;
 
   private Map<String, Prop<? super V, ?>> props;
   private Map<String, Object> layoutPropMap;
@@ -241,14 +331,28 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
         new BgColorResProp(),
         new BgColorIntProp(),
         new PaddingLeftProp(COMPLEX_UNIT_PX),
-        new PaddingLeftProp(TypedValue.COMPLEX_UNIT_DIP),
+        new PaddingLeftProp(COMPLEX_UNIT_DIP),
         new PaddingTopProp(COMPLEX_UNIT_PX),
-        new PaddingTopProp(TypedValue.COMPLEX_UNIT_DIP),
+        new PaddingTopProp(COMPLEX_UNIT_DIP),
         new PaddingRightProp(COMPLEX_UNIT_PX),
-        new PaddingRightProp(TypedValue.COMPLEX_UNIT_DIP),
+        new PaddingRightProp(COMPLEX_UNIT_DIP),
         new PaddingBottomProp(COMPLEX_UNIT_PX),
-        new PaddingBottomProp(TypedValue.COMPLEX_UNIT_DIP),
+        new PaddingBottomProp(COMPLEX_UNIT_DIP),
         new OnClickProp()
+    ));
+    (layoutProps = new HashSet<>()).addAll(Arrays.asList(
+        new LayoutWidthProp(COMPLEX_UNIT_PX),
+        new LayoutWidthProp(COMPLEX_UNIT_DIP),
+        new LayoutHeightProp(COMPLEX_UNIT_PX),
+        new LayoutHeightProp(COMPLEX_UNIT_DIP),
+        new MarginLeftProp(COMPLEX_UNIT_PX),
+        new MarginLeftProp(COMPLEX_UNIT_DIP),
+        new MarginTopProp(COMPLEX_UNIT_PX),
+        new MarginTopProp(COMPLEX_UNIT_DIP),
+        new MarginRightProp(COMPLEX_UNIT_PX),
+        new MarginRightProp(COMPLEX_UNIT_DIP),
+        new MarginBottomProp(COMPLEX_UNIT_PX),
+        new MarginBottomProp(COMPLEX_UNIT_DIP)
     ));
     // @formatter:on
   }
@@ -461,168 +565,135 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   // LAYOUT PARAMS
 
   public VB width(int w) {
-    this.layoutWidth = w;
-    //noinspection unchecked
-    return (VB) this;
+    return layout(LayoutDimProp.makeName(LayoutParams.WIDTH, COMPLEX_UNIT_PX), w);
   }
 
   public VB widthDp(int w) {
-    this.layoutWidth = dpToPx(w);
-    //noinspection unchecked
-    return (VB) this;
+    return layout(LayoutDimProp.makeName(LayoutParams.WIDTH, COMPLEX_UNIT_DIP), w);
   }
 
   public VB height(int h) {
-    this.layoutHeight = h;
-    //noinspection unchecked
-    return (VB) this;
+    return layout(LayoutDimProp.makeName(LayoutParams.HEIGHT, COMPLEX_UNIT_PX), h);
   }
 
   public VB heightDp(int h) {
-    this.layoutHeight = dpToPx(h);
-    //noinspection unchecked
-    return (VB) this;
+    return layout(LayoutDimProp.makeName(LayoutParams.HEIGHT, COMPLEX_UNIT_DIP), h);
   }
 
   public VB dims(int w, int h) {
-    this.layoutWidth = w;
-    this.layoutHeight = h;
-    //noinspection unchecked
-    return (VB) this;
+    width(w);
+    return height(h);
   }
 
   public VB dimsDp(int w, int h) {
-    this.layoutWidth = dpToPx(w);
-    this.layoutHeight = dpToPx(h);
-    //noinspection unchecked
-    return (VB) this;
+    widthDp(w);
+    return heightDp(h);
   }
 
   public VB dims(int wh) {
-    this.layoutWidth = wh;
-    this.layoutHeight = wh;
-    //noinspection unchecked
-    return (VB) this;
+    width(wh);
+    return height(wh);
   }
 
   public VB dimsDp(int wh) {
-    this.layoutWidth = dpToPx(wh);
-    this.layoutHeight = dpToPx(wh);
-    //noinspection unchecked
-    return (VB) this;
+    widthDp(wh);
+    return heightDp(wh);
   }
 
   public VB wrapContent() {
-    this.layoutWidth = WRAP_CONTENT;
-    this.layoutHeight = WRAP_CONTENT;
-    //noinspection unchecked
-    return (VB) this;
+    width(WRAP_CONTENT);
+    return height(WRAP_CONTENT);
   }
 
   public VB matchParent() {
-    this.layoutWidth = MATCH_PARENT;
-    this.layoutHeight = MATCH_PARENT;
-    //noinspection unchecked
-    return (VB) this;
+    width(MATCH_PARENT);
+    return height(MATCH_PARENT);
   }
 
   public VB matchWidth() {
-    this.layoutWidth = MATCH_PARENT;
-    this.layoutHeight = WRAP_CONTENT;
-    //noinspection unchecked
-    return (VB) this;
+    width(MATCH_PARENT);
+    return height(WRAP_CONTENT);
   }
 
   public VB matchHeight() {
-    this.layoutWidth = WRAP_CONTENT;
-    this.layoutHeight = MATCH_PARENT;
-    //noinspection unchecked
-    return (VB) this;
+    width(WRAP_CONTENT);
+    return height(MATCH_PARENT);
   }
 
   // -----------
 
-  public VB margins(int l, int t, int r, int b) {
-    this.marginL = l;
-    this.marginT = t;
-    this.marginR = r;
-    this.marginB = b;
-    //noinspection unchecked
-    return (VB) this;
-  }
-
-  public VB marginsDp(int l, int t, int r, int b) {
-    return this.margins(dpToPx(l), dpToPx(t), dpToPx(r), dpToPx(b));
-  }
-
-  public VB margins(int all) {
-    this.marginL = this.marginT = this.marginR = this.marginB = all;
-    //noinspection unchecked
-    return (VB) this;
-  }
-
-  public VB marginsDp(int all) {
-    return this.margins(dpToPx(all));
-  }
-
-  public VB vMargins(int all) {
-    this.marginT = this.marginB = all;
-    //noinspection unchecked
-    return (VB) this;
-  }
-
-  public VB vMarginsDp(int all) {
-    return this.vMargins(dpToPx(all));
-  }
-
-  public VB hMargins(int all) {
-    this.marginL = this.marginR = all;
-    //noinspection unchecked
-    return (VB) this;
-  }
-
-  public VB hMarginsDp(int all) {
-    return this.hMargins(dpToPx(all));
-  }
-
   public VB leftMargin(int l) {
-    this.marginL = l;
-    //noinspection unchecked
-    return (VB) this;
+    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_LEFT, COMPLEX_UNIT_PX), l);
   }
 
   public VB leftMarginDp(int l) {
-    return this.leftMargin(dpToPx(l));
+    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_LEFT, COMPLEX_UNIT_DIP), l);
   }
 
   public VB topMargin(int t) {
-    this.marginT = t;
-    //noinspection unchecked
-    return (VB) this;
+    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_TOP, COMPLEX_UNIT_PX), t);
   }
 
   public VB topMarginDp(int t) {
-    return this.topMargin(dpToPx(t));
+    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_TOP, COMPLEX_UNIT_DIP), t);
   }
 
   public VB rightMargin(int r) {
-    this.marginR = r;
-    //noinspection unchecked
-    return (VB) this;
+    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_RIGHT, COMPLEX_UNIT_PX), r);
   }
 
   public VB rightMarginDp(int r) {
-    return this.rightMargin(dpToPx(r));
+    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_RIGHT, COMPLEX_UNIT_DIP), r);
   }
 
   public VB bottomMargin(int b) {
-    this.marginB = b;
-    //noinspection unchecked
-    return (VB) this;
+    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_BOTTOM, COMPLEX_UNIT_PX), b);
   }
 
   public VB bottomMarginDp(int b) {
-    return this.bottomMargin(dpToPx(b));
+    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_BOTTOM, COMPLEX_UNIT_DIP), b);
+  }
+
+  public VB margins(int l, int t, int r, int b) {
+    leftMargin(l);
+    topMargin(t);
+    rightMargin(r);
+    return bottomMargin(r);
+  }
+
+  public VB marginsDp(int l, int t, int r, int b) {
+    leftMarginDp(l);
+    topMarginDp(t);
+    rightMarginDp(r);
+    return bottomMarginDp(r);
+  }
+
+  public VB margins(int all) {
+    return margins(all, all, all, all);
+  }
+
+  public VB marginsDp(int all) {
+    return marginsDp(all, all, all, all);
+  }
+
+  public VB vMargins(int all) {
+    topMargin(all);
+    return bottomMargin(all);
+  }
+
+  public VB vMarginsDp(int all) {
+    topMarginDp(all);
+    return bottomMarginDp(all);
+  }
+
+  public VB hMargins(int all) {
+    leftMargin(all);
+    return rightMargin(all);
+  }
+
+  public VB hMarginsDp(int all) {
+    leftMarginDp(all);
+    return rightMarginDp(all);
   }
 
   // -----------
@@ -677,17 +748,6 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       plps = parent.createEmptyLayoutParamsForChild();
     }
 
-    plps.width = layoutWidth;
-    plps.height = layoutHeight;
-
-    if (plps instanceof ViewGroup.MarginLayoutParams) {
-      ViewGroup.MarginLayoutParams mlps = (ViewGroup.MarginLayoutParams) plps;
-      mlps.leftMargin = marginL;
-      mlps.topMargin = marginT;
-      mlps.rightMargin = marginR;
-      mlps.bottomMargin = marginB;
-    }
-
     if (layoutPropMap != null && layoutProps != null) {
       for (Map.Entry<String, Object> e : layoutPropMap.entrySet()) {
         for (LayoutProp lp : layoutProps) {
@@ -722,13 +782,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     return new IllegalArgumentException(String.format("%s required.", arg));
   }
 
-  /*package*/
-  static int dpToPx(float dp) {
-    return dimToPx(dp, TypedValue.COMPLEX_UNIT_DIP);
-  }
-
-  /*package*/
-  static int dimToPx(float dim, int type) {
+  private static int dimToPx(float dim, int type) {
     return (int) TypedValue.applyDimension(type, dim, Resources.getSystem().getDisplayMetrics());
   }
 }

@@ -2,6 +2,14 @@ package com.awesomeproject.layout;
 
 public class LayoutParams {
 
+  public static final String WIDTH = "LAYOUT_WIDTH";
+  public static final String HEIGHT = "LAYOUT_HEIGHT";
+
+  public static final String MARGIN_LEFT = "MARGIN_LEFT";
+  public static final String MARGIN_TOP = "MARGIN_TOP";
+  public static final String MARGIN_RIGHT = "MARGIN_RIGHT";
+  public static final String MARGIN_BOTTOM = "MARGIN_BOTTOM";
+
   public static final String GRAVITY = "LAYOUT_GRAVITY";
   public static final String WEIGHT = "LAYOUT_WEIGHT";
 
