@@ -81,12 +81,17 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   public static abstract class LayoutProp<LP extends ViewGroup.LayoutParams, T> {
     @NonNull public final String name;
+    private boolean onlyInEditMode;
 
     public LayoutProp(@NonNull String name) {
       this.name = name;
     }
 
     public abstract void apply(@NonNull LP lp, T val);
+
+    public void setOnlyInEditMode() {
+      onlyInEditMode = true;
+    }
 
     @Override
     public final boolean equals(Object o) {
@@ -320,6 +325,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   private Map<String, Prop<? super V, ?>> props;
   private Map<String, Object> layoutPropMap;
+  private Map<String, Boolean> layoutPropEditModes;
   private Set<LayoutProp> layoutProps;
 
   private ViewBuilder parent;
@@ -398,6 +404,11 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   public <T> VB layout(@NonNull String layoutPropName, T val) {
     if (layoutPropMap == null) layoutPropMap = new HashMap<>();
+    if (nextPropOnlyInEditMode) {
+      nextPropOnlyInEditMode = false;
+      if (layoutPropEditModes == null) layoutPropEditModes = new HashMap<>();
+      layoutPropEditModes.put(layoutPropName, true);
+    }
     layoutPropMap.put(layoutPropName, val);
     //noinspection unchecked
     return (VB) this;
@@ -752,8 +763,13 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       for (Map.Entry<String, Object> e : layoutPropMap.entrySet()) {
         for (LayoutProp lp : layoutProps) {
           if (lp.name.equals(e.getKey())) {
-            //noinspection unchecked
-            lp.apply(plps, e.getValue());
+            boolean onlyInEditMode = layoutPropEditModes != null && //
+                layoutPropEditModes.get(lp.name) != null && //
+                layoutPropEditModes.get(lp.name);
+            if (!onlyInEditMode || v.isInEditMode()) {
+              //noinspection unchecked
+              lp.apply(plps, e.getValue());
+            }
             break;
           }
         }
