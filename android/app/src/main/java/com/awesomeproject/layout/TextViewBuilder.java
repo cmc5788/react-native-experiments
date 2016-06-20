@@ -19,6 +19,7 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
 
     @Override
     public void apply(@NonNull TextView tv) {
+      Integer val = get();
       if (val != null) tv.setText(val);
     }
   }
@@ -32,6 +33,7 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
 
     @Override
     public void apply(@NonNull TextView tv) {
+      CharSequence val = get();
       if (val != null) tv.setText(val);
     }
   }
@@ -45,6 +47,7 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
 
     @Override
     public void apply(@NonNull TextView tv) {
+      Integer val = get();
       if (val != null) tv.setGravity(val);
     }
   }

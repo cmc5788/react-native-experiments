@@ -18,6 +18,7 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
 
     @Override
     public void apply(@NonNull LinearLayout ll) {
+      Integer val = get();
       if (val != null) ll.setOrientation(val);
     }
   }
@@ -31,6 +32,7 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
 
     @Override
     public void apply(@NonNull LinearLayout ll) {
+      Integer val = get();
       if (val != null) ll.setGravity(val);
     }
   }

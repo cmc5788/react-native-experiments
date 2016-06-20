@@ -6,6 +6,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,24 +29,38 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   private static final int LAYOUT_DIM_EMPTY = Integer.MIN_VALUE;
 
+  private static final String EDIT_MODE_TAG = "ONLY_IN_EDIT_MODE.";
+
+  private static <V extends View, T> Prop<V, T> simpleSyncPropCopy(final Prop<V, T> prop) {
+    return new Prop<V, T>(prop.name) {
+      @Override
+      public void apply(@NonNull V v) {
+        T t = prop.get();
+        prop.set(get());
+        prop.apply(v);
+        prop.set(t);
+      }
+    };
+  }
+
   public static abstract class Prop<V extends View, T> {
     @NonNull public final String name;
-    protected T val;
-    private boolean onlyInEditMode;
+    private T val;
 
     public Prop(@NonNull String name) {
       this.name = name;
     }
 
-    public void set(T val) {
+    public void set(@Nullable T val) {
       this.val = val;
     }
 
-    public abstract void apply(@NonNull V v);
-
-    public void setOnlyInEditMode() {
-      onlyInEditMode = true;
+    @Nullable
+    public T get() {
+      return val;
     }
+
+    public abstract void apply(@NonNull V v);
 
     @Override
     public final boolean equals(Object o) {
@@ -75,23 +91,19 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     @CallSuper
     @Override
     public void apply(@NonNull V v) {
-      if (val != null) val = dimToPx(val, type);
+      Integer val = get();
+      if (val != null) set(dimToPx(val, type));
     }
   }
 
   public static abstract class LayoutProp<LP extends ViewGroup.LayoutParams, T> {
     @NonNull public final String name;
-    private boolean onlyInEditMode;
 
     public LayoutProp(@NonNull String name) {
       this.name = name;
     }
 
     public abstract void apply(@NonNull LP lp, T val);
-
-    public void setOnlyInEditMode() {
-      onlyInEditMode = true;
-    }
 
     @Override
     public final boolean equals(Object o) {
@@ -137,6 +149,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
     @Override
     public void apply(@NonNull View v) {
+      Integer val = get();
       if (val != null) v.setId(val);
     }
   }
@@ -150,6 +163,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
     @Override
     public void apply(@NonNull View v) {
+      Integer val = get();
       if (val != null) {
         //noinspection deprecation
         v.setBackgroundColor(v.getResources().getColor(val));
@@ -166,6 +180,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
     @Override
     public void apply(@NonNull View v) {
+      Integer val = get();
       if (val != null) v.setBackgroundColor(val);
     }
   }
@@ -180,6 +195,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     @Override
     public void apply(@NonNull View v) {
       super.apply(v);
+      Integer val = get();
       if (val != null) {
         v.setPadding(val, v.getPaddingTop(), v.getPaddingRight(), v.getPaddingBottom());
       }
@@ -196,6 +212,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     @Override
     public void apply(@NonNull View v) {
       super.apply(v);
+      Integer val = get();
       if (val != null) {
         v.setPadding(v.getPaddingLeft(), val, v.getPaddingRight(), v.getPaddingBottom());
       }
@@ -212,6 +229,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     @Override
     public void apply(@NonNull View v) {
       super.apply(v);
+      Integer val = get();
       if (val != null) {
         v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), val, v.getPaddingBottom());
       }
@@ -228,6 +246,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     @Override
     public void apply(@NonNull View v) {
       super.apply(v);
+      Integer val = get();
       if (val != null) {
         v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), val);
       }
@@ -243,6 +262,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
     @Override
     public void apply(@NonNull View v) {
+      View.OnClickListener val = get();
       if (val != null) v.setOnClickListener(val);
     }
   }
@@ -325,7 +345,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   private Map<String, Prop<? super V, ?>> props;
   private Map<String, Object> layoutPropMap;
-  private Map<String, Boolean> layoutPropEditModes;
+  //private Map<String, Boolean> layoutPropEditModes;
   private Set<LayoutProp> layoutProps;
 
   private ViewBuilder parent;
@@ -395,9 +415,12 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     Prop<? super V, T> prop = (Prop<? super V, T>) props.get(name);
     if (nextPropOnlyInEditMode) {
       nextPropOnlyInEditMode = false;
-      prop.setOnlyInEditMode();
+      Prop<? super V, T> editModeCopy = simpleSyncPropCopy(prop);
+      props.put(EDIT_MODE_TAG + prop.name, editModeCopy);
+      editModeCopy.set(val);
+    } else {
+      prop.set(val);
     }
-    prop.set(val);
     //noinspection unchecked
     return (VB) this;
   }
@@ -406,10 +429,10 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     if (layoutPropMap == null) layoutPropMap = new HashMap<>();
     if (nextPropOnlyInEditMode) {
       nextPropOnlyInEditMode = false;
-      if (layoutPropEditModes == null) layoutPropEditModes = new HashMap<>();
-      layoutPropEditModes.put(layoutPropName, true);
+      layoutPropMap.put(EDIT_MODE_TAG + layoutPropName, val);
+    } else {
+      layoutPropMap.put(layoutPropName, val);
     }
-    layoutPropMap.put(layoutPropName, val);
     //noinspection unchecked
     return (VB) this;
   }
@@ -743,10 +766,30 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   @SuppressWarnings("deprecation")
   private void applyProps(@NonNull V v) {
     if (props != null) {
-      for (Prop<? super V, ?> p : props.values()) {
-        if (!p.onlyInEditMode || v.isInEditMode()) {
-          p.apply(v);
+
+      if (v.isInEditMode()) {
+        Set<String> toRemove = new HashSet<>();
+        for (Map.Entry<String, Prop<? super V, ?>> p : props.entrySet()) {
+          if (p.getKey().startsWith(EDIT_MODE_TAG)) {
+            p.getValue().apply(v);
+            toRemove.add(p.getKey());
+            toRemove.add(p.getKey().replace(EDIT_MODE_TAG, ""));
+          }
         }
+        for (String keyToRemove : toRemove) {
+          props.remove(keyToRemove);
+        }
+      } else {
+        for (Iterator<Map.Entry<String, Prop<? super V, ?>>> i = props.entrySet().iterator();
+            i.hasNext(); ) {
+          if (i.next().getKey().startsWith(EDIT_MODE_TAG)) {
+            i.remove();
+          }
+        }
+      }
+
+      for (Prop<? super V, ?> p : props.values()) {
+        p.apply(v);
       }
     }
   }
@@ -760,16 +803,39 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
 
     if (layoutPropMap != null && layoutProps != null) {
+
+      if (v.isInEditMode()) {
+        Set<String> toRemove = new HashSet<>();
+        for (Map.Entry<String, Object> e : layoutPropMap.entrySet()) {
+          if (e.getKey().startsWith(EDIT_MODE_TAG)) {
+            for (LayoutProp lp : layoutProps) {
+              if (lp.name.equals(e.getKey())) {
+                //noinspection unchecked
+                lp.apply(plps, e.getValue());
+                break;
+              }
+            }
+            toRemove.add(e.getKey());
+            toRemove.add(e.getKey().replace(EDIT_MODE_TAG, ""));
+          }
+        }
+        for (String keyToRemove : toRemove) {
+          layoutPropMap.remove(keyToRemove);
+        }
+      } else {
+        for (Iterator<Map.Entry<String, Object>> i = layoutPropMap.entrySet().iterator();
+            i.hasNext(); ) {
+          if (i.next().getKey().startsWith(EDIT_MODE_TAG)) {
+            i.remove();
+          }
+        }
+      }
+
       for (Map.Entry<String, Object> e : layoutPropMap.entrySet()) {
         for (LayoutProp lp : layoutProps) {
           if (lp.name.equals(e.getKey())) {
-            boolean onlyInEditMode = layoutPropEditModes != null && //
-                layoutPropEditModes.get(lp.name) != null && //
-                layoutPropEditModes.get(lp.name);
-            if (!onlyInEditMode || v.isInEditMode()) {
-              //noinspection unchecked
-              lp.apply(plps, e.getValue());
-            }
+            //noinspection unchecked
+            lp.apply(plps, e.getValue());
             break;
           }
         }

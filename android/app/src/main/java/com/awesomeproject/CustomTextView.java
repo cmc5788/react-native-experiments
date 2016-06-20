@@ -26,6 +26,7 @@ public class CustomTextView extends TextView {
 
     @Override
     public void apply(@NonNull CustomTextView tv) {
+      Integer val = get();
       if (val != null) tv.setTextClr(val);
     }
   }
