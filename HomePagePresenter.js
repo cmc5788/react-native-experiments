@@ -21,6 +21,8 @@ function HomePagePresenter() {
       .then(() => wait(1000))
       .then(() => this.view.send({ setButtonColor: '#FF00FF' })) // MAGENTA
       .then(() => wait(1000))
+      .then(() => this.view.send({ setImageUrl: 'https://vinli-public.s3.amazonaws.com/app-catalog/home-connect/home-icon.png' }))
+      .then(() => wait(2000))
       .then(() => fetch('https://auth.vin.li/api/v1/config'))
       .then((response) => response.json())
       .then((responseJson) => nav.recvJson(responseJson))

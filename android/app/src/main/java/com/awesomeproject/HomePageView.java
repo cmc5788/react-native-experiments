@@ -10,11 +10,13 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
 import com.awesomeproject.MyNavigator.NavigableView;
 import com.awesomeproject.MyNavigator.ViewFactory;
+import com.awesomeproject.layout.ImageViews;
 import com.awesomeproject.layout.LinearLayouts;
 import com.awesomeproject.layout.RelativeLayouts;
 import com.awesomeproject.layout.ScrollViews;
@@ -23,6 +25,7 @@ import com.awesomeproject.layout.TextViews;
 import com.awesomeproject.layout.ViewBuilder;
 import com.awesomeproject.layout.Views;
 import com.facebook.react.bridge.ReadableMap;
+import com.squareup.picasso.Picasso;
 
 import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
@@ -38,6 +41,7 @@ import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 public class HomePageView extends ScrollView implements NavigableView, JSViewEventTarget {
 
   private static final int TEXT_ID = Views.generateViewId();
+  private static final int IMAGE_ID = Views.generateViewId();
   private static final int TEXT_CENTER_ANCHOR = Views.generateViewId();
   private static final int TEXT_LEFT_ANCHOR = Views.generateViewId();
   private static final int TEXT_RIGHT_ANCHOR = Views.generateViewId();
@@ -121,6 +125,8 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
   public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
     if (args != null && args.hasKey("setButtonColor")) {
       setBtnColor(Color.parseColor(args.getString("setButtonColor")));
+    } else if (args != null && args.hasKey("setImageUrl")) {
+      setImageUrl(args.getString("setImageUrl"));
     }
   }
 
@@ -154,9 +160,9 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
             .child(Spaces.vSpace(0.5f))
 
             .child(
-                TextViews.build()
-                .wrapContent()
-                .text("I am the Home Page")
+                ImageViews.build()
+                .id(IMAGE_ID)
+                .dimsDp(64)
             )
 
             .child(Spaces.vSpace(1))
@@ -275,5 +281,13 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
 
   private void setBtnColor(@ColorInt int color) {
     findViewById(TEXT_ID).setBackgroundColor(color);
+  }
+
+  private void setImageUrl(String url) {
+    Picasso.with(getContext())
+        .load(url)
+        .fit()
+        .centerInside()
+        .into((ImageView) findViewById(IMAGE_ID));
   }
 }
