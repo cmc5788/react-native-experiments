@@ -46,7 +46,7 @@ module.exports = (appPresenter) =>
             if (prop !== 'init' && prop !== 'destroy' &&
                 typeof activePresenters[evt.tag][prop] === 'function') {
               activePresenters[evt.tag][prop + 'Sub'] = DeviceEventEmitter.addListener(
-                evt.tag + '.' + prop, activePresenters[evt.tag][prop]);
+                `${evt.tag}.${prop}`, activePresenters[evt.tag][prop]);
             }
           }
 
