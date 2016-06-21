@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
 import com.awesomeproject.MyNavigator.NavigableView;
 import com.awesomeproject.MyNavigator.ViewFactory;
@@ -19,6 +20,7 @@ import com.awesomeproject.layout.RelativeLayouts;
 import com.awesomeproject.layout.ScrollViews;
 import com.awesomeproject.layout.Spaces;
 import com.awesomeproject.layout.TextViews;
+import com.awesomeproject.layout.ViewBuilder;
 import com.awesomeproject.layout.Views;
 import com.facebook.react.bridge.ReadableMap;
 
@@ -144,6 +146,12 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
             .gravity(CENTER)
 
             .child(Spaces.vSpace(1))
+
+            .child(
+                ViewBuilder.<TextView>fromXml(R.layout.simple_textview)
+            )
+
+            .child(Spaces.vSpace(0.5f))
 
             .child(
                 TextViews.build()

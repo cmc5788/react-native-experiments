@@ -5,9 +5,11 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import java.util.ArrayList;
@@ -30,6 +32,18 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   private static final int LAYOUT_DIM_EMPTY = Integer.MIN_VALUE;
 
   private static final String EDIT_MODE_TAG = "ONLY_IN_EDIT_MODE.";
+
+  public static <V extends View> ViewBuilder<ViewBuilder<?, V>, V> fromXml(
+      @LayoutRes final int layoutResId) {
+    return new ViewBuilder<ViewBuilder<?, V>, V>() {
+      @NonNull
+      @Override
+      protected V createView(ViewGroup root) {
+        //noinspection unchecked
+        return (V) LayoutInflater.from(root.getContext()).inflate(layoutResId, root, false);
+      }
+    };
+  }
 
   private static <V extends View, T> Prop<V, T> simpleSyncPropCopy(final Prop<V, T> prop) {
     return new Prop<V, T>(prop.name) {
@@ -800,6 +814,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       plps = new ViewGroup.LayoutParams(0, 0);
     } else {
       plps = parent.createEmptyLayoutParamsForChild();
+      plps.width = plps.height = LAYOUT_DIM_EMPTY;
     }
 
     if (layoutPropMap != null && layoutProps != null) {
@@ -843,7 +858,11 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
 
     if (plps.width == LAYOUT_DIM_EMPTY || plps.height == LAYOUT_DIM_EMPTY) {
-      throw reqArg("layout width & height");
+      if (v.getLayoutParams() == null) {
+        throw reqArg("layout width & height");
+      } else {
+        plps = v.getLayoutParams();
+      }
     }
 
     v.setLayoutParams(plps);
