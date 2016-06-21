@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class FrameLayoutBuilder extends ViewBuilder<FrameLayoutBuilder, FrameLayout> {
 
-  public static class LayoutGravityProp extends LayoutProp<FrameLayout.LayoutParams, Integer> {
+  private static class LayoutGravityProp extends LayoutProp<FrameLayout.LayoutParams, Integer> {
 
     public LayoutGravityProp() {
       super(LayoutParams.GRAVITY);

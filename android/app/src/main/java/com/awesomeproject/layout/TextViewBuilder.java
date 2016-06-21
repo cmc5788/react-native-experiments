@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
     implements TextViews.TextViewProps<TextViewBuilder> {
 
-  public static class TextResProp extends Prop<TextView, Integer> {
+  private static class TextResProp extends Prop<TextView, Integer> {
     private static final String NAME = "TEXT_RES";
 
     public TextResProp() {
@@ -24,7 +24,7 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
     }
   }
 
-  public static class TextCharSequenceProp extends Prop<TextView, CharSequence> {
+  private static class TextCharSequenceProp extends Prop<TextView, CharSequence> {
     private static final String NAME = "TEXT_CHARSEQUENCE";
 
     public TextCharSequenceProp() {
@@ -38,7 +38,7 @@ public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>
     }
   }
 
-  public static class TextGravityProp extends Prop<TextView, Integer> {
+  private static class TextGravityProp extends Prop<TextView, Integer> {
     private static final String NAME = "TEXT_GRAVITY";
 
     public TextGravityProp() {

@@ -115,7 +115,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class IdProp extends Prop<View, Integer> {
+  private static class IdProp extends Prop<View, Integer> {
     private static final String NAME = "ID";
 
     public IdProp() {
@@ -129,7 +129,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class BgColorResProp extends Prop<View, Integer> {
+  private static class BgColorResProp extends Prop<View, Integer> {
     private static final String NAME = "BG_COLOR_RES";
 
     public BgColorResProp() {
@@ -146,7 +146,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class BgColorIntProp extends Prop<View, Integer> {
+  private static class BgColorIntProp extends Prop<View, Integer> {
     private static final String NAME = "BG_COLOR_INT";
 
     public BgColorIntProp() {
@@ -160,7 +160,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class PaddingLeftProp extends Prop<View, DimVal> {
+  private static class PaddingLeftProp extends Prop<View, DimVal> {
     private static final String NAME = "PADDING_LEFT";
 
     public PaddingLeftProp() {
@@ -176,7 +176,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class PaddingTopProp extends Prop<View, DimVal> {
+  private static class PaddingTopProp extends Prop<View, DimVal> {
     private static final String NAME = "PADDING_TOP";
 
     public PaddingTopProp() {
@@ -192,7 +192,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class PaddingRightProp extends Prop<View, DimVal> {
+  private static class PaddingRightProp extends Prop<View, DimVal> {
     private static final String NAME = "PADDING_RIGHT";
 
     public PaddingRightProp() {
@@ -208,7 +208,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class PaddingBottomProp extends Prop<View, DimVal> {
+  private static class PaddingBottomProp extends Prop<View, DimVal> {
     private static final String NAME = "PADDING_BOTTOM";
 
     public PaddingBottomProp() {
@@ -224,7 +224,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class OnClickProp extends Prop<View, View.OnClickListener> {
+  private static class OnClickProp extends Prop<View, View.OnClickListener> {
     private static final String NAME = "ON_CLICK";
 
     public OnClickProp() {
@@ -238,7 +238,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class WidthFlexMinProp extends Prop<View, DimVal> {
+  private static class WidthFlexMinProp extends Prop<View, DimVal> {
     private static final String NAME = "WIDTH_FLEX_MIN";
 
     public WidthFlexMinProp() {
@@ -251,7 +251,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class WidthFlexMaxProp extends Prop<View, DimVal> {
+  private static class WidthFlexMaxProp extends Prop<View, DimVal> {
     private static final String NAME = "WIDTH_FLEX_MAX";
 
     public WidthFlexMaxProp() {
@@ -264,7 +264,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class WidthFlexPctProp extends Prop<View, Float> {
+  private static class WidthFlexPctProp extends Prop<View, Float> {
     private static final String NAME = "WIDTH_FLEX_PCT";
 
     public WidthFlexPctProp() {
@@ -277,7 +277,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class HeightFlexMinProp extends Prop<View, DimVal> {
+  private static class HeightFlexMinProp extends Prop<View, DimVal> {
     private static final String NAME = "HEIGHT_FLEX_MIN";
 
     public HeightFlexMinProp() {
@@ -290,7 +290,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class HeightFlexMaxProp extends Prop<View, DimVal> {
+  private static class HeightFlexMaxProp extends Prop<View, DimVal> {
     private static final String NAME = "HEIGHT_FLEX_MAX";
 
     public HeightFlexMaxProp() {
@@ -303,7 +303,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class HeightFlexPctProp extends Prop<View, Float> {
+  private static class HeightFlexPctProp extends Prop<View, Float> {
     private static final String NAME = "HEIGHT_FLEX_PCT";
 
     public HeightFlexPctProp() {
@@ -316,7 +316,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class LayoutWidthProp extends LayoutProp<ViewGroup.LayoutParams, DimVal> {
+  private static class LayoutWidthProp extends LayoutProp<ViewGroup.LayoutParams, DimVal> {
 
     public LayoutWidthProp() {
       super(LayoutParams.WIDTH);
@@ -328,7 +328,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class LayoutHeightProp extends LayoutProp<ViewGroup.LayoutParams, DimVal> {
+  private static class LayoutHeightProp extends LayoutProp<ViewGroup.LayoutParams, DimVal> {
 
     public LayoutHeightProp() {
       super(LayoutParams.HEIGHT);
@@ -340,7 +340,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class MarginLeftProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
+  private static class MarginLeftProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
 
     public MarginLeftProp() {
       super(LayoutParams.MARGIN_LEFT);
@@ -352,7 +352,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class MarginTopProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
+  private static class MarginTopProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
 
     public MarginTopProp() {
       super(LayoutParams.MARGIN_TOP);
@@ -364,7 +364,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class MarginRightProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
+  private static class MarginRightProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
 
     public MarginRightProp() {
       super(LayoutParams.MARGIN_RIGHT);
@@ -376,7 +376,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class MarginBottomProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
+  private static class MarginBottomProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
 
     public MarginBottomProp() {
       super(LayoutParams.MARGIN_BOTTOM);

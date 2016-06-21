@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class RelativeLayoutBuilder extends ViewBuilder<RelativeLayoutBuilder, RelativeLayout> {
 
-  public static class AlignParentProp extends LayoutProp<RelativeLayout.LayoutParams, Object> {
+  private static class AlignParentProp extends LayoutProp<RelativeLayout.LayoutParams, Object> {
 
     private final int rule;
 

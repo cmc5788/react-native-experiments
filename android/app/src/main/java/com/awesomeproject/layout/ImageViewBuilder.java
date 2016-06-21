@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class ImageViewBuilder extends ViewBuilder<ImageViewBuilder, ImageView>
     implements ImageViews.ImageViewProps<ImageViewBuilder> {
 
-  public static class ImageResProp extends Prop<ImageView, Integer> {
+  private static class ImageResProp extends Prop<ImageView, Integer> {
     private static final String NAME = "IMAGE_RES";
 
     public ImageResProp() {
@@ -25,7 +25,7 @@ public class ImageViewBuilder extends ViewBuilder<ImageViewBuilder, ImageView>
     }
   }
 
-  public static class ImageDrawableProp extends Prop<ImageView, Drawable> {
+  private static class ImageDrawableProp extends Prop<ImageView, Drawable> {
     private static final String NAME = "IMAGE_DRAWABLE";
 
     public ImageDrawableProp() {
@@ -39,7 +39,7 @@ public class ImageViewBuilder extends ViewBuilder<ImageViewBuilder, ImageView>
     }
   }
 
-  public static class ImageBitmapProp extends Prop<ImageView, Bitmap> {
+  private static class ImageBitmapProp extends Prop<ImageView, Bitmap> {
     private static final String NAME = "IMAGE_BITMAP";
 
     public ImageBitmapProp() {

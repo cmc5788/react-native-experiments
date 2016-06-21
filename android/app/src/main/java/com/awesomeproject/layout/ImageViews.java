@@ -8,7 +8,9 @@ public class ImageViews {
 
   public interface ImageViewProps<VB extends ViewBuilder> {
     VB image(@DrawableRes int image);
+
     VB image(Drawable image);
+
     VB image(Bitmap image);
   }
 

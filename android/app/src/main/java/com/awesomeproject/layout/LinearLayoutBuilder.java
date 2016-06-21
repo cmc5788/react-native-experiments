@@ -9,7 +9,7 @@ import java.util.Set;
 public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, LinearLayout>
     implements LinearLayouts.LinearLayoutProps<LinearLayoutBuilder> {
 
-  public static final class OrientationProp extends Prop<LinearLayout, Integer> {
+  private static final class OrientationProp extends Prop<LinearLayout, Integer> {
     private static final String NAME = "ORIENTATION";
 
     public OrientationProp() {
@@ -26,7 +26,7 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
     }
   }
 
-  public static final class GravityProp extends Prop<LinearLayout, Integer> {
+  private static final class GravityProp extends Prop<LinearLayout, Integer> {
     private static final String NAME = "GRAVITY";
 
     public GravityProp() {
@@ -40,7 +40,7 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
     }
   }
 
-  public static class LayoutGravityProp extends LayoutProp<LinearLayout.LayoutParams, Integer> {
+  private static class LayoutGravityProp extends LayoutProp<LinearLayout.LayoutParams, Integer> {
 
     public LayoutGravityProp() {
       super(LayoutParams.GRAVITY);
@@ -52,7 +52,7 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
     }
   }
 
-  public static class LayoutWeightProp extends LayoutProp<LinearLayout.LayoutParams, Float> {
+  private static class LayoutWeightProp extends LayoutProp<LinearLayout.LayoutParams, Float> {
 
     public LayoutWeightProp() {
       super(LayoutParams.WEIGHT);

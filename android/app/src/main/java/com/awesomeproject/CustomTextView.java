@@ -17,7 +17,7 @@ public class CustomTextView extends TextView {
     return new Builder();
   }
 
-  public static class TextClrProp extends ViewBuilder.Prop<CustomTextView, Integer> {
+  private static class TextClrProp extends ViewBuilder.Prop<CustomTextView, Integer> {
     private static final String NAME = "TEXT_CLR";
 
     public TextClrProp() {

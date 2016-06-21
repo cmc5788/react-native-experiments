@@ -9,7 +9,7 @@ import java.util.Set;
 public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView> implements
     ScrollViews.ScrollViewProps<ScrollViewBuilder> {
 
-  public static class FillViewportProp extends Prop<ScrollView, Boolean> {
+  private static class FillViewportProp extends Prop<ScrollView, Boolean> {
     private static final String NAME = "FILL_VIEWPORT";
 
     public FillViewportProp() {
@@ -23,7 +23,7 @@ public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView
     }
   }
 
-  public static class LayoutGravityProp extends LayoutProp<ScrollView.LayoutParams, Integer> {
+  private static class LayoutGravityProp extends LayoutProp<ScrollView.LayoutParams, Integer> {
 
     public LayoutGravityProp() {
       super(LayoutParams.GRAVITY);
