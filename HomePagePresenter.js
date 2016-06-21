@@ -34,7 +34,7 @@ function HomePagePresenter() {
 
   this.destroy = () => {
     console.log('HomePagePresenter destroy');
-  }
+  };
 }
 
 module.exports = HomePagePresenter;
