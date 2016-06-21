@@ -39,6 +39,17 @@ module.exports = (appPresenter) =>
           const presenterCtor = appPresenter.viewPresenters[evt.tag]();
           activePresenters[evt.tag] = BuildPresenter(
             presenterCtor, evt.tag, ViewEventSender(evt.tag));
+
+          // auto register event listeners for presenter based on prop names
+          // TODO - clean this code up
+          for (var prop in activePresenters[evt.tag]) {
+            if (prop !== 'init' && prop !== 'destroy' &&
+                typeof activePresenters[evt.tag][prop] === 'function') {
+              activePresenters[evt.tag][prop + 'Sub'] = DeviceEventEmitter.addListener(
+                evt.tag + '.' + prop, activePresenters[evt.tag][prop]);
+            }
+          }
+
           activePresenters[evt.tag].init();
         }
       }
@@ -47,6 +58,18 @@ module.exports = (appPresenter) =>
     DeviceEventEmitter.addListener('onDestroyView', (evt) => {
       if (activePresenters[evt.tag]) {
         activePresenters[evt.tag].destroy();
+
+        // auto cleanup event listeners for presenter based on prop names
+        // TODO - clean this code up
+        for (var prop in activePresenters[evt.tag]) {
+          if (prop !== 'init' && prop !== 'destroy' &&
+              typeof activePresenters[evt.tag][prop] === 'function') {
+            activePresenters[evt.tag][prop + 'Sub'] && console.log(`${evt.tag}.${prop} remove sub`);
+            activePresenters[evt.tag][prop + 'Sub'] && activePresenters[evt.tag][prop + 'Sub'].remove();
+            activePresenters[evt.tag][prop + 'Sub'] = null;
+          }
+        }
+
         activePresenters[evt.tag] = null;
       }
     });

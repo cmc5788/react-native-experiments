@@ -125,7 +125,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
   public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
     if (args != null && args.hasKey("setButtonColor")) {
       setBtnColor(Color.parseColor(args.getString("setButtonColor")));
-    } else if (args != null && args.hasKey("setImageUrl")) {
+    } if (args != null && args.hasKey("setImageUrl")) {
       setImageUrl(args.getString("setImageUrl"));
     }
   }
@@ -275,7 +275,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
   private final OnClickListener onBtnClick = new OnClickListener() {
     @Override
     public void onClick(View v) {
-      eventDispatcher.dispatch(TAG + ".ButtonClicked", null);
+      eventDispatcher.dispatch(TAG + ".buttonClicked", null);
     }
   };
 
