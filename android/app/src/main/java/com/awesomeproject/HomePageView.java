@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
 import com.awesomeproject.MyNavigator.NavigableView;
 import com.awesomeproject.MyNavigator.ViewFactory;
@@ -22,7 +21,6 @@ import com.awesomeproject.layout.RelativeLayouts;
 import com.awesomeproject.layout.ScrollViews;
 import com.awesomeproject.layout.Spaces;
 import com.awesomeproject.layout.TextViews;
-import com.awesomeproject.layout.ViewBuilder;
 import com.awesomeproject.layout.Views;
 import com.facebook.react.bridge.ReadableMap;
 import com.squareup.picasso.Picasso;
@@ -30,12 +28,12 @@ import com.squareup.picasso.Picasso;
 import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
 import static android.widget.LinearLayout.HORIZONTAL;
-import static android.widget.LinearLayout.VERTICAL;
 import static com.awesomeproject.layout.LayoutParams.ALIGN_PARENT_LEFT;
 import static com.awesomeproject.layout.LayoutParams.ALIGN_PARENT_RIGHT;
 import static com.awesomeproject.layout.LayoutParams.CENTER_IN_PARENT;
 import static com.awesomeproject.layout.LayoutParams.LEFT_OF;
 import static com.awesomeproject.layout.LayoutParams.RIGHT_OF;
+import static com.awesomeproject.layout.LayoutParams.WEIGHT;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class HomePageView extends ScrollView implements NavigableView, JSViewEventTarget {
@@ -125,7 +123,8 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
   public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
     if (args != null && args.hasKey("setButtonColor")) {
       setBtnColor(Color.parseColor(args.getString("setButtonColor")));
-    } if (args != null && args.hasKey("setImageUrl")) {
+    }
+    if (args != null && args.hasKey("setImageUrl")) {
       setImageUrl(args.getString("setImageUrl"));
     }
   }
@@ -140,133 +139,189 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
 
   private void buildLayout() {
     // @formatter:off
-    ScrollViews.build()
+    ScrollViews.buildWithInnerLinear()
         .matchParent()
-        .fillViewport(true)
+        .gravity(CENTER)
         .bgColorInt(WHITE)
+
+        .child(Spaces.vSpace(1))
+
+        .childXml(R.layout.simple_textview)
+
+        .child(Spaces.vSpace(0.5f))
+
+        .child(
+          LinearLayouts.build()
+          .matchWidth()
+          .orientation(HORIZONTAL)
+          .gravity(CENTER)
+
+          .child(
+              ImageViews.build()
+              .bgColorInt(Color.MAGENTA)
+              .id(IMAGE_ID)
+              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .heightFlexPct(1f)
+          )
+
+          .child(
+              ImageViews.build()
+              .bgColorInt(Color.GREEN)
+              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .heightFlexPct(1f)
+          )
+
+          .child(
+              ImageViews.build()
+              .bgColorInt(Color.BLUE)
+              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .heightFlexPct(1f)
+          )
+
+          .child(
+              ImageViews.build()
+              .bgColorInt(Color.RED)
+              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .heightFlexPct(1f)
+          )
+        )
+
+        .child(
+          LinearLayouts.build()
+          .matchWidth()
+          .orientation(HORIZONTAL)
+          .gravity(CENTER)
+
+          .child(
+              ImageViews.build()
+              .bgColorInt(Color.RED)
+              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .heightFlexPct(1)
+          )
+
+          .child(
+              ImageViews.build()
+              .bgColorInt(Color.BLUE)
+              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .heightFlexPct(1)
+          )
+
+          .child(
+              ImageViews.build()
+              .bgColorInt(Color.GREEN)
+              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .heightFlexPct(1)
+          )
+
+          .child(
+              ImageViews.build()
+              .bgColorInt(Color.MAGENTA)
+              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .heightFlexPct(1)
+          )
+        )
+
+        .child(Spaces.vSpace(1))
+
+        .child(
+            TextViews.build()
+            .id(TEXT_ID)
+            .wrapContent()
+            .vPaddingDp(14).hPaddingDp(10)
+            .bgColorInt(Color.LTGRAY)
+            .text("I am just some text")
+            .onClick(onBtnClick)
+        )
+
+        .child(Spaces.vSpace(1))
 
         .child(
             LinearLayouts.build()
-            .matchParent()
-            .orientation(VERTICAL)
+            .matchWidth()
+            .orientation(HORIZONTAL)
             .gravity(CENTER)
 
-            .child(Spaces.vSpace(1))
-
-            .child(
-                ViewBuilder.<TextView>fromXml(R.layout.simple_textview)
-            )
-
-            .child(Spaces.vSpace(0.5f))
-
-            .child(
-                ImageViews.build()
-                .id(IMAGE_ID)
-                .dimsDp(64)
-            )
-
-            .child(Spaces.vSpace(1))
+            .child(Spaces.hSpace(1))
 
             .child(
                 TextViews.build()
-                .id(TEXT_ID)
                 .wrapContent()
-                .vPaddingDp(14).hPaddingDp(10)
-                .bgColorInt(Color.LTGRAY)
-                .text("I am just some text")
-                .onClick(onBtnClick)
+                .text("COL 1")
             )
 
-            .child(Spaces.vSpace(1))
+            .child(Spaces.hSpace(1.5f))
 
             .child(
-                LinearLayouts.build()
-                .matchWidth()
-                .orientation(HORIZONTAL)
-                .gravity(CENTER)
-
-                .child(Spaces.hSpace(1))
-
-                .child(
-                    TextViews.build()
-                    .wrapContent()
-                    .text("COL 1")
-                )
-
-                .child(Spaces.hSpace(1.5f))
-
-                .child(
-                    CustomTextView.build()
-                    .wrapContent()
-                    .textClr(Color.GREEN)
-                    .text("COL 2")
-                )
-
-                .child(Spaces.hSpace(1.5f))
-
-                .child(
-                    TextViews.build()
-                    .wrapContent()
-                    .text("COL 3")
-                )
-
-                .child(Spaces.hSpace(1))
+                CustomTextView.build()
+                .wrapContent()
+                .textClr(Color.GREEN)
+                .text("COL 2")
             )
 
-            .child(Spaces.vSpace(1))
+            .child(Spaces.hSpace(1.5f))
 
             .child(
-                RelativeLayouts.build()
-                .matchWidth()
-
-                .child(
-                    TextViews.build()
-                    .wrapContent()
-                    .gravity(CENTER)
-                    .layout(ALIGN_PARENT_LEFT, true)
-                    .layout(LEFT_OF, TEXT_LEFT_ANCHOR)
-                    .text("COL ??")
-                )
-
-                .child(
-                    TextViews.build()
-                    .id(TEXT_LEFT_ANCHOR)
-                    .wrapContent()
-                    .layout(LEFT_OF, TEXT_CENTER_ANCHOR)
-                    .text("COL A")
-                )
-
-                .child(
-                    TextViews.build()
-                    .id(TEXT_CENTER_ANCHOR)
-                    .editMode().bgColorInt(Color.MAGENTA)
-                    .bgColorInt(Color.CYAN)
-                    .wrapContent()
-                    .hMarginsDp(16)
-                    .layout(CENTER_IN_PARENT, true)
-                    .text("COL B")
-                )
-
-                .child(
-                    TextViews.build()
-                    .id(TEXT_RIGHT_ANCHOR)
-                    .wrapContent()
-                    .layout(RIGHT_OF, TEXT_CENTER_ANCHOR)
-                    .text("COL C")
-                )
-
-                .child(
-                    TextViews.build()
-                    .wrapContent()
-                    .gravity(CENTER)
-                    .layout(ALIGN_PARENT_RIGHT, true)
-                    .layout(RIGHT_OF, TEXT_RIGHT_ANCHOR)
-                    .text("COL !!")
-                )
+                TextViews.build()
+                .wrapContent()
+                .text("COL 3")
             )
 
-            .child(Spaces.vSpace(1))
+            .child(Spaces.hSpace(1))
         )
+
+        .child(Spaces.vSpace(1))
+
+        .child(
+            RelativeLayouts.build()
+            .matchWidth()
+
+            .child(
+                TextViews.build()
+                .wrapContent()
+                .gravity(CENTER)
+                .layout(ALIGN_PARENT_LEFT, true)
+                .layout(LEFT_OF, TEXT_LEFT_ANCHOR)
+                .text("COL ??")
+            )
+
+            .child(
+                TextViews.build()
+                .id(TEXT_LEFT_ANCHOR)
+                .wrapContent()
+                .layout(LEFT_OF, TEXT_CENTER_ANCHOR)
+                .text("COL A")
+            )
+
+            .child(
+                TextViews.build()
+                .id(TEXT_CENTER_ANCHOR)
+                .editMode().bgColorInt(Color.MAGENTA)
+                .bgColorInt(Color.CYAN)
+                .wrapContent()
+                .hMarginsDp(16)
+                .layout(CENTER_IN_PARENT, true)
+                .text("COL B")
+            )
+
+            .child(
+                TextViews.build()
+                .id(TEXT_RIGHT_ANCHOR)
+                .wrapContent()
+                .layout(RIGHT_OF, TEXT_CENTER_ANCHOR)
+                .text("COL C")
+            )
+
+            .child(
+                TextViews.build()
+                .wrapContent()
+                .gravity(CENTER)
+                .layout(ALIGN_PARENT_RIGHT, true)
+                .layout(RIGHT_OF, TEXT_RIGHT_ANCHOR)
+                .text("COL !!")
+            )
+        )
+
+        .child(Spaces.vSpace(1))
 
     .applyOnto(this);
     // @formatter:on

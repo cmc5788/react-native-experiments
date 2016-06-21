@@ -6,7 +6,8 @@ import android.widget.ScrollView;
 import java.util.Collections;
 import java.util.Set;
 
-public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView> {
+public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView> implements
+    ScrollViews.ScrollViewProps<ScrollViewBuilder> {
 
   public static class FillViewportProp extends Prop<ScrollView, Boolean> {
     private static final String NAME = "FILL_VIEWPORT";
@@ -38,6 +39,7 @@ public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView
     regProps(Collections.singleton(new FillViewportProp()));
   }
 
+  @Override
   public ScrollViewBuilder fillViewport(boolean fillViewport) {
     setProp(FillViewportProp.NAME, fillViewport);
     return this;

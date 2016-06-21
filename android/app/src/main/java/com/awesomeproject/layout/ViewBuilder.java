@@ -12,6 +12,8 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -281,6 +283,64 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
+  public static class WidthFlexMinProp extends DimProp<View> {
+    private static final String NAME = "WIDTH_FLEX_MIN";
+
+    public WidthFlexMinProp(int type) {
+      super(NAME, type);
+    }
+  }
+
+  public static class WidthFlexMaxProp extends DimProp<View> {
+    private static final String NAME = "WIDTH_FLEX_MAX";
+
+    public WidthFlexMaxProp(int type) {
+      super(NAME, type);
+    }
+  }
+
+  public static class WidthFlexPctProp extends Prop<View, Float> {
+    private static final String NAME = "WIDTH_FLEX_PCT";
+
+    public WidthFlexPctProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void apply(@NonNull View view) {
+      // no-op
+    }
+  }
+
+  public static class HeightFlexMinProp extends DimProp<View> {
+    private static final String NAME = "HEIGHT_FLEX_MIN";
+
+    public HeightFlexMinProp(int type) {
+      super(NAME, type);
+    }
+  }
+
+  public static class HeightFlexMaxProp extends DimProp<View> {
+    private static final String NAME = "HEIGHT_FLEX_MAX";
+
+    public HeightFlexMaxProp(int type) {
+      super(NAME, type);
+    }
+  }
+
+  public static class HeightFlexPctProp extends Prop<View, Float> {
+    private static final String NAME = "HEIGHT_FLEX_PCT";
+
+    public HeightFlexPctProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void apply(@NonNull View view) {
+      // no-op
+    }
+  }
+
   public static class LayoutWidthProp extends LayoutDimProp<ViewGroup.LayoutParams> {
 
     public LayoutWidthProp(int type) {
@@ -353,13 +413,14 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
+  private String tag;
+
   private List<ViewBuilder> children;
 
   private boolean nextPropOnlyInEditMode;
 
   private Map<String, Prop<? super V, ?>> props;
   private Map<String, Object> layoutPropMap;
-  //private Map<String, Boolean> layoutPropEditModes;
   private Set<LayoutProp> layoutProps;
 
   private ViewBuilder parent;
@@ -378,7 +439,17 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
         new PaddingRightProp(COMPLEX_UNIT_DIP),
         new PaddingBottomProp(COMPLEX_UNIT_PX),
         new PaddingBottomProp(COMPLEX_UNIT_DIP),
-        new OnClickProp()
+        new OnClickProp(),
+        new WidthFlexMinProp(COMPLEX_UNIT_PX),
+        new WidthFlexMinProp(COMPLEX_UNIT_DIP),
+        new WidthFlexMaxProp(COMPLEX_UNIT_PX),
+        new WidthFlexMaxProp(COMPLEX_UNIT_DIP),
+        new WidthFlexPctProp(),
+        new HeightFlexMinProp(COMPLEX_UNIT_PX),
+        new HeightFlexMinProp(COMPLEX_UNIT_DIP),
+        new HeightFlexMaxProp(COMPLEX_UNIT_PX),
+        new HeightFlexMaxProp(COMPLEX_UNIT_DIP),
+        new HeightFlexPctProp()
     ));
     (layoutProps = new HashSet<>()).addAll(Arrays.asList(
         new LayoutWidthProp(COMPLEX_UNIT_PX),
@@ -439,6 +510,33 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     return (VB) this;
   }
 
+  @NonNull
+  public ViewBuilder tagged(@NonNull String tag) {
+    //noinspection ConstantConditions
+    return tagged(tag, true);
+  }
+
+  @Nullable
+  public ViewBuilder tagged(@NonNull String tag, boolean throwIfNotFound) {
+    if (tag.equals(this.tag)) {
+      return this;
+    }
+    for (ViewBuilder child : children()) {
+      ViewBuilder vb = child.tagged(tag, false);
+      if (vb != null) return vb;
+    }
+    if (throwIfNotFound) {
+      throw new RuntimeException("tagged not found.");
+    }
+    return null;
+  }
+
+  public VB tag(@NonNull String tag) {
+    this.tag = tag;
+    //noinspection unchecked
+    return (VB) this;
+  }
+
   public <T> VB layout(@NonNull String layoutPropName, T val) {
     if (layoutPropMap == null) layoutPropMap = new HashMap<>();
     if (nextPropOnlyInEditMode) {
@@ -446,6 +544,18 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       layoutPropMap.put(EDIT_MODE_TAG + layoutPropName, val);
     } else {
       layoutPropMap.put(layoutPropName, val);
+    }
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public <VV extends View> VB childXml(@LayoutRes int layoutResId) {
+    return child(ViewBuilder.<VV>fromXml(layoutResId));
+  }
+
+  public VB children(ViewBuilder... children) {
+    for (ViewBuilder child : children) {
+      child(child);
     }
     //noinspection unchecked
     return (VB) this;
@@ -459,20 +569,6 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     provideLayoutPropsToChild(child.layoutProps);
 
     children().add(child);
-    //noinspection unchecked
-    return (VB) this;
-  }
-
-  public VB children(ViewBuilder... children) {
-    for (ViewBuilder child : children) {
-
-      child.parent = this;
-      if (child.layoutProps == null) child.layoutProps = new HashSet<>();
-      //noinspection unchecked
-      provideLayoutPropsToChild(child.layoutProps);
-
-      children().add(child);
-    }
     //noinspection unchecked
     return (VB) this;
   }
@@ -605,6 +701,66 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   public VB onClick(View.OnClickListener onClick) {
     setProp(OnClickProp.NAME, onClick);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB widthFlexMin(int f) {
+    setProp(DimProp.makeName(WidthFlexMinProp.NAME, COMPLEX_UNIT_PX), f);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB widthFlexMinDp(int f) {
+    setProp(DimProp.makeName(WidthFlexMinProp.NAME, COMPLEX_UNIT_DIP), f);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB widthFlexMax(int f) {
+    setProp(DimProp.makeName(WidthFlexMaxProp.NAME, COMPLEX_UNIT_PX), f);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB widthFlexMaxDp(int f) {
+    setProp(DimProp.makeName(WidthFlexMaxProp.NAME, COMPLEX_UNIT_DIP), f);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB widthFlexPct(float f) {
+    setProp(WidthFlexPctProp.NAME, f);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB heightFlexMin(int f) {
+    setProp(DimProp.makeName(HeightFlexMinProp.NAME, COMPLEX_UNIT_PX), f);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB heightFlexMinDp(int f) {
+    setProp(DimProp.makeName(HeightFlexMinProp.NAME, COMPLEX_UNIT_DIP), f);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB heightFlexMax(int f) {
+    setProp(DimProp.makeName(HeightFlexMaxProp.NAME, COMPLEX_UNIT_PX), f);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB heightFlexMaxDp(int f) {
+    setProp(DimProp.makeName(HeightFlexMaxProp.NAME, COMPLEX_UNIT_DIP), f);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB heightFlexPct(float f) {
+    setProp(HeightFlexPctProp.NAME, f);
     //noinspection unchecked
     return (VB) this;
   }
@@ -748,7 +904,6 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   public void buildInto(ViewGroup root) {
     V v = createView(root);
-    applyProps(v);
 
     boolean isViewGroup = (v instanceof ViewGroup);
 
@@ -761,20 +916,93 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       buildChildren((ViewGroup) v);
     }
 
+    applyProps(v);
+
     applyLayoutProps(v);
 
     root.addView(v);
+
+    applyFlex(v);
   }
 
   public void applyOnto(V v) {
     if (!(v instanceof ViewGroup)) throw reqArg("applyOnto: ViewGroup");
 
     ViewGroup vg = (ViewGroup) v;
-    applyProps(v);
 
     buildChildren(vg);
 
+    applyProps(v);
+
     applyLayoutProps(v);
+
+    applyFlex(v);
+  }
+
+  private void buildChildren(ViewGroup vg) {
+    for (ViewBuilder child : children()) {
+      child.buildInto(vg);
+    }
+  }
+
+  private void applyFlex(@NonNull V v) {
+    if (props == null) return;
+
+    int widthFlexMin = Integer.MIN_VALUE,
+        widthFlexMax = Integer.MIN_VALUE,
+        heightFlexMin = Integer.MIN_VALUE,
+        heightFlexMax = Integer.MIN_VALUE;
+    float widthFlexPct = Integer.MIN_VALUE,
+        heightFlexPct = Integer.MIN_VALUE;
+
+    for (Prop<? super V, ?> p : props.values()) {
+      if (p instanceof WidthFlexMinProp) {
+        Integer val = ((WidthFlexMinProp) p).get();
+        if (val != null) widthFlexMin = val;
+      } else if (p instanceof WidthFlexMaxProp) {
+        Integer val = ((WidthFlexMaxProp) p).get();
+        if (val != null) widthFlexMax = val;
+      } else if (p instanceof WidthFlexPctProp) {
+        Float val = ((WidthFlexPctProp) p).get();
+        if (val != null) widthFlexPct = val;
+      } else if (p instanceof HeightFlexMinProp) {
+        Integer val = ((HeightFlexMinProp) p).get();
+        if (val != null) heightFlexMin = val;
+      } else if (p instanceof HeightFlexMaxProp) {
+        Integer val = ((HeightFlexMaxProp) p).get();
+        if (val != null) heightFlexMax = val;
+      } else if (p instanceof HeightFlexPctProp) {
+        Float val = ((HeightFlexPctProp) p).get();
+        if (val != null) heightFlexPct = val;
+      }
+    }
+
+    boolean widthFlex = widthFlexMin != Integer.MIN_VALUE ||
+        widthFlexMax != Integer.MIN_VALUE ||
+        widthFlexPct != Integer.MIN_VALUE;
+
+    boolean heightFlex = heightFlexMin != Integer.MIN_VALUE ||
+        heightFlexMax != Integer.MIN_VALUE ||
+        heightFlexPct != Integer.MIN_VALUE;
+
+    if (widthFlex && heightFlex) {
+      throw reqArg("width flex XOR height flex");
+    }
+
+    if (widthFlex || heightFlex) {
+      final ViewTreeObserver vto = v.getViewTreeObserver();
+      if (!vto.isAlive()) {
+        throw reqArg("alive ViewTreeObserver");
+      }
+      if (widthFlex) {
+        vto.addOnGlobalLayoutListener(new SameDimGlobalLayoutListener(vto, v, //
+            true, widthFlexMin, widthFlexMax, widthFlexPct));
+      }
+      if (heightFlex) {
+        vto.addOnGlobalLayoutListener(new SameDimGlobalLayoutListener(vto, v, //
+            false, heightFlexMin, heightFlexMax, heightFlexPct));
+      }
+    }
   }
 
   @SuppressWarnings("deprecation")
@@ -824,7 +1052,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
         for (Map.Entry<String, Object> e : layoutPropMap.entrySet()) {
           if (e.getKey().startsWith(EDIT_MODE_TAG)) {
             for (LayoutProp lp : layoutProps) {
-              if (lp.name.equals(e.getKey())) {
+              if (lp.name.equals(e.getKey().replace(EDIT_MODE_TAG, ""))) {
                 //noinspection unchecked
                 lp.apply(plps, e.getValue());
                 break;
@@ -868,12 +1096,6 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     v.setLayoutParams(plps);
   }
 
-  private void buildChildren(ViewGroup vg) {
-    for (ViewBuilder child : children) {
-      child.buildInto(vg);
-    }
-  }
-
   private List<ViewBuilder> children() {
     if (children == null) children = new ArrayList<>();
     return children;
@@ -885,5 +1107,76 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   private static int dimToPx(float dim, int type) {
     return (int) TypedValue.applyDimension(type, dim, Resources.getSystem().getDisplayMetrics());
+  }
+
+  private static final class SameDimGlobalLayoutListener
+      implements ViewTreeObserver.OnGlobalLayoutListener {
+
+    private final WeakReference<ViewTreeObserver> vtoRef;
+    private final WeakReference<View> vRef;
+    private final boolean widthFlex;
+    private final int min;
+    private final int max;
+    private final float pct;
+
+    SameDimGlobalLayoutListener(ViewTreeObserver vto, View v, //
+        boolean widthFlex, int min, int max, float pct) {
+      vtoRef = new WeakReference<>(vto);
+      vRef = new WeakReference<>(v);
+      this.widthFlex = widthFlex;
+      if (pct < 0) pct = 1;
+      if (min < 0) min = 0;
+      if (max < 0) max = 0;
+      this.min = min;
+      this.max = max;
+      this.pct = pct;
+    }
+
+    private void cleanup() {
+      try {
+        vRef.get().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+      } catch (Exception ignored) {
+      }
+      try {
+        vtoRef.get().removeOnGlobalLayoutListener(this);
+      } catch (Exception ignored) {
+      }
+    }
+
+    @Nullable
+    private View aliveView() {
+      View v = vRef.get();
+      if (v == null) return null;
+      ViewTreeObserver vto = v.getViewTreeObserver();
+      if (vto != null && vto.isAlive()) return v;
+      return null;
+    }
+
+    @Override
+    public void onGlobalLayout() {
+      View v = aliveView();
+      if (v == null) {
+        cleanup();
+        return;
+      }
+
+      ViewGroup.LayoutParams lp = v.getLayoutParams();
+      if (lp != null) {
+        boolean heightFlex = !widthFlex;
+        if (widthFlex && v.getHeight() != 0) {
+          int w = Math.round(v.getHeight() * pct);
+          if (min != 0) w = Math.max(w, min);
+          if (max != 0) w = Math.min(w, max);
+          lp.width = w;
+        } else if (heightFlex && v.getWidth() != 0) {
+          int h = Math.round(v.getWidth() * pct);
+          if (min != 0) h = Math.max(h, min);
+          if (max != 0) h = Math.min(h, max);
+          lp.height = h;
+        }
+      }
+
+      v.requestLayout();
+    }
   }
 }

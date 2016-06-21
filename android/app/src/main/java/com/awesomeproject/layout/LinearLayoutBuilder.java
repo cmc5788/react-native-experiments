@@ -19,7 +19,10 @@ public class LinearLayoutBuilder extends ViewBuilder<LinearLayoutBuilder, Linear
     @Override
     public void apply(@NonNull LinearLayout ll) {
       Integer val = get();
-      if (val != null) ll.setOrientation(val);
+      if (val != null) {
+        //noinspection WrongConstant
+        ll.setOrientation(val);
+      }
     }
   }
 
