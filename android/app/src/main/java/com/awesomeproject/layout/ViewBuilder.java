@@ -92,26 +92,6 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static abstract class DimProp<V extends View> extends Prop<V, Integer> {
-    private final int type;
-
-    public static String makeName(String name, int type) {
-      return name + "_" + type;
-    }
-
-    public DimProp(@NonNull String name, int type) {
-      super(makeName(name, type));
-      this.type = type;
-    }
-
-    @CallSuper
-    @Override
-    public void apply(@NonNull V v) {
-      Integer val = get();
-      if (val != null) set(dimToPx(val, type));
-    }
-  }
-
   public static abstract class LayoutProp<LP extends ViewGroup.LayoutParams, T> {
     @NonNull public final String name;
 
@@ -132,27 +112,6 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     @Override
     public final int hashCode() {
       return name.hashCode();
-    }
-  }
-
-  public static abstract class LayoutDimProp<LP extends ViewGroup.LayoutParams>
-      extends LayoutProp<LP, Integer> {
-    private final int type;
-
-    public static String makeName(String name, int type) {
-      return name + "_" + type;
-    }
-
-    public LayoutDimProp(@NonNull String name, int type) {
-      super(makeName(name, type));
-      this.type = type;
-    }
-
-    public abstract void applyDim(@NonNull LP lp, int val);
-
-    @Override
-    public final void apply(@NonNull LP lp, Integer val) {
-      if (val != null) applyDim(lp, dimToPx(val, type));
     }
   }
 
@@ -201,70 +160,66 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class PaddingLeftProp extends DimProp<View> {
+  public static class PaddingLeftProp extends Prop<View, DimVal> {
     private static final String NAME = "PADDING_LEFT";
 
-    public PaddingLeftProp(int type) {
-      super(NAME, type);
+    public PaddingLeftProp() {
+      super(NAME);
     }
 
     @Override
     public void apply(@NonNull View v) {
-      super.apply(v);
-      Integer val = get();
+      DimVal val = get();
       if (val != null) {
-        v.setPadding(val, v.getPaddingTop(), v.getPaddingRight(), v.getPaddingBottom());
+        v.setPadding(val.px(), v.getPaddingTop(), v.getPaddingRight(), v.getPaddingBottom());
       }
     }
   }
 
-  public static class PaddingTopProp extends DimProp<View> {
+  public static class PaddingTopProp extends Prop<View, DimVal> {
     private static final String NAME = "PADDING_TOP";
 
-    public PaddingTopProp(int type) {
-      super(NAME, type);
+    public PaddingTopProp() {
+      super(NAME);
     }
 
     @Override
     public void apply(@NonNull View v) {
-      super.apply(v);
-      Integer val = get();
+      DimVal val = get();
       if (val != null) {
-        v.setPadding(v.getPaddingLeft(), val, v.getPaddingRight(), v.getPaddingBottom());
+        v.setPadding(v.getPaddingLeft(), val.px(), v.getPaddingRight(), v.getPaddingBottom());
       }
     }
   }
 
-  public static class PaddingRightProp extends DimProp<View> {
+  public static class PaddingRightProp extends Prop<View, DimVal> {
     private static final String NAME = "PADDING_RIGHT";
 
-    public PaddingRightProp(int type) {
-      super(NAME, type);
+    public PaddingRightProp() {
+      super(NAME);
     }
 
     @Override
     public void apply(@NonNull View v) {
-      super.apply(v);
-      Integer val = get();
+      DimVal val = get();
       if (val != null) {
-        v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), val, v.getPaddingBottom());
+        v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), val.px(), v.getPaddingBottom());
       }
     }
   }
 
-  public static class PaddingBottomProp extends DimProp<View> {
+  public static class PaddingBottomProp extends Prop<View, DimVal> {
     private static final String NAME = "PADDING_BOTTOM";
 
-    public PaddingBottomProp(int type) {
-      super(NAME, type);
+    public PaddingBottomProp() {
+      super(NAME);
     }
 
     @Override
     public void apply(@NonNull View v) {
-      super.apply(v);
-      Integer val = get();
+      DimVal val = get();
       if (val != null) {
-        v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), val);
+        v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), val.px());
       }
     }
   }
@@ -283,19 +238,29 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class WidthFlexMinProp extends DimProp<View> {
+  public static class WidthFlexMinProp extends Prop<View, DimVal> {
     private static final String NAME = "WIDTH_FLEX_MIN";
 
-    public WidthFlexMinProp(int type) {
-      super(NAME, type);
+    public WidthFlexMinProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void apply(@NonNull View view) {
+      // no-op
     }
   }
 
-  public static class WidthFlexMaxProp extends DimProp<View> {
+  public static class WidthFlexMaxProp extends Prop<View, DimVal> {
     private static final String NAME = "WIDTH_FLEX_MAX";
 
-    public WidthFlexMaxProp(int type) {
-      super(NAME, type);
+    public WidthFlexMaxProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void apply(@NonNull View view) {
+      // no-op
     }
   }
 
@@ -312,19 +277,29 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class HeightFlexMinProp extends DimProp<View> {
+  public static class HeightFlexMinProp extends Prop<View, DimVal> {
     private static final String NAME = "HEIGHT_FLEX_MIN";
 
-    public HeightFlexMinProp(int type) {
-      super(NAME, type);
+    public HeightFlexMinProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void apply(@NonNull View view) {
+      // no-op
     }
   }
 
-  public static class HeightFlexMaxProp extends DimProp<View> {
+  public static class HeightFlexMaxProp extends Prop<View, DimVal> {
     private static final String NAME = "HEIGHT_FLEX_MAX";
 
-    public HeightFlexMaxProp(int type) {
-      super(NAME, type);
+    public HeightFlexMaxProp() {
+      super(NAME);
+    }
+
+    @Override
+    public void apply(@NonNull View view) {
+      // no-op
     }
   }
 
@@ -341,75 +316,75 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  public static class LayoutWidthProp extends LayoutDimProp<ViewGroup.LayoutParams> {
+  public static class LayoutWidthProp extends LayoutProp<ViewGroup.LayoutParams, DimVal> {
 
-    public LayoutWidthProp(int type) {
-      super(LayoutParams.WIDTH, type);
+    public LayoutWidthProp() {
+      super(LayoutParams.WIDTH);
     }
 
     @Override
-    public void applyDim(@NonNull ViewGroup.LayoutParams lp, int val) {
-      lp.width = val;
+    public void apply(@NonNull ViewGroup.LayoutParams lp, DimVal val) {
+      if (val != null) lp.width = val.px();
     }
   }
 
-  public static class LayoutHeightProp extends LayoutDimProp<ViewGroup.LayoutParams> {
+  public static class LayoutHeightProp extends LayoutProp<ViewGroup.LayoutParams, DimVal> {
 
-    public LayoutHeightProp(int type) {
-      super(LayoutParams.HEIGHT, type);
+    public LayoutHeightProp() {
+      super(LayoutParams.HEIGHT);
     }
 
     @Override
-    public void applyDim(@NonNull ViewGroup.LayoutParams lp, int val) {
-      lp.height = val;
+    public void apply(@NonNull ViewGroup.LayoutParams lp, DimVal val) {
+      if (val != null) lp.height = val.px();
     }
   }
 
-  public static class MarginLeftProp extends LayoutDimProp<ViewGroup.MarginLayoutParams> {
+  public static class MarginLeftProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
 
-    public MarginLeftProp(int type) {
-      super(LayoutParams.MARGIN_LEFT, type);
+    public MarginLeftProp() {
+      super(LayoutParams.MARGIN_LEFT);
     }
 
     @Override
-    public void applyDim(@NonNull ViewGroup.MarginLayoutParams lp, int val) {
-      lp.leftMargin = val;
+    public void apply(@NonNull ViewGroup.MarginLayoutParams lp, DimVal val) {
+      if (val != null) lp.leftMargin = val.px();
     }
   }
 
-  public static class MarginTopProp extends LayoutDimProp<ViewGroup.MarginLayoutParams> {
+  public static class MarginTopProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
 
-    public MarginTopProp(int type) {
-      super(LayoutParams.MARGIN_TOP, type);
+    public MarginTopProp() {
+      super(LayoutParams.MARGIN_TOP);
     }
 
     @Override
-    public void applyDim(@NonNull ViewGroup.MarginLayoutParams lp, int val) {
-      lp.topMargin = val;
+    public void apply(@NonNull ViewGroup.MarginLayoutParams lp, DimVal val) {
+      if (val != null) lp.topMargin = val.px();
     }
   }
 
-  public static class MarginRightProp extends LayoutDimProp<ViewGroup.MarginLayoutParams> {
+  public static class MarginRightProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
 
-    public MarginRightProp(int type) {
-      super(LayoutParams.MARGIN_RIGHT, type);
+    public MarginRightProp() {
+      super(LayoutParams.MARGIN_RIGHT);
     }
 
     @Override
-    public void applyDim(@NonNull ViewGroup.MarginLayoutParams lp, int val) {
-      lp.rightMargin = val;
+    public void apply(@NonNull ViewGroup.MarginLayoutParams lp, DimVal val) {
+      if (val != null) lp.rightMargin = val.px();
     }
   }
 
-  public static class MarginBottomProp extends LayoutDimProp<ViewGroup.MarginLayoutParams> {
+  public static class MarginBottomProp extends LayoutProp<ViewGroup.MarginLayoutParams, DimVal> {
 
-    public MarginBottomProp(int type) {
-      super(LayoutParams.MARGIN_BOTTOM, type);
+    public MarginBottomProp() {
+      super(LayoutParams.MARGIN_BOTTOM);
     }
 
     @Override
-    public void applyDim(@NonNull ViewGroup.MarginLayoutParams lp, int val) {
-      lp.bottomMargin = val;
+    public void apply(@NonNull ViewGroup.MarginLayoutParams lp, DimVal val) {
+      if (val != null) lp.bottomMargin = val.px();
     }
   }
 
@@ -431,39 +406,25 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
         new IdProp(),
         new BgColorResProp(),
         new BgColorIntProp(),
-        new PaddingLeftProp(COMPLEX_UNIT_PX),
-        new PaddingLeftProp(COMPLEX_UNIT_DIP),
-        new PaddingTopProp(COMPLEX_UNIT_PX),
-        new PaddingTopProp(COMPLEX_UNIT_DIP),
-        new PaddingRightProp(COMPLEX_UNIT_PX),
-        new PaddingRightProp(COMPLEX_UNIT_DIP),
-        new PaddingBottomProp(COMPLEX_UNIT_PX),
-        new PaddingBottomProp(COMPLEX_UNIT_DIP),
+        new PaddingLeftProp(),
+        new PaddingTopProp(),
+        new PaddingRightProp(),
+        new PaddingBottomProp(),
         new OnClickProp(),
-        new WidthFlexMinProp(COMPLEX_UNIT_PX),
-        new WidthFlexMinProp(COMPLEX_UNIT_DIP),
-        new WidthFlexMaxProp(COMPLEX_UNIT_PX),
-        new WidthFlexMaxProp(COMPLEX_UNIT_DIP),
+        new WidthFlexMinProp(),
+        new WidthFlexMaxProp(),
         new WidthFlexPctProp(),
-        new HeightFlexMinProp(COMPLEX_UNIT_PX),
-        new HeightFlexMinProp(COMPLEX_UNIT_DIP),
-        new HeightFlexMaxProp(COMPLEX_UNIT_PX),
-        new HeightFlexMaxProp(COMPLEX_UNIT_DIP),
+        new HeightFlexMinProp(),
+        new HeightFlexMaxProp(),
         new HeightFlexPctProp()
     ));
     (layoutProps = new HashSet<>()).addAll(Arrays.asList(
-        new LayoutWidthProp(COMPLEX_UNIT_PX),
-        new LayoutWidthProp(COMPLEX_UNIT_DIP),
-        new LayoutHeightProp(COMPLEX_UNIT_PX),
-        new LayoutHeightProp(COMPLEX_UNIT_DIP),
-        new MarginLeftProp(COMPLEX_UNIT_PX),
-        new MarginLeftProp(COMPLEX_UNIT_DIP),
-        new MarginTopProp(COMPLEX_UNIT_PX),
-        new MarginTopProp(COMPLEX_UNIT_DIP),
-        new MarginRightProp(COMPLEX_UNIT_PX),
-        new MarginRightProp(COMPLEX_UNIT_DIP),
-        new MarginBottomProp(COMPLEX_UNIT_PX),
-        new MarginBottomProp(COMPLEX_UNIT_DIP)
+        new LayoutWidthProp(),
+        new LayoutHeightProp(),
+        new MarginLeftProp(),
+        new MarginTopProp(),
+        new MarginRightProp(),
+        new MarginBottomProp()
     ));
     // @formatter:on
   }
@@ -598,19 +559,19 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   }
 
   public VB padding(int l, int t, int r, int b) {
-    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_PX), l);
-    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_PX), t);
-    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_PX), r);
-    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_PX), b);
+    setProp(PaddingLeftProp.NAME, new DimVal(l, COMPLEX_UNIT_PX));
+    setProp(PaddingTopProp.NAME, new DimVal(t, COMPLEX_UNIT_PX));
+    setProp(PaddingRightProp.NAME, new DimVal(r, COMPLEX_UNIT_PX));
+    setProp(PaddingBottomProp.NAME, new DimVal(b, COMPLEX_UNIT_PX));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB paddingDp(int l, int t, int r, int b) {
-    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_DIP), l);
-    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_DIP), t);
-    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_DIP), r);
-    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_DIP), b);
+    setProp(PaddingLeftProp.NAME, new DimVal(l, COMPLEX_UNIT_DIP));
+    setProp(PaddingTopProp.NAME, new DimVal(t, COMPLEX_UNIT_DIP));
+    setProp(PaddingRightProp.NAME, new DimVal(r, COMPLEX_UNIT_DIP));
+    setProp(PaddingBottomProp.NAME, new DimVal(b, COMPLEX_UNIT_DIP));
     //noinspection unchecked
     return (VB) this;
   }
@@ -624,77 +585,77 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   }
 
   public VB vPadding(int all) {
-    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_PX), all);
-    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_PX), all);
+    setProp(PaddingTopProp.NAME, new DimVal(all, COMPLEX_UNIT_PX));
+    setProp(PaddingBottomProp.NAME, new DimVal(all, COMPLEX_UNIT_PX));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB vPaddingDp(int all) {
-    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_DIP), all);
-    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_DIP), all);
+    setProp(PaddingTopProp.NAME, new DimVal(all, COMPLEX_UNIT_DIP));
+    setProp(PaddingBottomProp.NAME, new DimVal(all, COMPLEX_UNIT_DIP));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB hPadding(int all) {
-    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_PX), all);
-    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_PX), all);
+    setProp(PaddingLeftProp.NAME, new DimVal(all, COMPLEX_UNIT_PX));
+    setProp(PaddingRightProp.NAME, new DimVal(all, COMPLEX_UNIT_PX));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB hPaddingDp(int all) {
-    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_DIP), all);
-    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_DIP), all);
+    setProp(PaddingLeftProp.NAME, new DimVal(all, COMPLEX_UNIT_DIP));
+    setProp(PaddingRightProp.NAME, new DimVal(all, COMPLEX_UNIT_DIP));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB leftPadding(int l) {
-    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_PX), l);
+    setProp(PaddingLeftProp.NAME, new DimVal(l, COMPLEX_UNIT_PX));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB leftPaddingDp(int l) {
-    setProp(DimProp.makeName(PaddingLeftProp.NAME, COMPLEX_UNIT_DIP), l);
+    setProp(PaddingLeftProp.NAME, new DimVal(l, COMPLEX_UNIT_DIP));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB topPadding(int t) {
-    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_PX), t);
+    setProp(PaddingTopProp.NAME, new DimVal(t, COMPLEX_UNIT_PX));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB topPaddingDp(int t) {
-    setProp(DimProp.makeName(PaddingTopProp.NAME, COMPLEX_UNIT_DIP), t);
+    setProp(PaddingTopProp.NAME, new DimVal(t, COMPLEX_UNIT_DIP));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB rightPadding(int r) {
-    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_PX), r);
+    setProp(PaddingRightProp.NAME, new DimVal(r, COMPLEX_UNIT_PX));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB rightPaddingDp(int r) {
-    setProp(DimProp.makeName(PaddingRightProp.NAME, COMPLEX_UNIT_DIP), r);
+    setProp(PaddingRightProp.NAME, new DimVal(r, COMPLEX_UNIT_DIP));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB bottomPadding(int b) {
-    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_PX), b);
+    setProp(PaddingBottomProp.NAME, new DimVal(b, COMPLEX_UNIT_PX));
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB bottomPaddingDp(int b) {
-    setProp(DimProp.makeName(PaddingBottomProp.NAME, COMPLEX_UNIT_DIP), b);
+    setProp(PaddingBottomProp.NAME, new DimVal(b, COMPLEX_UNIT_DIP));
     //noinspection unchecked
     return (VB) this;
   }
@@ -706,82 +667,104 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   }
 
   public VB widthFlexMin(int f) {
-    setProp(DimProp.makeName(WidthFlexMinProp.NAME, COMPLEX_UNIT_PX), f);
+    setProp(WidthFlexMinProp.NAME, new DimVal(f, COMPLEX_UNIT_PX));
+    widthOneIfNotSet();
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB widthFlexMinDp(int f) {
-    setProp(DimProp.makeName(WidthFlexMinProp.NAME, COMPLEX_UNIT_DIP), f);
+    setProp(WidthFlexMinProp.NAME, new DimVal(f, COMPLEX_UNIT_DIP));
+    widthOneIfNotSet();
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB widthFlexMax(int f) {
-    setProp(DimProp.makeName(WidthFlexMaxProp.NAME, COMPLEX_UNIT_PX), f);
+    setProp(WidthFlexMaxProp.NAME, new DimVal(f, COMPLEX_UNIT_PX));
+    widthOneIfNotSet();
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB widthFlexMaxDp(int f) {
-    setProp(DimProp.makeName(WidthFlexMaxProp.NAME, COMPLEX_UNIT_DIP), f);
+    setProp(WidthFlexMaxProp.NAME, new DimVal(f, COMPLEX_UNIT_DIP));
+    widthOneIfNotSet();
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB widthFlexPct(float f) {
     setProp(WidthFlexPctProp.NAME, f);
+    widthOneIfNotSet();
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB heightFlexMin(int f) {
-    setProp(DimProp.makeName(HeightFlexMinProp.NAME, COMPLEX_UNIT_PX), f);
+    setProp(HeightFlexMinProp.NAME, new DimVal(f, COMPLEX_UNIT_PX));
+    heightOneIfNotSet();
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB heightFlexMinDp(int f) {
-    setProp(DimProp.makeName(HeightFlexMinProp.NAME, COMPLEX_UNIT_DIP), f);
+    setProp(HeightFlexMinProp.NAME, new DimVal(f, COMPLEX_UNIT_DIP));
+    heightOneIfNotSet();
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB heightFlexMax(int f) {
-    setProp(DimProp.makeName(HeightFlexMaxProp.NAME, COMPLEX_UNIT_PX), f);
+    setProp(HeightFlexMaxProp.NAME, new DimVal(f, COMPLEX_UNIT_PX));
+    heightOneIfNotSet();
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB heightFlexMaxDp(int f) {
-    setProp(DimProp.makeName(HeightFlexMaxProp.NAME, COMPLEX_UNIT_DIP), f);
+    setProp(HeightFlexMaxProp.NAME, new DimVal(f, COMPLEX_UNIT_DIP));
+    heightOneIfNotSet();
     //noinspection unchecked
     return (VB) this;
   }
 
   public VB heightFlexPct(float f) {
     setProp(HeightFlexPctProp.NAME, f);
+    heightOneIfNotSet();
     //noinspection unchecked
     return (VB) this;
+  }
+
+  private void widthOneIfNotSet() {
+    if (!layoutPropMap.keySet().contains(LayoutParams.WIDTH)) {
+      width(1);
+    }
+  }
+
+  private void heightOneIfNotSet() {
+    if (!layoutPropMap.keySet().contains(LayoutParams.HEIGHT)) {
+      height(1);
+    }
   }
 
   // -----------
   // LAYOUT PARAMS
 
   public VB width(int w) {
-    return layout(LayoutDimProp.makeName(LayoutParams.WIDTH, COMPLEX_UNIT_PX), w);
+    return layout(LayoutParams.WIDTH, new DimVal(w, COMPLEX_UNIT_PX));
   }
 
   public VB widthDp(int w) {
-    return layout(LayoutDimProp.makeName(LayoutParams.WIDTH, COMPLEX_UNIT_DIP), w);
+    return layout(LayoutParams.WIDTH, new DimVal(w, COMPLEX_UNIT_DIP));
   }
 
   public VB height(int h) {
-    return layout(LayoutDimProp.makeName(LayoutParams.HEIGHT, COMPLEX_UNIT_PX), h);
+    return layout(LayoutParams.HEIGHT, new DimVal(h, COMPLEX_UNIT_PX));
   }
 
   public VB heightDp(int h) {
-    return layout(LayoutDimProp.makeName(LayoutParams.HEIGHT, COMPLEX_UNIT_DIP), h);
+    return layout(LayoutParams.HEIGHT, new DimVal(h, COMPLEX_UNIT_DIP));
   }
 
   public VB dims(int w, int h) {
@@ -827,49 +810,49 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   // -----------
 
   public VB leftMargin(int l) {
-    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_LEFT, COMPLEX_UNIT_PX), l);
+    return layout(LayoutParams.MARGIN_LEFT, new DimVal(l, COMPLEX_UNIT_PX));
   }
 
   public VB leftMarginDp(int l) {
-    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_LEFT, COMPLEX_UNIT_DIP), l);
+    return layout(LayoutParams.MARGIN_LEFT, new DimVal(l, COMPLEX_UNIT_DIP));
   }
 
   public VB topMargin(int t) {
-    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_TOP, COMPLEX_UNIT_PX), t);
+    return layout(LayoutParams.MARGIN_TOP, new DimVal(t, COMPLEX_UNIT_PX));
   }
 
   public VB topMarginDp(int t) {
-    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_TOP, COMPLEX_UNIT_DIP), t);
+    return layout(LayoutParams.MARGIN_TOP, new DimVal(t, COMPLEX_UNIT_DIP));
   }
 
   public VB rightMargin(int r) {
-    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_RIGHT, COMPLEX_UNIT_PX), r);
+    return layout(LayoutParams.MARGIN_RIGHT, new DimVal(r, COMPLEX_UNIT_PX));
   }
 
   public VB rightMarginDp(int r) {
-    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_RIGHT, COMPLEX_UNIT_DIP), r);
+    return layout(LayoutParams.MARGIN_RIGHT, new DimVal(r, COMPLEX_UNIT_DIP));
   }
 
   public VB bottomMargin(int b) {
-    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_BOTTOM, COMPLEX_UNIT_PX), b);
+    return layout(LayoutParams.MARGIN_BOTTOM, new DimVal(b, COMPLEX_UNIT_PX));
   }
 
   public VB bottomMarginDp(int b) {
-    return layout(LayoutDimProp.makeName(LayoutParams.MARGIN_BOTTOM, COMPLEX_UNIT_DIP), b);
+    return layout(LayoutParams.MARGIN_BOTTOM, new DimVal(b, COMPLEX_UNIT_DIP));
   }
 
   public VB margins(int l, int t, int r, int b) {
     leftMargin(l);
     topMargin(t);
     rightMargin(r);
-    return bottomMargin(r);
+    return bottomMargin(b);
   }
 
   public VB marginsDp(int l, int t, int r, int b) {
     leftMarginDp(l);
     topMarginDp(t);
     rightMarginDp(r);
-    return bottomMarginDp(r);
+    return bottomMarginDp(b);
   }
 
   public VB margins(int all) {
@@ -957,20 +940,20 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
     for (Prop<? super V, ?> p : props.values()) {
       if (p instanceof WidthFlexMinProp) {
-        Integer val = ((WidthFlexMinProp) p).get();
-        if (val != null) widthFlexMin = val;
+        DimVal val = ((WidthFlexMinProp) p).get();
+        if (val != null) widthFlexMin = val.px();
       } else if (p instanceof WidthFlexMaxProp) {
-        Integer val = ((WidthFlexMaxProp) p).get();
-        if (val != null) widthFlexMax = val;
+        DimVal val = ((WidthFlexMaxProp) p).get();
+        if (val != null) widthFlexMax = val.px();
       } else if (p instanceof WidthFlexPctProp) {
         Float val = ((WidthFlexPctProp) p).get();
         if (val != null) widthFlexPct = val;
       } else if (p instanceof HeightFlexMinProp) {
-        Integer val = ((HeightFlexMinProp) p).get();
-        if (val != null) heightFlexMin = val;
+        DimVal val = ((HeightFlexMinProp) p).get();
+        if (val != null) heightFlexMin = val.px();
       } else if (p instanceof HeightFlexMaxProp) {
-        Integer val = ((HeightFlexMaxProp) p).get();
-        if (val != null) heightFlexMax = val;
+        DimVal val = ((HeightFlexMaxProp) p).get();
+        if (val != null) heightFlexMax = val.px();
       } else if (p instanceof HeightFlexPctProp) {
         Float val = ((HeightFlexPctProp) p).get();
         if (val != null) heightFlexPct = val;
@@ -1076,7 +1059,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
       for (Map.Entry<String, Object> e : layoutPropMap.entrySet()) {
         for (LayoutProp lp : layoutProps) {
-          if (lp.name.equals(e.getKey())) {
+          if (lp.name.equals(e.getKey().replace(EDIT_MODE_TAG, ""))) {
             //noinspection unchecked
             lp.apply(plps, e.getValue());
             break;
@@ -1107,6 +1090,20 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   private static int dimToPx(float dim, int type) {
     return (int) TypedValue.applyDimension(type, dim, Resources.getSystem().getDisplayMetrics());
+  }
+
+  private static final class DimVal {
+    final int dim;
+    final int type;
+
+    private DimVal(int dim, int type) {
+      this.dim = dim;
+      this.type = type;
+    }
+
+    int px() {
+      return dimToPx(dim, type);
+    }
   }
 
   private static final class SameDimGlobalLayoutListener

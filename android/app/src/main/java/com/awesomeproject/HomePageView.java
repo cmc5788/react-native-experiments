@@ -160,28 +160,28 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
               ImageViews.build()
               .bgColorInt(Color.MAGENTA)
               .id(IMAGE_ID)
-              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
               .heightFlexPct(1f)
           )
 
           .child(
               ImageViews.build()
               .bgColorInt(Color.GREEN)
-              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
               .heightFlexPct(1f)
           )
 
           .child(
               ImageViews.build()
               .bgColorInt(Color.BLUE)
-              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
               .heightFlexPct(1f)
           )
 
           .child(
               ImageViews.build()
               .bgColorInt(Color.RED)
-              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
               .heightFlexPct(1f)
           )
         )
@@ -195,28 +195,28 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
           .child(
               ImageViews.build()
               .bgColorInt(Color.RED)
-              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
               .heightFlexPct(1)
           )
 
           .child(
               ImageViews.build()
               .bgColorInt(Color.BLUE)
-              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
               .heightFlexPct(1)
           )
 
           .child(
               ImageViews.build()
               .bgColorInt(Color.GREEN)
-              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
               .heightFlexPct(1)
           )
 
           .child(
               ImageViews.build()
               .bgColorInt(Color.MAGENTA)
-              .width(0).heightDp(100).layout(WEIGHT, 1f)
+              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
               .heightFlexPct(1)
           )
         )
