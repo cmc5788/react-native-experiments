@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnPreDrawListener;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1066,11 +1067,11 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
         throw reqArg("alive ViewTreeObserver");
       }
       if (widthFlex) {
-        vto.addOnGlobalLayoutListener(new SameDimGlobalLayoutListener(vto, v, //
+        vto.addOnPreDrawListener(new SameDimPreDrawListener(vto, v, //
             true, widthFlexMin, widthFlexMax, widthFlexPct));
       }
       if (heightFlex) {
-        vto.addOnGlobalLayoutListener(new SameDimGlobalLayoutListener(vto, v, //
+        vto.addOnPreDrawListener(new SameDimPreDrawListener(vto, v, //
             false, heightFlexMin, heightFlexMax, heightFlexPct));
       }
     }
@@ -1197,8 +1198,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
-  private static final class SameDimGlobalLayoutListener
-      implements ViewTreeObserver.OnGlobalLayoutListener {
+  private static final class SameDimPreDrawListener implements OnPreDrawListener {
 
     private final WeakReference<ViewTreeObserver> vtoRef;
     private final WeakReference<View> vRef;
@@ -1207,7 +1207,9 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     private final int max;
     private final float pct;
 
-    SameDimGlobalLayoutListener(ViewTreeObserver vto, View v, //
+    private boolean flexApplied;
+
+    SameDimPreDrawListener(ViewTreeObserver vto, View v, //
         boolean widthFlex, int min, int max, float pct) {
       vtoRef = new WeakReference<>(vto);
       vRef = new WeakReference<>(v);
@@ -1222,11 +1224,11 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
     private void cleanup() {
       try {
-        vRef.get().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        vRef.get().getViewTreeObserver().removeOnPreDrawListener(this);
       } catch (Exception ignored) {
       }
       try {
-        vtoRef.get().removeOnGlobalLayoutListener(this);
+        vtoRef.get().removeOnPreDrawListener(this);
       } catch (Exception ignored) {
       }
     }
@@ -1241,30 +1243,40 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
 
     @Override
-    public void onGlobalLayout() {
+    public boolean onPreDraw() {
       View v = aliveView();
       if (v == null) {
         cleanup();
-        return;
+        return true;
       }
 
       ViewGroup.LayoutParams lp = v.getLayoutParams();
       if (lp != null) {
+        boolean flexed = false;
         boolean heightFlex = !widthFlex;
         if (widthFlex && v.getHeight() != 0) {
           int w = Math.round(v.getHeight() * pct);
           if (min != 0) w = Math.max(w, min);
           if (max != 0) w = Math.min(w, max);
           lp.width = w;
+          flexed = true;
         } else if (heightFlex && v.getWidth() != 0) {
           int h = Math.round(v.getWidth() * pct);
           if (min != 0) h = Math.max(h, min);
           if (max != 0) h = Math.min(h, max);
           lp.height = h;
+          flexed = true;
+        }
+        if (flexed) {
+          boolean wasApplied = flexApplied;
+          flexApplied = true;
+          v.requestLayout();
+          return wasApplied;
         }
       }
 
       v.requestLayout();
+      return true;
     }
   }
 }
