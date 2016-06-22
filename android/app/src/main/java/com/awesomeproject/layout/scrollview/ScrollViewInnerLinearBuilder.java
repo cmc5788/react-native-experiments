@@ -66,7 +66,6 @@ public class ScrollViewInnerLinearBuilder
         new GravityProp()
     ));
 
-
     super.child(
         composedLinearLayoutViewBuilder
         .matchParent()
