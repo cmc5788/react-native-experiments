@@ -33,7 +33,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   private static final int LAYOUT_DIM_EMPTY = Integer.MIN_VALUE;
 
-  private static final String EDIT_MODE_TAG = "ONLY_IN_EDIT_MODE.";
+  private static final String EDIT_MODE_PREFIX = "ONLY_IN_EDIT_MODE.";
 
   public static <V extends View> ViewBuilder<ViewBuilder<?, V>, V> fromXml(
       @LayoutRes final int layoutResId) {
@@ -492,7 +492,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     if (nextPropOnlyInEditMode) {
       nextPropOnlyInEditMode = false;
       Prop<? super V, T> editModeCopy = simpleSyncPropCopy(prop);
-      props.put(EDIT_MODE_TAG + prop.name, editModeCopy);
+      props.put(EDIT_MODE_PREFIX + prop.name, editModeCopy);
       editModeCopy.set(val);
     } else {
       prop.set(val);
@@ -505,7 +505,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     if (layoutPropMap == null) layoutPropMap = new HashMap<>();
     if (nextPropOnlyInEditMode) {
       nextPropOnlyInEditMode = false;
-      layoutPropMap.put(EDIT_MODE_TAG + layoutPropName, val);
+      layoutPropMap.put(EDIT_MODE_PREFIX + layoutPropName, val);
     } else {
       layoutPropMap.put(layoutPropName, val);
     }
@@ -1040,10 +1040,10 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       if (v.isInEditMode()) {
         Set<String> toRemove = new HashSet<>();
         for (Map.Entry<String, Prop<? super V, ?>> p : props.entrySet()) {
-          if (p.getKey().startsWith(EDIT_MODE_TAG)) {
+          if (p.getKey().startsWith(EDIT_MODE_PREFIX)) {
             p.getValue().apply(v);
             toRemove.add(p.getKey());
-            toRemove.add(p.getKey().replace(EDIT_MODE_TAG, ""));
+            toRemove.add(p.getKey().replace(EDIT_MODE_PREFIX, ""));
           }
         }
         for (String keyToRemove : toRemove) {
@@ -1052,7 +1052,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       } else {
         for (Iterator<Map.Entry<String, Prop<? super V, ?>>> i = props.entrySet().iterator();
             i.hasNext(); ) {
-          if (i.next().getKey().startsWith(EDIT_MODE_TAG)) {
+          if (i.next().getKey().startsWith(EDIT_MODE_PREFIX)) {
             i.remove();
           }
         }
@@ -1081,16 +1081,16 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       if (v.isInEditMode()) {
         Set<String> toRemove = new HashSet<>();
         for (Map.Entry<String, Object> e : layoutPropMap.entrySet()) {
-          if (e.getKey().startsWith(EDIT_MODE_TAG)) {
+          if (e.getKey().startsWith(EDIT_MODE_PREFIX)) {
             for (LayoutProp lp : layoutProps) {
-              if (lp.name.equals(e.getKey().replace(EDIT_MODE_TAG, ""))) {
+              if (lp.name.equals(e.getKey().replace(EDIT_MODE_PREFIX, ""))) {
                 //noinspection unchecked
                 lp.apply(plps, e.getValue());
                 break;
               }
             }
             toRemove.add(e.getKey());
-            toRemove.add(e.getKey().replace(EDIT_MODE_TAG, ""));
+            toRemove.add(e.getKey().replace(EDIT_MODE_PREFIX, ""));
           }
         }
         for (String keyToRemove : toRemove) {
@@ -1099,7 +1099,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       } else {
         for (Iterator<Map.Entry<String, Object>> i = layoutPropMap.entrySet().iterator();
             i.hasNext(); ) {
-          if (i.next().getKey().startsWith(EDIT_MODE_TAG)) {
+          if (i.next().getKey().startsWith(EDIT_MODE_PREFIX)) {
             i.remove();
           }
         }
@@ -1107,7 +1107,7 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
       for (Map.Entry<String, Object> e : layoutPropMap.entrySet()) {
         for (LayoutProp lp : layoutProps) {
-          if (lp.name.equals(e.getKey().replace(EDIT_MODE_TAG, ""))) {
+          if (lp.name.equals(e.getKey().replace(EDIT_MODE_PREFIX, ""))) {
             //noinspection unchecked
             lp.apply(plps, e.getValue());
             break;
