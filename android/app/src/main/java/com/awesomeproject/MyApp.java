@@ -78,6 +78,7 @@ public class MyApp extends Application implements MyInjector {
   public Map<String, ViewFactory> viewFactoriesFor(MyNavigator navigator) {
     HashMap<String, ViewFactory> m = new HashMap<>();
     m.put(HomePageView.TAG, HomePageView.factory());
+    m.put(DetailPageView.TAG, DetailPageView.factory());
     return m;
   }
 
@@ -88,6 +89,11 @@ public class MyApp extends Application implements MyInjector {
 
   @Override
   public JSEventDispatcher eventDispatcherFor(HomePageView homePageView) {
+    return _eventDispatcher(null);
+  }
+
+  @Override
+  public JSEventDispatcher eventDispatcherFor(DetailPageView detailPageView) {
     return _eventDispatcher(null);
   }
 

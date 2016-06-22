@@ -45,6 +45,7 @@ module.exports = (appPresenter) =>
           for (var prop in activePresenters[evt.tag]) {
             if (prop !== 'init' && prop !== 'destroy' &&
                 typeof activePresenters[evt.tag][prop] === 'function') {
+              console.log(`adding listener for ${evt.tag}.${prop}`);
               activePresenters[evt.tag][prop + 'Sub'] = DeviceEventEmitter.addListener(
                 `${evt.tag}.${prop}`, activePresenters[evt.tag][prop]);
             }

@@ -21,7 +21,8 @@ const app = {
   emptyView: 'HomePageView',
 
   viewPresenters: {
-    'HomePageView': () => require('./HomePagePresenter')
+    'HomePageView': () => require('./HomePagePresenter'),
+    'DetailPageView': () => require('./DetailPagePresenter')
   }
 
 };

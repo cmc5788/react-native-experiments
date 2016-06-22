@@ -34,4 +34,6 @@ public interface MyInjector {
   JSEventDispatcher eventDispatcherFor(MyNavigator navigator);
 
   JSEventDispatcher eventDispatcherFor(HomePageView homePageView);
+
+  JSEventDispatcher eventDispatcherFor(DetailPageView detailPageView);
 }

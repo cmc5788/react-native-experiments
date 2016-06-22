@@ -23,9 +23,10 @@ function HomePagePresenter() {
       .then((response) => response.json())
       .then((responseJson) => this.nav.recvJson(responseJson))
       .catch((error) => console.warn(error))
-      .then(() => this.nav.goBack())
-      .then((wentBack) =>
-        console.log(`goBack went back? ${JSON.stringify(wentBack)}`));
+      .then(() => this.nav.navigate("DetailPageView", 1, "meta"))
+      // .then(() => this.nav.goBack())
+      // .then((wentBack) =>
+      //   console.log(`goBack went back? ${JSON.stringify(wentBack)}`));
   };
 
   this.init = () => {
