@@ -359,7 +359,18 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
       // TODO - onDestroyView, does it make sense here?
 
-      dispatchDestroy(topTag);
+      String oldTopTag = null;
+      for (String tag : viewFactories.keySet()) {
+        if (oldTopView.matchesNavTag(tag)) {
+          oldTopTag = tag;
+          break;
+        }
+      }
+      if (oldTopTag == null) {
+        throw new IllegalStateException("No tag found for old top view!");
+      }
+
+      dispatchDestroy(oldTopTag);
     }
   }
 
