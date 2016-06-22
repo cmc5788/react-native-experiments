@@ -10,6 +10,8 @@ public interface Navigator {
 
   boolean goBack();
 
+  void clear();
+
   void save();
 
   void restore();

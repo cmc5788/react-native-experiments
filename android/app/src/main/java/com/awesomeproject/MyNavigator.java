@@ -230,7 +230,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
     handler().post(new Runnable() {
       @Override
       public void run() {
-        Log.e(TAG, "Got JSON from JS: servicesDisabled = " +
+        Log.e(TAG, "Got JSON from JS: servicesDisabled = " + //
             json.getMap("APP").getBoolean("servicesDisabled"));
         p.resolve(null);
       }
@@ -248,6 +248,31 @@ public class MyNavigator extends MyReactModule implements Navigator {
   }
 
   @Override
+  public void clear() {
+    assertOnUiThread();
+    MainActivity activity = activity();
+    if (activity == null) {
+      Log.e(TAG, "Aborting clear: activity dead, dying, or dormant.");
+      return;
+    }
+
+    prefs(activity) //
+        .edit() //
+        .remove("stack") //
+        .apply();
+
+    stack.clear();
+    if (emptyTag == null) {
+      needsEmptyTag = true;
+    } else {
+      stack.add(emptyTag);
+    }
+
+    applyStack();
+    Log.e(TAG, "STACK CLEARED");
+  }
+
+  @Override
   public void save() {
     assertOnUiThread();
     MainActivity activity = activity();
@@ -255,6 +280,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
       Log.e(TAG, "Aborting save: activity dead, dying, or dormant.");
       return;
     }
+
     prefs(activity) //
         .edit() //
         .putString("stack", serializableToStr(stack)) //

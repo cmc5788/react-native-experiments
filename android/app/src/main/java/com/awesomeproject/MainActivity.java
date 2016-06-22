@@ -32,6 +32,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   private LiteReactInstanceManager reactInstanceManager;
   private boolean isPausedOrPausing;
   private boolean navigatorRestored;
+  private boolean createdWithSavedState;
 
   @Override
   public boolean isUiInteractable() {
@@ -75,6 +76,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   @Override
   public void onCreate(Bundle savedState) {
     Log.d(TAG, String.format("onCreate(%d) savedInstanceState=%s", hashCode(), savedState));
+    createdWithSavedState = savedState != null;
     beginNewScopeAndInjectReactPackage();
     super.onCreate(savedState);
     reactInstanceManager.addReactInstanceEventListener(reactInstanceEventListener);
@@ -86,7 +88,11 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
     public void onReactContextInitialized(ReactContext context) {
       Log.d(TAG, String.format("onReactContextInitialized(%d)", MainActivity.this.hashCode()));
       if (!navigatorRestored) {
-        myReactPackage.navigator().restore();
+        if (createdWithSavedState) {
+          myReactPackage.navigator().restore();
+        } else {
+          myReactPackage.navigator().clear();
+        }
         navigatorRestored = true;
       } else if (BuildConfig.DEBUG) {
         android.os.Process.killProcess(android.os.Process.myPid());
