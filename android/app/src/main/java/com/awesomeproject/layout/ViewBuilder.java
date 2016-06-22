@@ -807,6 +807,16 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     return height(MATCH_PARENT);
   }
 
+  public VB wrapWidth() {
+    width(WRAP_CONTENT);
+    return height(MATCH_PARENT);
+  }
+
+  public VB wrapHeight() {
+    width(MATCH_PARENT);
+    return height(WRAP_CONTENT);
+  }
+
   // -----------
 
   public VB leftMargin(int l) {

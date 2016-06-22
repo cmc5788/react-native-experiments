@@ -1,5 +1,8 @@
 package com.awesomeproject.layout;
 
+import static android.widget.LinearLayout.HORIZONTAL;
+import static android.widget.LinearLayout.VERTICAL;
+
 public class LinearLayouts {
 
   public interface LinearLayoutProps<VB extends ViewBuilder> {
@@ -10,6 +13,14 @@ public class LinearLayouts {
 
   public static LinearLayoutBuilder build() {
     return new LinearLayoutBuilder();
+  }
+
+  public static LinearLayoutBuilder buildRow() {
+    return new LinearLayoutBuilder().matchWidth().orientation(HORIZONTAL);
+  }
+
+  public static LinearLayoutBuilder buildCol() {
+    return new LinearLayoutBuilder().matchHeight().orientation(VERTICAL);
   }
 
   protected LinearLayouts() {

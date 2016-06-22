@@ -29,7 +29,6 @@ import com.squareup.picasso.Picasso;
 
 import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
-import static android.widget.LinearLayout.HORIZONTAL;
 import static com.awesomeproject.layout.LayoutParams.ALIGN_PARENT_LEFT;
 import static com.awesomeproject.layout.LayoutParams.ALIGN_PARENT_RIGHT;
 import static com.awesomeproject.layout.LayoutParams.CENTER_IN_PARENT;
@@ -162,9 +161,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
         .child(Spaces.vSpace(0.5f))
 
         .child(
-          LinearLayouts.build()
-          .matchWidth()
-          .orientation(HORIZONTAL)
+          LinearLayouts.buildRow()
           .gravity(CENTER)
 
           .child(imageCell(Color.MAGENTA).id(IMAGE_ID))
@@ -175,9 +172,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
         )
 
         .child(
-          LinearLayouts.build()
-          .matchWidth()
-          .orientation(HORIZONTAL)
+          LinearLayouts.buildRow()
           .gravity(CENTER)
 
           .child(imageCell(Color.YELLOW))
@@ -192,8 +187,8 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
         .child(
             TextViews.build()
             .id(TEXT_ID)
-            .matchHeight().editMode().heightDp(128)
-            .heightFlexPct(1f)
+            .wrapWidth()
+            .heightFlexPct(1f).editMode().heightDp(128)
             .gravity(CENTER)
             .vPaddingDp(14).hPaddingDp(10)
             .bgColorInt(Color.LTGRAY)
@@ -204,9 +199,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
         .child(Spaces.vSpace(1))
 
         .child(
-            LinearLayouts.build()
-            .matchWidth()
-            .orientation(HORIZONTAL)
+            LinearLayouts.buildRow()
             .gravity(CENTER)
 
             .child(Spaces.hSpace(1))
