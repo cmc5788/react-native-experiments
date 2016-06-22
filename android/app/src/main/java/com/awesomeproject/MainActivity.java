@@ -133,7 +133,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   public void onBackPressed() {
     Log.d(TAG, String.format("onBackPressed(%d)", hashCode()));
     if (myReactPackage.navigatorReady() && navigatorRestored) {
-      myReactPackage.navigator().goBack();
+      myReactPackage.navigator().dispatchGoBack();
     }
   }
 }

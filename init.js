@@ -31,6 +31,10 @@ module.exports = (appPresenter) =>
       if (appPresenter.pause) appPresenter.pause();
     });
 
+    DeviceEventEmitter.addListener('onGoBack', (evt) => {
+      if (appPresenter.back) appPresenter.back();
+    });
+
     const activePresenters = { };
 
     DeviceEventEmitter.addListener('onInitView', (evt) => {

@@ -1,11 +1,5 @@
 'use strict';
 
-const wait = (time) => new Promise((resolve) => {
-  setTimeout(() => {
-    resolve();
-  }, time);
-});
-
 function DetailPagePresenter() {
 
   this.goBackClicked = (evt) => {

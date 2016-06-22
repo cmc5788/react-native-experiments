@@ -186,6 +186,11 @@ public class MyNavigator extends MyReactModule implements Navigator {
     return true;
   }
 
+  public void dispatchGoBack() {
+    assertOnUiThread();
+    eventDispatcher.dispatch("onGoBack", null);
+  }
+
   @ReactMethod
   public void empty(final String tag) {
     handler().post(new Runnable() {

@@ -18,6 +18,12 @@ const app = {
     console.log('got resume');
   },
 
+  back() {
+    console.log('got back');
+    Navigator.goBack().then((wentBack) =>
+      console.log(`goBack went back? ${JSON.stringify(wentBack)}`));
+  },
+
   emptyView: 'HomePageView',
 
   viewPresenters: {
