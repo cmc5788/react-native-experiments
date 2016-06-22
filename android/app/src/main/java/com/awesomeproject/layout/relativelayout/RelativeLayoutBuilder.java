@@ -1,8 +1,10 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.relativelayout;
 
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import com.awesomeproject.layout.LayoutParams;
+import com.awesomeproject.layout.ViewBuilder;
 import java.util.Arrays;
 import java.util.Set;
 

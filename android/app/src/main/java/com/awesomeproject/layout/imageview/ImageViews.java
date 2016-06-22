@@ -1,8 +1,9 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.imageview;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
+import com.awesomeproject.layout.ViewBuilder;
 
 public class ImageViews {
 

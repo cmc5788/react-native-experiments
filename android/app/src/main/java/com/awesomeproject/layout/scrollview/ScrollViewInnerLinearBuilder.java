@@ -1,11 +1,12 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.scrollview;
 
 import android.support.annotation.NonNull;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import com.awesomeproject.layout.ViewBuilder;
+import com.awesomeproject.layout.linearlayout.LinearLayoutBuilder;
+import com.awesomeproject.layout.linearlayout.LinearLayouts;
 import java.util.Arrays;
-import java.util.Set;
 
 import static android.widget.LinearLayout.VERTICAL;
 
@@ -51,7 +52,13 @@ public class ScrollViewInnerLinearBuilder
   private final LinearLayoutBuilder composedLinearLayoutViewBuilder;
 
   public ScrollViewInnerLinearBuilder() {
-    composePropsFrom(composedScrollViewBuilder = new ScrollViewBuilder());
+    composedScrollViewBuilder = new ScrollViewBuilder();
+    composedLinearLayoutViewBuilder = new LinearLayoutBuilder();
+
+    composePropsFrom(composedScrollViewBuilder);
+    composeCreateViewFrom(composedScrollViewBuilder);
+    composeEmptyLayoutParamsFrom(composedLinearLayoutViewBuilder);
+    composeLayoutPropsFrom(composedLinearLayoutViewBuilder);
 
     // @formatter:off
     regProps(Arrays.asList(
@@ -59,14 +66,21 @@ public class ScrollViewInnerLinearBuilder
         new GravityProp()
     ));
 
+
     super.child(
-        composedLinearLayoutViewBuilder = new LinearLayoutBuilder()
+        composedLinearLayoutViewBuilder
         .matchParent()
         .orientation(VERTICAL)
     );
     // @formatter:on
 
     fillViewport(true);
+  }
+
+  @Override
+  public ScrollViewInnerLinearBuilder child(ViewBuilder child) {
+    composedLinearLayoutViewBuilder.child(child);
+    return this;
   }
 
   @Override
@@ -85,29 +99,5 @@ public class ScrollViewInnerLinearBuilder
   public ScrollViewInnerLinearBuilder gravity(int gravity) {
     setProp(GravityProp.NAME, gravity);
     return this;
-  }
-
-  @NonNull
-  @Override
-  protected ScrollView createView(ViewGroup root) {
-    return composedScrollViewBuilder.createView(root);
-  }
-
-  @Override
-  public ScrollViewInnerLinearBuilder child(ViewBuilder child) {
-    composedLinearLayoutViewBuilder.child(child);
-    return this;
-  }
-
-  @NonNull
-  @Override
-  protected ViewGroup.LayoutParams createEmptyLayoutParamsForChild() {
-    return composedLinearLayoutViewBuilder.createEmptyLayoutParamsForChild();
-  }
-
-  @Override
-  protected void provideLayoutPropsToChild(@NonNull Set<LayoutProp> layoutProps) {
-    composedLinearLayoutViewBuilder.provideLayoutPropsToChild(layoutProps);
-    super.provideLayoutPropsToChild(layoutProps);
   }
 }

@@ -400,6 +400,10 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
 
   private ViewBuilder parent;
 
+  private List<ViewBuilder> composedForLayoutProps;
+  private ViewBuilder composedForEmptyLayoutParams;
+  private ViewBuilder<?, ? extends V> composedForCreateView;
+
   public ViewBuilder() {
     // @formatter:off
     regProps(Arrays.asList(
@@ -430,16 +434,29 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   }
 
   @NonNull
-  protected abstract V createView(ViewGroup root);
+  protected V createView(ViewGroup root) {
+    if (composedForCreateView != null) {
+      return composedForCreateView.createView(root);
+    }
+    throw new UnsupportedOperationException();
+  }
 
   @NonNull
   protected ViewGroup.LayoutParams createEmptyLayoutParamsForChild() {
+    if (composedForEmptyLayoutParams != null) {
+      return composedForEmptyLayoutParams.createEmptyLayoutParamsForChild();
+    }
     throw new UnsupportedOperationException();
   }
 
   @CallSuper
   protected void provideLayoutPropsToChild(@NonNull Set<LayoutProp> layoutProps) {
     // no-op
+    if (composedForLayoutProps != null) {
+      for (ViewBuilder vb : composedForLayoutProps) {
+        vb.provideLayoutPropsToChild(layoutProps);
+      }
+    }
   }
 
   protected void composePropsFrom(@NonNull ViewBuilder<?, ? super V> other) {
@@ -447,6 +464,19 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       if (props == null) props = new HashMap<>();
       props.putAll(other.props);
     }
+  }
+
+  protected void composeLayoutPropsFrom(@NonNull ViewBuilder other) {
+    if (composedForLayoutProps == null) composedForLayoutProps = new ArrayList<>();
+    composedForLayoutProps.add(other);
+  }
+
+  protected void composeEmptyLayoutParamsFrom(@NonNull ViewBuilder other) {
+    composedForEmptyLayoutParams = other;
+  }
+
+  protected void composeCreateViewFrom(@NonNull ViewBuilder<?, ? extends V> vb) {
+    composedForCreateView = vb;
   }
 
   protected void regProps(@NonNull Collection<? extends Prop<? super V, ?>> propsToReg) {
@@ -466,6 +496,18 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
       editModeCopy.set(val);
     } else {
       prop.set(val);
+    }
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public <T> VB layout(@NonNull String layoutPropName, T val) {
+    if (layoutPropMap == null) layoutPropMap = new HashMap<>();
+    if (nextPropOnlyInEditMode) {
+      nextPropOnlyInEditMode = false;
+      layoutPropMap.put(EDIT_MODE_TAG + layoutPropName, val);
+    } else {
+      layoutPropMap.put(layoutPropName, val);
     }
     //noinspection unchecked
     return (VB) this;
@@ -492,24 +534,6 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     return null;
   }
 
-  public VB tag(@NonNull String tag) {
-    this.tag = tag;
-    //noinspection unchecked
-    return (VB) this;
-  }
-
-  public <T> VB layout(@NonNull String layoutPropName, T val) {
-    if (layoutPropMap == null) layoutPropMap = new HashMap<>();
-    if (nextPropOnlyInEditMode) {
-      nextPropOnlyInEditMode = false;
-      layoutPropMap.put(EDIT_MODE_TAG + layoutPropName, val);
-    } else {
-      layoutPropMap.put(layoutPropName, val);
-    }
-    //noinspection unchecked
-    return (VB) this;
-  }
-
   public <VV extends View> VB childXml(@LayoutRes int layoutResId) {
     return child(ViewBuilder.<VV>fromXml(layoutResId));
   }
@@ -530,6 +554,12 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     provideLayoutPropsToChild(child.layoutProps);
 
     children().add(child);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
+  public VB tag(@NonNull String tag) {
+    this.tag = tag;
     //noinspection unchecked
     return (VB) this;
   }

@@ -1,4 +1,4 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.imageview;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -6,6 +6,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import com.awesomeproject.layout.ViewBuilder;
 import java.util.Arrays;
 
 public class ImageViewBuilder extends ViewBuilder<ImageViewBuilder, ImageView>

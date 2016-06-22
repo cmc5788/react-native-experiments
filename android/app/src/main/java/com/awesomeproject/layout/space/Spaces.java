@@ -1,4 +1,4 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.space;
 
 import static com.awesomeproject.layout.LayoutParams.WEIGHT;
 

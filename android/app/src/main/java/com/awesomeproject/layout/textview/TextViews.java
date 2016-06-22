@@ -1,6 +1,7 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.textview;
 
 import android.support.annotation.StringRes;
+import com.awesomeproject.layout.ViewBuilder;
 
 public class TextViews {
 

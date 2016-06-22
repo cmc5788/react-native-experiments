@@ -6,8 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.awesomeproject.layout.TextViewBuilder;
-import com.awesomeproject.layout.TextViews;
+import com.awesomeproject.layout.textview.TextViewBuilder;
+import com.awesomeproject.layout.textview.TextViews;
 import com.awesomeproject.layout.ViewBuilder;
 import java.util.Collections;
 

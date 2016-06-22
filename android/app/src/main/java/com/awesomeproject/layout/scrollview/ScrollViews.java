@@ -1,4 +1,6 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.scrollview;
+
+import com.awesomeproject.layout.ViewBuilder;
 
 public class ScrollViews {
 

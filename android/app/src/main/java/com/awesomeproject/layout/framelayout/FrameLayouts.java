@@ -1,4 +1,4 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.framelayout;
 
 public class FrameLayouts {
 

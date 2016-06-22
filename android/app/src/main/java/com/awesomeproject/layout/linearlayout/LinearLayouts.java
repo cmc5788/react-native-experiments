@@ -1,4 +1,6 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.linearlayout;
+
+import com.awesomeproject.layout.ViewBuilder;
 
 import static android.widget.LinearLayout.HORIZONTAL;
 import static android.widget.LinearLayout.VERTICAL;

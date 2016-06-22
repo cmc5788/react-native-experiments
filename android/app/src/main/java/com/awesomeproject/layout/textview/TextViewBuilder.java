@@ -1,10 +1,11 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.textview;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.AppCompatTextView;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.awesomeproject.layout.ViewBuilder;
 import java.util.Arrays;
 
 public class TextViewBuilder extends ViewBuilder<TextViewBuilder, TextView>

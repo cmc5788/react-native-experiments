@@ -1,8 +1,10 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.scrollview;
 
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+import com.awesomeproject.layout.LayoutParams;
+import com.awesomeproject.layout.ViewBuilder;
 import java.util.Collections;
 import java.util.Set;
 

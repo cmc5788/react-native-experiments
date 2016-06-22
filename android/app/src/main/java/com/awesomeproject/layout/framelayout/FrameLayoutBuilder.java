@@ -1,8 +1,10 @@
-package com.awesomeproject.layout;
+package com.awesomeproject.layout.framelayout;
 
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import com.awesomeproject.layout.LayoutParams;
+import com.awesomeproject.layout.ViewBuilder;
 import java.util.Set;
 
 public class FrameLayoutBuilder extends ViewBuilder<FrameLayoutBuilder, FrameLayout> {
