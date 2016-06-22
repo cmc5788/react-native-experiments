@@ -17,6 +17,8 @@ module.exports = (appPresenter) =>
 
   componentWillMount = () => {
 
+    const activePresenters = { };
+
     DeviceEventEmitter.addListener('onAppInit', (evt) => {
       if (!appPresenter.emptyView) throw new Error('emptyView required.');
       Navigator.empty(appPresenter.emptyView);
@@ -32,10 +34,17 @@ module.exports = (appPresenter) =>
     });
 
     DeviceEventEmitter.addListener('onGoBack', (evt) => {
-      if (appPresenter.back) appPresenter.back();
+      if (appPresenter.back && appPresenter.back()) return;
+      for (var p in activePresenters) {
+        if (activePresenters[p] &&
+            activePresenters[p].back &&
+            typeof activePresenters[p].back === 'function' &&
+            activePresenters[p].back()) {
+          return;
+        }
+      }
+      Navigator.goBack();
     });
-
-    const activePresenters = { };
 
     DeviceEventEmitter.addListener('onInitView', (evt) => {
       if (appPresenter.viewPresenters) {
@@ -47,7 +56,7 @@ module.exports = (appPresenter) =>
           // auto register event listeners for presenter based on prop names
           // TODO - clean this code up
           for (var prop in activePresenters[evt.tag]) {
-            if (prop !== 'init' && prop !== 'destroy' &&
+            if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
                 typeof activePresenters[evt.tag][prop] === 'function') {
               console.log(`adding listener for ${evt.tag}.${prop}`);
               activePresenters[evt.tag][prop + 'Sub'] = DeviceEventEmitter.addListener(
@@ -67,9 +76,9 @@ module.exports = (appPresenter) =>
         // auto cleanup event listeners for presenter based on prop names
         // TODO - clean this code up
         for (var prop in activePresenters[evt.tag]) {
-          if (prop !== 'init' && prop !== 'destroy' &&
+          if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
               typeof activePresenters[evt.tag][prop] === 'function') {
-            activePresenters[evt.tag][prop + 'Sub'] && console.log(`${evt.tag}.${prop} remove sub`);
+            activePresenters[evt.tag][prop + 'Sub'] && console.log(`removing listener for ${evt.tag}.${prop}`);
             activePresenters[evt.tag][prop + 'Sub'] && activePresenters[evt.tag][prop + 'Sub'].remove();
             activePresenters[evt.tag][prop + 'Sub'] = null;
           }

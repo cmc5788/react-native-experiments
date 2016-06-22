@@ -33,6 +33,10 @@ function HomePagePresenter() {
     console.log('HomePagePresenter init');
   };
 
+  this.back = () => {
+    console.log('HomePagePresenter back');
+  },
+
   this.destroy = () => {
     console.log('HomePagePresenter destroy');
   };
