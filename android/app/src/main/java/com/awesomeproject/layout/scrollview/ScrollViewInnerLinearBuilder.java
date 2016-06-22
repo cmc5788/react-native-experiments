@@ -6,7 +6,6 @@ import android.widget.ScrollView;
 import com.awesomeproject.layout.ViewBuilder;
 import com.awesomeproject.layout.linearlayout.LinearLayoutBuilder;
 import com.awesomeproject.layout.linearlayout.LinearLayouts;
-import java.util.Arrays;
 
 import static android.widget.LinearLayout.VERTICAL;
 
@@ -15,38 +14,14 @@ public class ScrollViewInnerLinearBuilder
     implements ScrollViews.ScrollViewProps<ScrollViewInnerLinearBuilder>,
     LinearLayouts.LinearLayoutProps<ScrollViewInnerLinearBuilder> {
 
-  private static final class OrientationProp extends Prop<ScrollView, Integer> {
-    private static final String NAME = "ORIENTATION";
-
-    public OrientationProp() {
-      super(NAME);
-    }
-
+  private static final ViewConverter<ScrollView, LinearLayout> CONVERTER = new ViewConverter< //
+      ScrollView, LinearLayout>() {
+    @NonNull
     @Override
-    public void apply(@NonNull ScrollView ll) {
-      Integer val = get();
-      if (val != null) {
-        //noinspection WrongConstant
-        ((LinearLayout) ll.getChildAt(0)).setOrientation(val);
-      }
+    public LinearLayout convert(@NonNull ScrollView sv) {
+      return (LinearLayout) sv.getChildAt(0);
     }
-  }
-
-  private static final class GravityProp extends Prop<ScrollView, Integer> {
-    private static final String NAME = "GRAVITY";
-
-    public GravityProp() {
-      super(NAME);
-    }
-
-    @Override
-    public void apply(@NonNull ScrollView ll) {
-      Integer val = get();
-      if (val != null) {
-        ((LinearLayout) ll.getChildAt(0)).setGravity(val);
-      }
-    }
-  }
+  };
 
   private final ScrollViewBuilder composedScrollViewBuilder;
   private final LinearLayoutBuilder composedLinearLayoutViewBuilder;
@@ -56,16 +31,12 @@ public class ScrollViewInnerLinearBuilder
     composedLinearLayoutViewBuilder = new LinearLayoutBuilder();
 
     composePropsFrom(composedScrollViewBuilder);
+    composePropsFrom(composedLinearLayoutViewBuilder, CONVERTER);
     composeCreateViewFrom(composedScrollViewBuilder);
     composeEmptyLayoutParamsFrom(composedLinearLayoutViewBuilder);
     composeLayoutPropsFrom(composedLinearLayoutViewBuilder);
 
     // @formatter:off
-    regProps(Arrays.asList(
-        new OrientationProp(),
-        new GravityProp()
-    ));
-
     super.child(
         composedLinearLayoutViewBuilder
         .matchParent()
@@ -90,13 +61,13 @@ public class ScrollViewInnerLinearBuilder
 
   @Override
   public ScrollViewInnerLinearBuilder orientation(int orientation) {
-    setProp(OrientationProp.NAME, orientation);
+    composedLinearLayoutViewBuilder.orientation(orientation);
     return this;
   }
 
   @Override
   public ScrollViewInnerLinearBuilder gravity(int gravity) {
-    setProp(GravityProp.NAME, gravity);
+    composedLinearLayoutViewBuilder.gravity(gravity);
     return this;
   }
 }

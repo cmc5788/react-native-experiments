@@ -59,6 +59,32 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     };
   }
 
+  public interface ViewConverter<V1 extends View, V2 extends View> {
+    @NonNull
+    V2 convert(@NonNull V1 from);
+  }
+
+  public static <FROM extends View, TO extends View, T> Prop<TO, T> convert( //
+      final Prop<FROM, T> p, final @NonNull ViewConverter<TO, FROM> converter) {
+    return new Prop<TO, T>(p.name) {
+      @Override
+      public void set(@Nullable T val) {
+        p.set(val);
+      }
+
+      @Nullable
+      @Override
+      public T get() {
+        return p.get();
+      }
+
+      @Override
+      public void apply(@NonNull TO to) {
+        p.apply(converter.convert(to));
+      }
+    };
+  }
+
   public static abstract class Prop<V extends View, T> {
     @NonNull public final String name;
     private T val;
@@ -466,6 +492,20 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     }
   }
 
+  protected <VV extends View> void composePropsFrom(@NonNull ViewBuilder<?, VV> other,
+      final ViewConverter<V, VV> converter) {
+    if (other.props != null) {
+      if (props == null) props = new HashMap<>();
+      //noinspection ForLoopReplaceableByForEach
+      for (Iterator i = other.props.entrySet().iterator(); i.hasNext(); ) {
+        //noinspection unchecked
+        Map.Entry<String, Prop> e = (Map.Entry<String, Prop>) i.next();
+        //noinspection unchecked
+        props.put(e.getKey(), ViewBuilder.convert(e.getValue(), converter));
+      }
+    }
+  }
+
   protected void composeLayoutPropsFrom(@NonNull ViewBuilder other) {
     if (composedForLayoutProps == null) composedForLayoutProps = new ArrayList<>();
     composedForLayoutProps.add(other);
@@ -482,6 +522,9 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   protected void regProps(@NonNull Collection<? extends Prop<? super V, ?>> propsToReg) {
     if (props == null) props = new HashMap<>();
     for (Prop<? super V, ?> prop : propsToReg) {
+      if (props.containsKey(prop.name)) {
+        throw new RuntimeException("regProps: already contains key " + prop.name);
+      }
       props.put(prop.name, prop);
     }
   }
