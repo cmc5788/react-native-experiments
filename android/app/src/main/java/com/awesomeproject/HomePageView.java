@@ -12,9 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
 import com.awesomeproject.MyNavigator.NavigableView;
 import com.awesomeproject.MyNavigator.ViewFactory;
+import com.awesomeproject.layout.ImageViewBuilder;
 import com.awesomeproject.layout.ImageViews;
 import com.awesomeproject.layout.LinearLayouts;
 import com.awesomeproject.layout.RelativeLayouts;
@@ -137,6 +139,15 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
   // -----
   // REAL CODE ... ?
 
+  ImageViewBuilder imageCell(@ColorInt int color) {
+    // @formatter:off
+    return ImageViews.build()
+        .bgColorInt(color)
+        .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
+        .heightFlexPct(1f);
+    // @formatter:on
+  }
+
   private void buildLayout() {
     // @formatter:off
     ScrollViews.buildWithInnerLinear()
@@ -156,34 +167,11 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
           .orientation(HORIZONTAL)
           .gravity(CENTER)
 
-          .child(
-              ImageViews.build()
-              .bgColorInt(Color.MAGENTA)
-              .id(IMAGE_ID)
-              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
-              .heightFlexPct(1f)
-          )
-
-          .child(
-              ImageViews.build()
-              .bgColorInt(Color.GREEN)
-              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
-              .heightFlexPct(1f)
-          )
-
-          .child(
-              ImageViews.build()
-              .bgColorInt(Color.BLUE)
-              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
-              .heightFlexPct(1f)
-          )
-
-          .child(
-              ImageViews.build()
-              .bgColorInt(Color.RED)
-              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
-              .heightFlexPct(1f)
-          )
+          .child(imageCell(Color.MAGENTA).id(IMAGE_ID))
+          .child(imageCell(Color.GREEN))
+          .child(imageCell(Color.BLUE))
+          .child(imageCell(Color.RED))
+          .child(imageCell(Color.YELLOW))
         )
 
         .child(
@@ -192,33 +180,11 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
           .orientation(HORIZONTAL)
           .gravity(CENTER)
 
-          .child(
-              ImageViews.build()
-              .bgColorInt(Color.RED)
-              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
-              .heightFlexPct(1)
-          )
-
-          .child(
-              ImageViews.build()
-              .bgColorInt(Color.BLUE)
-              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
-              .heightFlexPct(1)
-          )
-
-          .child(
-              ImageViews.build()
-              .bgColorInt(Color.GREEN)
-              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
-              .heightFlexPct(1)
-          )
-
-          .child(
-              ImageViews.build()
-              .bgColorInt(Color.MAGENTA)
-              .width(0).editMode().heightDp(64).layout(WEIGHT, 1f)
-              .heightFlexPct(1)
-          )
+          .child(imageCell(Color.YELLOW))
+          .child(imageCell(Color.RED))
+          .child(imageCell(Color.GREEN))
+          .child(imageCell(Color.BLUE))
+          .child(imageCell(Color.MAGENTA))
         )
 
         .child(Spaces.vSpace(1))
@@ -226,7 +192,9 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
         .child(
             TextViews.build()
             .id(TEXT_ID)
-            .wrapContent()
+            .matchHeight().editMode().heightDp(128)
+            .heightFlexPct(1f)
+            .gravity(CENTER)
             .vPaddingDp(14).hPaddingDp(10)
             .bgColorInt(Color.LTGRAY)
             .text("I am just some text")
@@ -336,6 +304,7 @@ public class HomePageView extends ScrollView implements NavigableView, JSViewEve
 
   private void setBtnColor(@ColorInt int color) {
     findViewById(TEXT_ID).setBackgroundColor(color);
+    TextViews.build().widthDp(256).applyOnto((TextView) findViewById(TEXT_ID));
   }
 
   private void setImageUrl(String url) {

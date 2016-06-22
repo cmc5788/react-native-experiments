@@ -909,11 +909,16 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   }
 
   public void applyOnto(V v) {
-    if (!(v instanceof ViewGroup)) throw reqArg("applyOnto: ViewGroup");
+    boolean isViewGroup = (v instanceof ViewGroup);
 
-    ViewGroup vg = (ViewGroup) v;
+    if (!isViewGroup && //
+        (children != null && !children.isEmpty())) {
+      throw new IllegalArgumentException("non-ViewGroup may not have children.");
+    }
 
-    buildChildren(vg);
+    if (isViewGroup) {
+      buildChildren((ViewGroup) v);
+    }
 
     applyProps(v);
 
@@ -1022,7 +1027,10 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
   private void applyLayoutProps(@NonNull V v) {
     ViewGroup.LayoutParams plps;
     if (parent == null) {
-      plps = new ViewGroup.LayoutParams(0, 0);
+      plps = v.getLayoutParams();
+      if (plps == null) {
+        plps = new ViewGroup.LayoutParams(LAYOUT_DIM_EMPTY, LAYOUT_DIM_EMPTY);
+      }
     } else {
       plps = parent.createEmptyLayoutParamsForChild();
       plps.width = plps.height = LAYOUT_DIM_EMPTY;
