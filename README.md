@@ -10,7 +10,9 @@ Experiment with making React Native apps more Native and less React.
 
 3. It would be nice to have a framework that's light on the React and heavy on the Native. It should utilize modern MVP architecture on the native side, facilitated by the JS only where necessary to bolster the architecture by sharing logic judiciously.
 
-4. That's it for now.
+4. Native dependencies should be minimized in favor of JS dependencies where possible. This should keep the native pieces easy to extend and maintain. Also, on the Android side, everything stays safely ProGuard-able out of the box since we don't have an intricate web of dependencies to maintain ProGuard rules for.
+
+5. That's it for now.
 
 ## TODO
 
