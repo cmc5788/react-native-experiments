@@ -68,7 +68,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
   private boolean needsApplyStack;
   private boolean needsEmptyTag;
   private String emptyTag;
-  private ViewGroup root;
+  private DisableableViewGroup root;
 
   public MyNavigator(ReactApplicationContext reactAppContext) {
     super(reactAppContext);
@@ -80,7 +80,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
     if (this.root != null) {
       throw new IllegalStateException("must only set appRoot once.");
     }
-    this.root = root.disableableViewGroup();
+    this.root = root;
     if (needsApplyStack) {
       needsApplyStack = false;
       applyStack();
@@ -351,9 +351,10 @@ public class MyNavigator extends MyReactModule implements Navigator {
     // this should be asynchronous, allow for some time where both views are attached so we can
     // have some in-between animations, etc.
 
-    final View newTopView = viewFactory.createView(root);
+    final View newTopView = viewFactory.createView(root.viewGroup());
 
-    root.addView(newTopView, -1, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+    root.viewGroup().addView( //
+        newTopView, -1, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
 
     // Dispatch the event. TODO - need before and after anim events?
 
@@ -371,6 +372,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
       // TODO - pull animation logic from injects; don't assume simple crossfade
 
+      root.disable();
       oldView.animate().alpha(0f);
       newTopView.setAlpha(0f);
       newTopView.animate().alpha(1f).setListener(new AnimatorListenerAdapter() {
@@ -378,7 +380,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
         public void onAnimationEnd(Animator animation) {
           newTopView.animate().setListener(null);
 
-          root.removeView(oldView);
+          root.viewGroup().removeView(oldView);
 
           String oldTopTag = null;
           for (String tag : viewFactories.keySet()) {
@@ -393,6 +395,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
           // TODO - onDestroyView, does it make sense here?
           dispatchDestroy(oldTopTag);
+          root.enable();
         }
       });
 
@@ -418,8 +421,8 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
   @Nullable
   private NavigableView findFirstNavigableView() {
-    for (int i = 0; i < root.getChildCount(); i++) {
-      View child = root.getChildAt(i);
+    for (int i = 0; i < root.viewGroup().getChildCount(); i++) {
+      View child = root.viewGroup().getChildAt(i);
       if (child instanceof NavigableView) {
         return (NavigableView) child;
       }

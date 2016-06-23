@@ -8,5 +8,5 @@ public interface DisableableViewGroup<VG extends ViewGroup & DisableableViewGrou
 
   void enable();
 
-  VG disableableViewGroup();
+  VG viewGroup();
 }

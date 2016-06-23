@@ -117,7 +117,7 @@ public class MyAppRoot extends FrameLayout
   }
 
   @Override
-  public MyAppRoot disableableViewGroup() {
+  public MyAppRoot viewGroup() {
     return this;
   }
 }
