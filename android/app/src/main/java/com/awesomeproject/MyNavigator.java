@@ -73,12 +73,12 @@ public class MyNavigator extends MyReactModule implements Navigator {
     injectDeps();
   }
 
-  /*package*/ void setRoot(@NonNull ViewGroup root) {
+  /*package*/ void setRoot(@NonNull DisableableViewGroup root) {
     assertOnUiThread();
     if (this.root != null) {
       throw new IllegalStateException("must only set appRoot once.");
     }
-    this.root = root;
+    this.root = root.disableableViewGroup();
     if (needsApplyStack) {
       needsApplyStack = false;
       applyStack();

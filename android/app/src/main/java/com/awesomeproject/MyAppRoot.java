@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -17,7 +18,8 @@ import com.facebook.react.bridge.ReadableMap;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class MyAppRoot extends FrameLayout implements JSViewEventTarget {
+public class MyAppRoot extends FrameLayout
+    implements JSViewEventTarget, DisableableViewGroup<MyAppRoot> {
 
   // We have to use this bizarre "ID tracking" system since React wants to assign view IDs to
   // certain views based on its own internal logic. This should be safe for now; eventually we
@@ -32,6 +34,7 @@ public class MyAppRoot extends FrameLayout implements JSViewEventTarget {
 
   private MyNavigator navigator;
   private JSEventReceiver eventReceiver;
+  private boolean disabled;
 
   private void injectDeps() {
     navigator = MyApp.injector(getContext()).navigatorFor(this);
@@ -96,5 +99,25 @@ public class MyAppRoot extends FrameLayout implements JSViewEventTarget {
   @Override
   public boolean respondsToTag(@NonNull String viewTag) {
     return true; // respond to all tags since we dispatch them
+  }
+
+  @Override
+  public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
+    return !disabled && super.dispatchTouchEvent(ev);
+  }
+
+  @Override
+  public void disable() {
+    disabled = true;
+  }
+
+  @Override
+  public void enable() {
+    disabled = false;
+  }
+
+  @Override
+  public MyAppRoot disableableViewGroup() {
+    return this;
   }
 }
