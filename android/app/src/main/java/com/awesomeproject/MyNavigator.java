@@ -380,8 +380,6 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
           root.removeView(oldView);
 
-          // TODO - onDestroyView, does it make sense here?
-
           String oldTopTag = null;
           for (String tag : viewFactories.keySet()) {
             if (oldTopView.matchesNavTag(tag)) {
