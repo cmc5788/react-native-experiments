@@ -1,5 +1,7 @@
 package com.awesomeproject;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
@@ -334,7 +336,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
     }
 
     String topTag = stack.get(stack.size() - 1);
-    NavigableView oldTopView = findFirstNavigableView();
+    final NavigableView oldTopView = findFirstNavigableView();
     if (oldTopView != null && oldTopView.matchesNavTag(topTag)) {
       // No need to navigate; already there.
       return;
@@ -349,7 +351,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
     // this should be asynchronous, allow for some time where both views are attached so we can
     // have some in-between animations, etc.
 
-    View newTopView = viewFactory.createView(root);
+    final View newTopView = viewFactory.createView(root);
 
     root.addView(newTopView, -1, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
 
@@ -360,22 +362,59 @@ public class MyNavigator extends MyReactModule implements Navigator {
     Log.e(TAG, "APPLY STACK: " + Arrays.toString(stack.toArray()));
 
     if (oldTopView != null) {
-      root.removeView((View) oldTopView);
 
-      // TODO - onDestroyView, does it make sense here?
+      // ANIM!!!!
 
-      String oldTopTag = null;
-      for (String tag : viewFactories.keySet()) {
-        if (oldTopView.matchesNavTag(tag)) {
-          oldTopTag = tag;
-          break;
+      final View oldView = (View) oldTopView;
+
+      // ----
+
+      // TODO - pull animation logic from injects; don't assume simple crossfade
+
+      oldView.animate().alpha(0f);
+      newTopView.setAlpha(0f);
+      newTopView.animate().alpha(1f).setListener(new AnimatorListenerAdapter() {
+        @Override
+        public void onAnimationEnd(Animator animation) {
+          newTopView.animate().setListener(null);
+
+          root.removeView(oldView);
+
+          // TODO - onDestroyView, does it make sense here?
+
+          String oldTopTag = null;
+          for (String tag : viewFactories.keySet()) {
+            if (oldTopView.matchesNavTag(tag)) {
+              oldTopTag = tag;
+              break;
+            }
+          }
+          if (oldTopTag == null) {
+            throw new IllegalStateException("No tag found for old top view!");
+          }
+
+          // TODO - onDestroyView, does it make sense here?
+          dispatchDestroy(oldTopTag);
         }
-      }
-      if (oldTopTag == null) {
-        throw new IllegalStateException("No tag found for old top view!");
-      }
+      });
 
-      dispatchDestroy(oldTopTag);
+      // ----
+      // TODO - old synchronous transitions, stable but wrong
+
+      //root.removeView(oldView);
+      //
+      //String oldTopTag = null;
+      //for (String tag : viewFactories.keySet()) {
+      //  if (oldTopView.matchesNavTag(tag)) {
+      //    oldTopTag = tag;
+      //    break;
+      //  }
+      //}
+      //if (oldTopTag == null) {
+      //  throw new IllegalStateException("No tag found for old top view!");
+      //}
+      //
+      //dispatchDestroy(oldTopTag);
     }
   }
 
