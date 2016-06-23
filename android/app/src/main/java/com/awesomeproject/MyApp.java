@@ -4,9 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import com.awesomeproject.MyNavigator.ViewFactory;
+import com.awesomeproject.util.MapUtil;
 import com.facebook.react.LiteReactInstanceManager;
 import com.facebook.react.bridge.ReactApplicationContext;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
@@ -76,10 +76,12 @@ public class MyApp extends Application implements MyInjector {
 
   @Override
   public Map<String, ViewFactory> viewFactoriesFor(MyNavigator navigator) {
-    HashMap<String, ViewFactory> m = new HashMap<>();
-    m.put(HomePageView.TAG, HomePageView.factory());
-    m.put(DetailPageView.TAG, DetailPageView.factory());
-    return m;
+    // @formatter:off
+    return MapUtil.<ViewFactory>buildStringMap()
+        .put(HomePageView.TAG, HomePageView.factory())
+        .put(DetailPageView.TAG, DetailPageView.factory())
+        .immutableMap();
+    // @formatter:on
   }
 
   @Override

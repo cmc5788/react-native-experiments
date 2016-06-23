@@ -8,7 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public final class StrUtil {
+public class StrUtil {
 
   @NonNull
   public static String serializableToStr(@NonNull Serializable ser) {
@@ -51,6 +51,7 @@ public final class StrUtil {
     }
   }
 
-  private StrUtil() {
+  protected StrUtil() {
+    throw new UnsupportedOperationException();
   }
 }
