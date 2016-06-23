@@ -96,7 +96,7 @@ module.exports = (appPresenter) =>
               typeof presenter[prop] === 'function') {
             presenter[prop + 'Sub'] && console.log(`removing listener for ${evt.tag}.${prop}`);
             presenter[prop + 'Sub'] && presenter[prop + 'Sub'].remove();
-            presenter[prop + 'Sub'] = null;
+            presenter[prop + 'Sub'] && presenter[prop + 'Sub'] = null;
           }
         }
 
