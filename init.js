@@ -61,8 +61,9 @@ module.exports = (appPresenter) =>
             if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
                 typeof presenter[prop] === 'function') {
               console.log(`adding listener for ${evt.tag}.${prop}`);
-              presenter[prop + 'Sub'] = DeviceEventEmitter.addListener(
-                `${evt.tag}.${prop}`, presenter[prop]);
+              presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] =
+                DeviceEventEmitter.addListener(
+                  `${evt.tag}.${prop}`, presenter[prop]);
             }
           }
 
@@ -94,9 +95,12 @@ module.exports = (appPresenter) =>
         for (var prop in presenter) {
           if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
               typeof presenter[prop] === 'function') {
-            presenter[prop + 'Sub'] && console.log(`removing listener for ${evt.tag}.${prop}`);
-            presenter[prop + 'Sub'] && presenter[prop + 'Sub'].remove();
-            presenter[prop + 'Sub'] && presenter[prop + 'Sub'] = null;
+            presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
+              console.log(`removing listener for ${evt.tag}.${prop}`);
+            presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
+              presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`].remove();
+            presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
+              (presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] = null);
           }
         }
 
