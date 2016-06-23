@@ -53,34 +53,50 @@ module.exports = (appPresenter) =>
           activePresenters[evt.tag] = BuildPresenter(
             presenterCtor, evt.tag, ViewEventSender(evt.tag));
 
+          const presenter = activePresenters[evt.tag];
+
           // auto register event listeners for presenter based on prop names
           // TODO - clean this code up
-          for (var prop in activePresenters[evt.tag]) {
+          for (var prop in presenter) {
             if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
-                typeof activePresenters[evt.tag][prop] === 'function') {
+                typeof presenter[prop] === 'function') {
               console.log(`adding listener for ${evt.tag}.${prop}`);
-              activePresenters[evt.tag][prop + 'Sub'] = DeviceEventEmitter.addListener(
-                `${evt.tag}.${prop}`, activePresenters[evt.tag][prop]);
+              presenter[prop + 'Sub'] = DeviceEventEmitter.addListener(
+                `${evt.tag}.${prop}`, presenter[prop]);
             }
           }
 
-          activePresenters[evt.tag].init();
+          presenter.unsub = (prop) => {
+            if (presenter[prop]) {
+              presenter[prop].unsubscribe();
+              presenter[prop] = null;
+              console.log(`${prop} unsubscribed.`);
+            }
+          };
+
+          presenter.sub = (prop, obs, next, err, complete) => {
+            presenter[prop] = obs.subscribe(next, err, complete);
+            console.log(`${prop} subscribed.`);
+          };
+
+          presenter.init();
         }
       }
     });
 
     DeviceEventEmitter.addListener('onDestroyView', (evt) => {
-      if (activePresenters[evt.tag]) {
-        activePresenters[evt.tag].destroy();
+      const presenter = activePresenters[evt.tag];
+      if (presenter) {
+        presenter.destroy();
 
         // auto cleanup event listeners for presenter based on prop names
         // TODO - clean this code up
-        for (var prop in activePresenters[evt.tag]) {
+        for (var prop in presenter) {
           if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
-              typeof activePresenters[evt.tag][prop] === 'function') {
-            activePresenters[evt.tag][prop + 'Sub'] && console.log(`removing listener for ${evt.tag}.${prop}`);
-            activePresenters[evt.tag][prop + 'Sub'] && activePresenters[evt.tag][prop + 'Sub'].remove();
-            activePresenters[evt.tag][prop + 'Sub'] = null;
+              typeof presenter[prop] === 'function') {
+            presenter[prop + 'Sub'] && console.log(`removing listener for ${evt.tag}.${prop}`);
+            presenter[prop + 'Sub'] && presenter[prop + 'Sub'].remove();
+            presenter[prop + 'Sub'] = null;
           }
         }
 

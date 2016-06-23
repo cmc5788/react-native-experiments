@@ -2,7 +2,7 @@
 
 function DetailPagePresenter() {
 
-  this.goBackClicked = (evt) => {
+  this.goBackClicked = () => {
     console.log('DetailPagePresenter goBackClicked');
     this.nav.goBack();
   };
@@ -13,7 +13,7 @@ function DetailPagePresenter() {
 
   this.back = () => {
     console.log('DetailPagePresenter back');
-  },
+  };
 
   this.destroy = () => {
     console.log('DetailPagePresenter destroy');
