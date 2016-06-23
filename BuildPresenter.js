@@ -12,7 +12,12 @@ const makeObservablesFromFuncs = (obj) => {
         const _this = this;
         const _args = arguments;
         return Rx.Observable.defer(() => {
-          const funcResult = func.apply(_this, _args);
+          let funcResult;
+          try {
+            funcResult = func.apply(_this, _args);
+          } catch(err) {
+            return Rx.Observable.throw(err);
+          }
           if (funcResult instanceof Promise) {
             return Rx.Observable.fromPromise(funcResult);
           }
