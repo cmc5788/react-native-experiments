@@ -373,7 +373,6 @@ public class MyNavigator extends MyReactModule implements Navigator {
       // TODO - pull animation logic from injects; don't assume simple crossfade
 
       root.disable();
-      oldView.animate().alpha(0f);
       newTopView.setAlpha(0f);
       newTopView.animate().alpha(1f).setListener(new AnimatorListenerAdapter() {
         @Override
