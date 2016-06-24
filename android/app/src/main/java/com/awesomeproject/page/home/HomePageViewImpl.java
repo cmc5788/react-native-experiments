@@ -277,7 +277,7 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
   private final OnClickListener onBtnClick = new OnClickListener() {
     @Override
     public void onClick(View v) {
-      presenter.onButtonClicked();
+      presenter.buttonClicked();
     }
   };
 

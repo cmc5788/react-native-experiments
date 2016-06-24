@@ -8,7 +8,7 @@ const timer = Observable.timer;
 
 function HomePagePresenter() {
 
-  this.onButtonClicked = () => {
+  this.buttonClicked = () => {
     console.log('HomePagePresenter buttonClicked');
 
     this.unsub('buttonClickedActionSub');

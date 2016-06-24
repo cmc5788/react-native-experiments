@@ -1,11 +1,8 @@
 package com.awesomeproject.page.detail;
 
-import android.support.annotation.NonNull;
-import com.facebook.react.bridge.ReadableMap;
+import com.awesomeproject.JSArgProcessor;
 
-public interface DetailPagePresenter {
+public interface DetailPagePresenter extends JSArgProcessor {
 
   void goBackClicked();
-
-  void processJsArgs(@NonNull ReadableMap args);
 }

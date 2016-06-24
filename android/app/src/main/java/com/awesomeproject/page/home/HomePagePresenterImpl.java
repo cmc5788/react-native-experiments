@@ -18,8 +18,8 @@ public class HomePagePresenterImpl implements HomePagePresenter {
   }
 
   @Override
-  public void onButtonClicked() {
-    eventDispatcher.dispatch(view.viewTag() + ".onButtonClicked", null);
+  public void buttonClicked() {
+    eventDispatcher.dispatch(view.viewTag() + ".buttonClicked", null);
   }
 
   @Override

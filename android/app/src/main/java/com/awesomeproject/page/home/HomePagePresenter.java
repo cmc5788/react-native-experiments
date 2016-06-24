@@ -1,11 +1,8 @@
 package com.awesomeproject.page.home;
 
-import android.support.annotation.NonNull;
-import com.facebook.react.bridge.ReadableMap;
+import com.awesomeproject.JSArgProcessor;
 
-public interface HomePagePresenter {
+public interface HomePagePresenter extends JSArgProcessor {
 
-  void onButtonClicked();
-
-  void processJsArgs(@NonNull ReadableMap args);
+  void buttonClicked();
 }
