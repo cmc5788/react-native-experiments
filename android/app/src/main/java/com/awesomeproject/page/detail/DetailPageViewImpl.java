@@ -1,18 +1,16 @@
-package com.awesomeproject;
+package com.awesomeproject.page.detail;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ScrollView;
-import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
-import com.awesomeproject.MyNavigator.NavigableView;
-import com.awesomeproject.MyNavigator.ViewFactory;
+import com.awesomeproject.MyApp;
 import com.awesomeproject.layout.scrollview.ScrollViews;
 import com.awesomeproject.layout.space.Spaces;
 import com.awesomeproject.layout.textview.TextViews;
@@ -23,7 +21,7 @@ import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class DetailPageView extends ScrollView implements NavigableView, JSViewEventTarget {
+public class DetailPageViewImpl extends ScrollView implements DetailPageView {
 
   // -----
   // STATICS
@@ -32,50 +30,39 @@ public class DetailPageView extends ScrollView implements NavigableView, JSViewE
 
   public static final int ID = Views.generateViewId();
 
-  private static class FactoryHolder {
-    private static final ViewFactory<DetailPageView> FACTORY = new ViewFactory<DetailPageView>() {
-      @Override
-      public DetailPageView createView(ViewGroup parent) {
-        return new DetailPageView(parent.getContext());
-      }
-    };
-  }
-
-  @NonNull
-  public static ViewFactory factory() {
-    return FactoryHolder.FACTORY;
-  }
+  public static final int BUTTON_ID = Views.generateViewId();
 
   // -----
   // INJECTS
 
-  private JSEventDispatcher eventDispatcher;
+  private DetailPagePresenter presenter;
 
   private void injectDeps() {
     if (isInEditMode()) return;
-    eventDispatcher = MyApp.injector(getContext()).eventDispatcherFor(this);
+    presenter = MyApp.injector(getContext()).presenterFor(this);
   }
 
   // -----
   // BOILERPLATE ... stuff we can abstract away later
 
-  public DetailPageView(Context context) {
+  public DetailPageViewImpl(Context context) {
     super(context);
     init();
   }
 
-  public DetailPageView(Context context, AttributeSet attrs) {
+  public DetailPageViewImpl(Context context, AttributeSet attrs) {
     super(context, attrs);
     init();
   }
 
-  public DetailPageView(Context context, AttributeSet attrs, int defStyleAttr) {
+  public DetailPageViewImpl(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     init();
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  public DetailPageView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+  public DetailPageViewImpl(Context context, AttributeSet attrs, int defStyleAttr,
+      int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
     init();
   }
@@ -102,17 +89,18 @@ public class DetailPageView extends ScrollView implements NavigableView, JSViewE
 
   @Override
   public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
-    //if (args != null && args.hasKey("setButtonColor")) {
-    //  setBtnColor(Color.parseColor(args.getString("setButtonColor")));
-    //}
-    //if (args != null && args.hasKey("setImageUrl")) {
-    //  setImageUrl(args.getString("setImageUrl"));
-    //}
+    if (args != null) presenter.processJsArgs(args);
   }
 
   @Override
   public boolean respondsToTag(@NonNull String viewTag) {
     return TAG.equals(viewTag);
+  }
+
+  @NonNull
+  @Override
+  public String viewTag() {
+    return TAG;
   }
 
   // -----
@@ -135,6 +123,7 @@ public class DetailPageView extends ScrollView implements NavigableView, JSViewE
 
         .child(
             TextViews.build()
+            .id(BUTTON_ID)
             .wrapContent()
             .topMarginDp(32)
             .paddingDp(12)
@@ -149,10 +138,15 @@ public class DetailPageView extends ScrollView implements NavigableView, JSViewE
     // @formatter:on
   }
 
-  private final OnClickListener goBackClicked = new OnClickListener() {
+  private final View.OnClickListener goBackClicked = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      eventDispatcher.dispatch(TAG + ".goBackClicked", null);
+      presenter.goBackClicked();
     }
   };
+
+  @Override
+  public void setButtonColor(@ColorInt int color) {
+    findViewById(BUTTON_ID).setBackgroundColor(color);
+  }
 }

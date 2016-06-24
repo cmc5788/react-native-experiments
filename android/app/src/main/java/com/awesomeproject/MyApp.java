@@ -4,6 +4,14 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import com.awesomeproject.MyNavigator.ViewFactory;
+import com.awesomeproject.page.detail.DetailPagePresenter;
+import com.awesomeproject.page.detail.DetailPagePresenterImpl;
+import com.awesomeproject.page.detail.DetailPageViewImpl;
+import com.awesomeproject.page.detail.DetailPageViewImplFactory;
+import com.awesomeproject.page.home.HomePagePresenter;
+import com.awesomeproject.page.home.HomePagePresenterImpl;
+import com.awesomeproject.page.home.HomePageViewImpl;
+import com.awesomeproject.page.home.HomePageViewImplFactory;
 import com.awesomeproject.util.MapUtil;
 import com.facebook.react.LiteReactInstanceManager;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -78,8 +86,8 @@ public class MyApp extends Application implements MyInjector {
   public Map<String, ViewFactory> viewFactoriesFor(MyNavigator navigator) {
     // @formatter:off
     return MapUtil.<ViewFactory>buildStringMap()
-        .put(HomePageView.TAG, HomePageView.factory())
-        .put(DetailPageView.TAG, DetailPageView.factory())
+        .put(HomePageViewImpl.TAG, new HomePageViewImplFactory())
+        .put(DetailPageViewImpl.TAG, new DetailPageViewImplFactory())
         .immutableMap();
     // @formatter:on
   }
@@ -90,13 +98,13 @@ public class MyApp extends Application implements MyInjector {
   }
 
   @Override
-  public JSEventDispatcher eventDispatcherFor(HomePageView homePageView) {
-    return _eventDispatcher(null);
+  public DetailPagePresenter presenterFor(DetailPageViewImpl detailPageView) {
+    return new DetailPagePresenterImpl(_eventDispatcher(null), detailPageView);
   }
 
   @Override
-  public JSEventDispatcher eventDispatcherFor(DetailPageView detailPageView) {
-    return _eventDispatcher(null);
+  public HomePagePresenter presenterFor(HomePageViewImpl homePageView) {
+    return new HomePagePresenterImpl(_eventDispatcher(null), homePageView);
   }
 
   // Lazy init scoped injectables with DCL

@@ -1,5 +1,9 @@
 package com.awesomeproject;
 
+import com.awesomeproject.page.detail.DetailPagePresenter;
+import com.awesomeproject.page.detail.DetailPageViewImpl;
+import com.awesomeproject.page.home.HomePagePresenter;
+import com.awesomeproject.page.home.HomePageViewImpl;
 import com.facebook.react.LiteReactInstanceManager;
 import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.Map;
@@ -9,10 +13,6 @@ public interface MyInjector {
   // Defines the scope
 
   void beginNewScope();
-
-  //void registerMainActivity(MainActivity activity);
-
-  //void unregisterMainActivity(MainActivity activity);
 
   // Injectable values
 
@@ -33,7 +33,7 @@ public interface MyInjector {
 
   JSEventDispatcher eventDispatcherFor(MyNavigator navigator);
 
-  JSEventDispatcher eventDispatcherFor(HomePageView homePageView);
+  DetailPagePresenter presenterFor(DetailPageViewImpl detailPageView);
 
-  JSEventDispatcher eventDispatcherFor(DetailPageView detailPageView);
+  HomePagePresenter presenterFor(HomePageViewImpl homePageView);
 }

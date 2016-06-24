@@ -59,6 +59,7 @@ module.exports = (appPresenter) =>
           // TODO - clean this code up
           for (var prop in presenter) {
             if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
+                prop !== 'sub' && prop !== 'unsub' &&
                 typeof presenter[prop] === 'function') {
               console.log(`adding listener for ${evt.tag}.${prop}`);
               presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] =
@@ -94,6 +95,7 @@ module.exports = (appPresenter) =>
         // TODO - clean this code up
         for (var prop in presenter) {
           if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
+              prop !== 'sub' && prop !== 'unsub' &&
               typeof presenter[prop] === 'function') {
             presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
               console.log(`removing listener for ${evt.tag}.${prop}`);
