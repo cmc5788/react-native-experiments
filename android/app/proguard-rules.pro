@@ -61,3 +61,7 @@
 -dontwarn java.nio.file.*
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 -dontwarn okio.**
+
+# picasso
+
+-dontwarn com.squareup.okhttp.**
