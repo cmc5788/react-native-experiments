@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ScrollView;
-import com.awesomeproject.MyApp;
+import com.awesomeproject.MyNavigator.NavTag;
 import com.awesomeproject.layout.scrollview.ScrollViews;
 import com.awesomeproject.layout.space.Spaces;
 import com.awesomeproject.layout.textview.TextViews;
@@ -26,24 +26,22 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
   // -----
   // STATICS
 
-  public static final String TAG = "DetailPageView";
-
   public static final int ID = Views.generateViewId();
-
   public static final int BUTTON_ID = Views.generateViewId();
 
   // -----
-  // INJECTS
+  // BOILERPLATE ... stuff we can abstract away later
 
+  private NavTag tag;
   private DetailPagePresenter presenter;
 
-  private void injectDeps() {
-    if (isInEditMode()) return;
-    presenter = MyApp.injector(getContext()).presenterFor(this);
+  /*package*/ void setNavTag(@NonNull NavTag tag) {
+    this.tag = tag;
   }
 
-  // -----
-  // BOILERPLATE ... stuff we can abstract away later
+  /*package*/ void setPresenter(@NonNull DetailPagePresenter presenter) {
+    this.presenter = presenter;
+  }
 
   public DetailPageViewImpl(Context context) {
     super(context);
@@ -52,6 +50,7 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
 
   public DetailPageViewImpl(Context context, AttributeSet attrs) {
     super(context, attrs);
+    if (!isInEditMode()) throw new RuntimeException("no inflated instances.");
     init();
   }
 
@@ -67,14 +66,8 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
     init();
   }
 
-  @Override
-  public boolean matchesNavTag(String tag) {
-    return TAG.equals(tag);
-  }
-
   private void init() {
     setId(ID);
-    injectDeps();
     buildLayout();
   }
 
@@ -94,13 +87,14 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
 
   @Override
   public boolean respondsToTag(@NonNull String viewTag) {
-    return TAG.equals(viewTag);
+    if (tag == null) throw new NullPointerException();
+    return tag.equals(NavTag.parse(viewTag));
   }
 
   @NonNull
   @Override
-  public String viewTag() {
-    return TAG;
+  public NavTag navTag() {
+    return tag;
   }
 
   // -----

@@ -10,7 +10,4 @@ public interface HomePageView extends NavigableView, JSViewEventTarget {
   void setButtonColor(@ColorInt int color);
 
   void setImageUrl(@NonNull String url);
-
-  @NonNull
-  String viewTag();
 }

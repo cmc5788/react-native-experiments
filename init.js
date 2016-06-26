@@ -48,8 +48,8 @@ module.exports = (appPresenter) =>
 
     DeviceEventEmitter.addListener('onInitView', (evt) => {
       if (appPresenter.viewPresenters) {
-        if (appPresenter.viewPresenters[evt.tag]) {
-          const presenterCtor = appPresenter.viewPresenters[evt.tag]();
+        if (appPresenter.viewPresenters[evt.tagBase]) {
+          const presenterCtor = appPresenter.viewPresenters[evt.tagBase]();
           activePresenters[evt.tag] = BuildPresenter(
             presenterCtor, evt.tag, ViewEventSender(evt.tag));
 

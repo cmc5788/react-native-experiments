@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import com.awesomeproject.CustomTextView;
-import com.awesomeproject.MyApp;
+import com.awesomeproject.MyNavigator.NavTag;
 import com.awesomeproject.R;
 import com.awesomeproject.layout.imageview.ImageViewBuilder;
 import com.awesomeproject.layout.imageview.ImageViews;
@@ -41,10 +41,7 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
   // -----
   // STATICS
 
-  public static final String TAG = "HomePageView";
-
   public static final int ID = Views.generateViewId();
-
   private static final int TEXT_ID = Views.generateViewId();
   private static final int IMAGE_ID = Views.generateViewId();
   private static final int TEXT_CENTER_ANCHOR = Views.generateViewId();
@@ -52,17 +49,18 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
   private static final int TEXT_RIGHT_ANCHOR = Views.generateViewId();
 
   // -----
-  // INJECTS
+  // BOILERPLATE ... stuff we can abstract away later
 
+  private NavTag tag;
   private HomePagePresenter presenter;
 
-  private void injectDeps() {
-    if (isInEditMode()) return;
-    presenter = MyApp.injector(getContext()).presenterFor(this);
+  /*package*/ void setNavTag(@NonNull NavTag tag) {
+    this.tag = tag;
   }
 
-  // -----
-  // BOILERPLATE ... stuff we can abstract away later
+  /*package*/ void setPresenter(@NonNull HomePagePresenter presenter) {
+    this.presenter = presenter;
+  }
 
   public HomePageViewImpl(Context context) {
     super(context);
@@ -85,14 +83,8 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
     init();
   }
 
-  @Override
-  public boolean matchesNavTag(String tag) {
-    return TAG.equals(tag);
-  }
-
   private void init() {
     setId(ID);
-    injectDeps();
     buildLayout();
   }
 
@@ -112,13 +104,14 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
 
   @Override
   public boolean respondsToTag(@NonNull String viewTag) {
-    return TAG.equals(viewTag);
+    return tag.equals(NavTag.parse(viewTag));
   }
 
   @NonNull
   @Override
-  public String viewTag() {
-    return TAG;
+  public NavTag navTag() {
+    if (tag == null) throw new NullPointerException();
+    return tag;
   }
 
   // -----

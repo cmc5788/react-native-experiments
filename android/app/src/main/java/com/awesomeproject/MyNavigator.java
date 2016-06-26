@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,11 +32,78 @@ import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 public class MyNavigator extends MyReactModule implements Navigator {
 
   public interface ViewFactory<V extends View & NavigableView> {
-    V createView(ViewGroup parent);
+    V createView(@NonNull ViewGroup parent, @NonNull NavTag tag);
   }
 
   public interface NavigableView {
-    boolean matchesNavTag(String tag);
+    @NonNull
+    NavTag navTag();
+  }
+
+  public static final class NavTag {
+    @NonNull private final String base;
+    @NonNull private final String extras;
+
+    @NonNull
+    public static NavTag parse(@NonNull String tag) {
+      // View tag may have "extras" that define logical equality with other views for nav and
+      // eventing purposes; these are separated from the base tag with a colon delimeter. We do not
+      // care about these tags for deciding which view factory to use, so we separate them.
+      String base;
+      String extras;
+      int startOfExtras = tag.indexOf(':');
+      if (startOfExtras != -1) {
+        base = tag.substring(0, startOfExtras);
+        extras = tag.substring(startOfExtras + 1);
+      } else {
+        base = tag;
+        extras = "";
+      }
+      return new NavTag(base, extras);
+    }
+
+    public NavTag(@NonNull String base, @NonNull String extras) {
+      if (TextUtils.getTrimmedLength(base) == 0) {
+        throw new IllegalArgumentException("base must be non-empty.");
+      }
+      this.base = base;
+      this.extras = extras;
+    }
+
+    @NonNull
+    public String base() {
+      return base;
+    }
+
+    @NonNull
+    public String extras() {
+      return extras;
+    }
+
+    @NonNull
+    public String tag() {
+      return String.format("%s:%s", base, extras);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      NavTag navTag = (NavTag) o;
+      return base.equals(navTag.base) && extras.equals(navTag.extras);
+    }
+
+    @Override
+    public int hashCode() {
+      int result = base.hashCode();
+      result = 31 * result + extras.hashCode();
+      return result;
+    }
+
+    @Override
+    public String toString() {
+      return tag();
+    }
   }
 
   // -------------------
@@ -98,6 +166,9 @@ public class MyNavigator extends MyReactModule implements Navigator {
     constants.put(FORWARD, 1);
     constants.put(REPLACE, 0);
     constants.put(BACKWARD, -1);
+    for (String key : viewFactories.keySet()) {
+      constants.put(key, key);
+    }
     return constants;
   }
 
@@ -165,11 +236,11 @@ public class MyNavigator extends MyReactModule implements Navigator {
       return false;
     }
 
-    String poppedTag = stack.remove(stack.size() - 1);
+    NavTag poppedTag = NavTag.parse(stack.remove(stack.size() - 1));
 
     if (stack.isEmpty()) {
       NavigableView oldTopView = findFirstNavigableView();
-      if (oldTopView != null && oldTopView.matchesNavTag(poppedTag)) {
+      if (oldTopView != null && oldTopView.navTag().equals(poppedTag)) {
         dispatchDestroy(poppedTag);
       }
       handler().post(new Runnable() {
@@ -335,23 +406,19 @@ public class MyNavigator extends MyReactModule implements Navigator {
       return;
     }
 
-    String topTag = stack.get(stack.size() - 1);
+    NavTag topTag = NavTag.parse(stack.get(stack.size() - 1));
     final NavigableView oldTopView = findFirstNavigableView();
-    if (oldTopView != null && oldTopView.matchesNavTag(topTag)) {
+    if (oldTopView != null && oldTopView.navTag().equals(topTag)) {
       // No need to navigate; already there.
       return;
     }
 
-    ViewFactory viewFactory = viewFactories.get(topTag);
+    ViewFactory viewFactory = viewFactories.get(topTag.base());
     if (viewFactory == null) {
       throw new IllegalStateException(String.format("No ViewFactory found for tag %s!", topTag));
     }
 
-    // TODO :
-    // this should be asynchronous, allow for some time where both views are attached so we can
-    // have some in-between animations, etc.
-
-    final View newTopView = viewFactory.createView(root.viewGroup());
+    final View newTopView = viewFactory.createView(root.viewGroup(), topTag);
 
     root.viewGroup().addView( //
         newTopView, -1, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
@@ -381,19 +448,8 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
           root.viewGroup().removeView(oldView);
 
-          String oldTopTag = null;
-          for (String tag : viewFactories.keySet()) {
-            if (oldTopView.matchesNavTag(tag)) {
-              oldTopTag = tag;
-              break;
-            }
-          }
-          if (oldTopTag == null) {
-            throw new IllegalStateException("No tag found for old top view!");
-          }
-
           // TODO - onDestroyView, does it make sense here?
-          dispatchDestroy(oldTopTag);
+          dispatchDestroy(oldTopView.navTag());
           root.enable();
         }
       });
@@ -429,15 +485,17 @@ public class MyNavigator extends MyReactModule implements Navigator {
     return null;
   }
 
-  private void dispatchInit(String tag) {
+  private void dispatchInit(@NonNull NavTag tag) {
     WritableMap args = Arguments.createMap();
-    args.putString("tag", tag);
+    args.putString("tag", tag.toString());
+    args.putString("tagBase", tag.base());
     eventDispatcher.dispatch("onInitView", args);
   }
 
-  private void dispatchDestroy(String tag) {
+  private void dispatchDestroy(@NonNull NavTag tag) {
     WritableMap args = Arguments.createMap();
-    args.putString("tag", tag);
+    args.putString("tag", tag.toString());
+    args.putString("tagBase", tag.base());
     eventDispatcher.dispatch("onDestroyView", args);
   }
 }

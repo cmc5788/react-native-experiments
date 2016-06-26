@@ -19,7 +19,7 @@ public class DetailPagePresenterImpl implements DetailPagePresenter {
 
   @Override
   public void goBackClicked() {
-    eventDispatcher.dispatch(view.viewTag() + ".goBackClicked", null);
+    eventDispatcher.dispatch(String.format("%s.goBackClicked", view.navTag()), null);
   }
 
   @Override

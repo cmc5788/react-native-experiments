@@ -23,12 +23,12 @@ const app = {
     console.log('app back');
   },
 
-  emptyView: 'HomePageView',
+  emptyView: Navigator.HomePage,
 
-  viewPresenters: {
-    'HomePageView': () => require('./HomePagePresenter'),
-    'DetailPageView': () => require('./DetailPagePresenter')
-  }
+  viewPresenters: new function() {
+    this[Navigator.HomePage] = () => require('./HomePagePresenter');
+    this[Navigator.DetailPage] = () => require('./DetailPagePresenter');
+  }()
 
 };
 
