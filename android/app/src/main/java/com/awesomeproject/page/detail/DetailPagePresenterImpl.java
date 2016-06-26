@@ -26,7 +26,7 @@ public class DetailPagePresenterImpl implements DetailPagePresenter {
   public void processJsArgs(@NonNull ReadableMap args) {
     if (args.hasKey("setButtonColor")) {
       view.setButtonColor(Color.parseColor(args.getString("setButtonColor")));
-    } else if (args.hasKey("setLabelText")) {
+    } if (args.hasKey("setLabelText")) {
       view.setLabelText(args.getString("setLabelText"));
     }
   }

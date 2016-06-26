@@ -26,7 +26,7 @@ public class HomePagePresenterImpl implements HomePagePresenter {
   public void processJsArgs(@NonNull ReadableMap args) {
     if (args.hasKey("setButtonColor")) {
       view.setButtonColor(Color.parseColor(args.getString("setButtonColor")));
-    } else if (args.hasKey("setImageUrl")) {
+    } if (args.hasKey("setImageUrl")) {
       view.setImageUrl(args.getString("setImageUrl"));
     }
   }
