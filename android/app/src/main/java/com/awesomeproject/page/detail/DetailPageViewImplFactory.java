@@ -9,7 +9,7 @@ import com.awesomeproject.MyNavigator.NavTag;
 public final class DetailPageViewImplFactory
     implements MyNavigator.ViewFactory<DetailPageViewImpl> {
 
-  public static final String KEY = "DetailPage";
+  public static final String KEY = "DETAIL_PAGE";
 
   @Override
   public DetailPageViewImpl createView(@NonNull ViewGroup parent, @NonNull NavTag tag) {

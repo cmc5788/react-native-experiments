@@ -23,11 +23,11 @@ const app = {
     console.log('app back');
   },
 
-  emptyView: Navigator.HomePage,
+  emptyView: Navigator.HOME_PAGE,
 
   viewPresenters: new function() {
-    this[Navigator.HomePage] = () => require('./HomePagePresenter');
-    this[Navigator.DetailPage] = () => require('./DetailPagePresenter');
+    this[Navigator.HOME_PAGE] = () => require('./HomePagePresenter');
+    this[Navigator.DETAIL_PAGE] = () => require('./DetailPagePresenter');
   }()
 
 };

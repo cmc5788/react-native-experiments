@@ -51,7 +51,8 @@ module.exports = (appPresenter) =>
         if (appPresenter.viewPresenters[evt.tagBase]) {
           const presenterCtor = appPresenter.viewPresenters[evt.tagBase]();
           activePresenters[evt.tag] = BuildPresenter(
-            presenterCtor, evt.tag, ViewEventSender(evt.tag));
+            presenterCtor, evt.tag, evt.tagBase, evt.tagExtras,
+            ViewEventSender(evt.tag));
 
           const presenter = activePresenters[evt.tag];
 

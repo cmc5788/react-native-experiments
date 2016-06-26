@@ -108,11 +108,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
   // -------------------
 
-  // TODO - actually use these constants, or drop them if they prove to not be useful.
   private static final String TAG = "MyNavigator";
-  private static final String FORWARD = "FORWARD";
-  private static final String REPLACE = "REPLACE";
-  private static final String BACKWARD = "BACKWARD";
 
   @NonNull
   private static SharedPreferences prefs(@NonNull MainActivity activity) {
@@ -163,9 +159,6 @@ public class MyNavigator extends MyReactModule implements Navigator {
   @Override
   public Map<String, Object> getConstants() {
     final Map<String, Object> constants = MapBuilder.newHashMap();
-    constants.put(FORWARD, 1);
-    constants.put(REPLACE, 0);
-    constants.put(BACKWARD, -1);
     for (String key : viewFactories.keySet()) {
       constants.put(key, key);
     }
@@ -174,21 +167,25 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
   @Override
   @ReactMethod
-  public void navigate(final String target, final int direction, final String meta) {
+  public void navigate(final String target, final String extras, final String meta) {
     if (target == null) {
       Log.e(TAG, "cannot navigate to null target.");
       return;
     }
 
+    final String fullTarget = new NavTag(target, extras == null
+        ? ""
+        : extras).toString();
+
     handler().post(new Runnable() {
       @Override
       public void run() {
-        _navigate(target, direction, meta);
+        _navigate(fullTarget, meta);
       }
     });
   }
 
-  private void _navigate(final String target, final int direction, final String meta) {
+  private void _navigate(final String target, final String meta) {
     assertOnUiThread();
     MainActivity activity = activity();
     if (activity == null || !activity.isUiInteractable()) {
@@ -489,6 +486,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
     WritableMap args = Arguments.createMap();
     args.putString("tag", tag.toString());
     args.putString("tagBase", tag.base());
+    args.putString("tagExtras", tag.extras());
     eventDispatcher.dispatch("onInitView", args);
   }
 
@@ -496,6 +494,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
     WritableMap args = Arguments.createMap();
     args.putString("tag", tag.toString());
     args.putString("tagBase", tag.base());
+    args.putString("tagExtras", tag.extras());
     eventDispatcher.dispatch("onDestroyView", args);
   }
 }

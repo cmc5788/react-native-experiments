@@ -9,6 +9,7 @@ function DetailPagePresenter() {
 
   this.init = () => {
     console.log('DetailPagePresenter init');
+    this.view.send({ setLabelText: this.tagExtras });
   };
 
   this.back = () => {

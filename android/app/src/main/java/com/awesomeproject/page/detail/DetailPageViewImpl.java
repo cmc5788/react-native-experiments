@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import com.awesomeproject.MyNavigator.NavTag;
 import com.awesomeproject.layout.scrollview.ScrollViews;
 import com.awesomeproject.layout.space.Spaces;
@@ -27,6 +28,7 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
   // STATICS
 
   public static final int ID = Views.generateViewId();
+  public static final int LABEL_ID = Views.generateViewId();
   public static final int BUTTON_ID = Views.generateViewId();
 
   // -----
@@ -111,6 +113,7 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
 
         .child(
             TextViews.build()
+            .id(LABEL_ID)
             .wrapContent()
             .text("I am a Detail Page")
         )
@@ -142,5 +145,10 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
   @Override
   public void setButtonColor(@ColorInt int color) {
     findViewById(BUTTON_ID).setBackgroundColor(color);
+  }
+
+  @Override
+  public void setLabelText(@NonNull CharSequence text) {
+    ((TextView) findViewById(LABEL_ID)).setText(text);
   }
 }

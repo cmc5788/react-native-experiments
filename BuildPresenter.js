@@ -28,9 +28,11 @@ const makeObservablesFromFuncs = (obj) => {
   }
 };
 
-module.exports = (presenterFunc, tag, view) => {
+module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
   const presenter = new presenterFunc();
   presenter.tag = tag;
+  presenter.tagBase = tagBase;
+  presenter.tagExtras = tagExtras;
   presenter.view = view;
   presenter.nav = nav;
   presenter.net = net;

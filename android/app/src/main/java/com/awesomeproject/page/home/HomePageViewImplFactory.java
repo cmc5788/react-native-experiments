@@ -8,7 +8,7 @@ import com.awesomeproject.MyNavigator.NavTag;
 
 public final class HomePageViewImplFactory implements MyNavigator.ViewFactory<HomePageViewImpl> {
 
-  public static final String KEY = "HomePage";
+  public static final String KEY = "HOME_PAGE";
 
   @Override
   public HomePageViewImpl createView(@NonNull ViewGroup parent, @NonNull NavTag tag) {
