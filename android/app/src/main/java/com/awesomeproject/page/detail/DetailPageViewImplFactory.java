@@ -3,14 +3,10 @@ package com.awesomeproject.page.detail;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import com.awesomeproject.MyApp;
-import com.awesomeproject.MyNavigator;
 import com.awesomeproject.MyNavigator.NavTag;
+import com.awesomeproject.MyNavigator.ViewFactory;
 
-public final class DetailPageViewImplFactory
-    implements MyNavigator.ViewFactory<DetailPageViewImpl> {
-
-  public static final String KEY = "DETAIL_PAGE";
-
+public final class DetailPageViewImplFactory implements ViewFactory<DetailPageViewImpl> {
   @Override
   public DetailPageViewImpl createView(@NonNull ViewGroup parent, @NonNull NavTag tag) {
     DetailPageViewImpl impl = new DetailPageViewImpl(parent.getContext());

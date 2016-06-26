@@ -86,8 +86,8 @@ public class MyApp extends Application implements MyInjector {
   public Map<String, ViewFactory> viewFactoriesFor(MyNavigator navigator) {
     // @formatter:off
     return MapUtil.<ViewFactory>buildStringMap()
-        .put(HomePageViewImplFactory.KEY, new HomePageViewImplFactory())
-        .put(DetailPageViewImplFactory.KEY, new DetailPageViewImplFactory())
+        .put("HOME_PAGE", new HomePageViewImplFactory())
+        .put("DETAIL_PAGE", new DetailPageViewImplFactory())
         .immutableMap();
     // @formatter:on
   }
