@@ -44,6 +44,7 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
   presenter.state = { };
 
   presenter.saveState = (permanentlyDestroying) => {
+    presenter.state.___saved = true;
     new Promise((resolve) => {
       if (permanentlyDestroying) {
         presenter.state = { };
@@ -51,7 +52,6 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
       if (presenter.beforeSave &&
           typeof presenter.beforeSave === 'function') {
         presenter.beforeSave();
-        presenter.state.___saved = true;
       }
       resolve();
     })
