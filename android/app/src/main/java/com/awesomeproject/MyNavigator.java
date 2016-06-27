@@ -216,7 +216,8 @@ public class MyNavigator extends MyReactModule implements Navigator {
     assertOnUiThread();
     MainActivity activity = activity();
     if (activity == null || !activity.isUiInteractable()) {
-      throw new RuntimeException("bad _restoreState!");
+      Log.i(TAG, "Aborting restoreState: activity dead, dying, or dormant.");
+      return null;
     }
 
     Log.d(TAG, String.format("_restoreState %s", tag));
