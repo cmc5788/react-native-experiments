@@ -8,16 +8,23 @@ const timer = Observable.timer;
 
 function HomePagePresenter() {
 
+  this.setButtonColorObs = (color) => {
+    return Observable.defer(() => {
+      return Observable.of(this.state.buttonColor = color);
+    })
+    .flatMap((c) => this.view.sendObs({ setButtonColor: c }));
+  };
+
   this.buttonClicked = () => {
     console.log('HomePagePresenter buttonClicked');
 
     this.unsub('buttonClickedActionSub');
     this.sub('buttonClickedActionSub',
-      this.view.sendObs({ setButtonColor: '#0000FF' })
+      this.setButtonColorObs('#0000FF')
       .flatMap(() => timer(500))
-      .flatMap(() => this.view.sendObs({ setButtonColor: '#00FF00' }))
+      .flatMap(() => this.setButtonColorObs('#00FF00'))
       .flatMap(() => timer(500))
-      .flatMap(() => this.view.sendObs({ setButtonColor: '#FF00FF' }))
+      .flatMap(() => this.setButtonColorObs('#FF00FF'))
       .flatMap(() => timer(500))
       .flatMap(() => this.view.sendObs({ setImageUrl: 'https://vinli-public.s3.amazonaws.com/app-catalog/home-connect/home-icon.png' }))
       .flatMap(() => timer(500))
@@ -42,6 +49,17 @@ function HomePagePresenter() {
   this.destroy = () => {
     console.log('HomePagePresenter destroy');
     this.unsub('buttonClickedActionSub');
+  };
+
+  this.beforeSave = () => {
+    console.log('HomePagePresenter beforeSave');
+  };
+
+  this.afterRestore = () => {
+    console.log(`HomePagePresenter afterRestore ${this.state.blah}`);
+    if (this.state.buttonColor) {
+      this.view.send({ setButtonColor: this.state.buttonColor });
+    }
   };
 }
 
