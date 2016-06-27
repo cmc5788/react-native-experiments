@@ -294,7 +294,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
     stack.remove(stack.size() - 1);
 
     if (stack.isEmpty()) {
-      dispatchDestroyAllNavigableViews();
+      dispatchDestroyAllNavigableViews(true);
       handler().post(new Runnable() {
         @Override
         public void run() {
@@ -487,6 +487,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
       // ANIM!!!!
 
+      final boolean navBack = !isInStack(oldTopView.navTag());
       final View oldView = (View) oldTopView;
 
       // ----
@@ -502,7 +503,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
           // TODO - onDestroyView, does it make sense here?
           destroyAnims.remove(a);
           root.viewGroup().removeView(oldView);
-          dispatchDestroy(oldTopView.navTag());
+          dispatchDestroy(oldTopView.navTag(), navBack);
           root.enable();
 
           Log.e(TAG, "ROOT CHILD COUNT " + root.viewGroup().getChildCount());
@@ -554,14 +555,23 @@ public class MyNavigator extends MyReactModule implements Navigator {
     return -1;
   }
 
-  private int dispatchDestroyAllNavigableViews() {
+  private int dispatchDestroyAllNavigableViews(boolean permanent) {
     for (int i = 0; i < root.viewGroup().getChildCount(); i++) {
       View child = root.viewGroup().getChildAt(i);
       if (child instanceof NavigableView) {
-        dispatchDestroy(((NavigableView) child).navTag());
+        dispatchDestroy(((NavigableView) child).navTag(), permanent);
       }
     }
     return -1;
+  }
+
+  private boolean isInStack(@NonNull NavTag navTag) {
+    for (String tag : stack) {
+      if (NavTag.parse(tag).equals(navTag)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void dispatchInit(@NonNull NavTag tag) {
@@ -572,11 +582,12 @@ public class MyNavigator extends MyReactModule implements Navigator {
     eventDispatcher.dispatch("onInitView", args);
   }
 
-  private void dispatchDestroy(@NonNull NavTag tag) {
+  private void dispatchDestroy(@NonNull NavTag tag, boolean permanent) {
     WritableMap args = Arguments.createMap();
     args.putString("tag", tag.toString());
     args.putString("tagBase", tag.base());
     args.putString("tagExtras", tag.extras());
+    args.putBoolean("permanent", permanent);
     eventDispatcher.dispatch("onDestroyView", args);
   }
 }

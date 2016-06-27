@@ -24,6 +24,15 @@ function DetailPagePresenter() {
   this.destroy = () => {
     console.log('DetailPagePresenter destroy');
   };
+
+  this.beforeSave = () => {
+    console.log('DetailPagePresenter beforeSave');
+    this.state.blah = this.tagExtras;
+  };
+
+  this.afterRestore = () => {
+    console.log(`DetailPagePresenter afterRestore ${this.state.blah}`);
+  };
 }
 
 module.exports = DetailPagePresenter;

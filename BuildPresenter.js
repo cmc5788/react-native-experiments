@@ -43,14 +43,33 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
 
   presenter.state = { };
 
-  presenter.saveState = () => {
-    nav.saveState(presenter.tag, JSON.stringify(presenter.state))
-      .then(() => console.log(`state saved for ${presenter.tag}`));
+  presenter.saveState = (permanentlyDestroying) => {
+    new Promise((resolve) => {
+      if (permanentlyDestroying) {
+        presenter.state = { };
+      } else
+      if (presenter.beforeSave &&
+          typeof presenter.beforeSave === 'function') {
+        presenter.beforeSave();
+      }
+      resolve();
+    })
+    .then(() => nav.saveState(presenter.tag, JSON.stringify(presenter.state)))
+    .then(() => console.log(`state saved for ${presenter.tag}`));
   };
 
   presenter.restoreState = () => {
     nav.restoreState(presenter.tag)
-      .then((state) => { presenter.state = (state && JSON.parse(state)) || presenter.state; })
+      .then((state) => {
+        const restoredState = state && JSON.parse(state);
+        if (restoredState) {
+          presenter.state = restoredState;
+        }
+        if (presenter.afterRestore &&
+            typeof presenter.afterRestore === 'function') {
+          presenter.afterRestore();
+        }
+      })
       .then(() => console.log(`state restored for ${presenter.tag}`));
   };
 

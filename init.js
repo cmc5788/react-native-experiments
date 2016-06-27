@@ -44,19 +44,19 @@ module.exports = (appPresenter) =>
     });
 
     DeviceEventEmitter.addListener('onAppPause', (evt) => {
+      for (var p in activePresenters) {
+        if (activePresenters[p] &&
+            activePresenters[p].saveState &&
+            typeof activePresenters[p].saveState === 'function') {
+          activePresenters[p].saveState();
+        }
+      }
       if (appPresenter.pause) appPresenter.pause();
       for (var p in activePresenters) {
         if (activePresenters[p] &&
             activePresenters[p].pause &&
             typeof activePresenters[p].pause === 'function') {
           activePresenters[p].pause();
-        }
-      }
-      for (var p in activePresenters) {
-        if (activePresenters[p] &&
-            activePresenters[p].saveState &&
-            typeof activePresenters[p].saveState === 'function') {
-          activePresenters[p].saveState();
         }
       }
     });
@@ -88,9 +88,10 @@ module.exports = (appPresenter) =>
           // TODO - clean this code up
           for (var prop in presenter) {
             if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
-                prop !== 'sub' && prop !== 'unsub' && prop !== 'pause' &&
-                prop !== 'resume' && prop !== 'saveState' &&
-                prop !== 'restoreState' &&
+                prop !== 'sub' && prop !== 'unsub' &&
+                prop !== 'pause' && prop !== 'resume' &&
+                prop !== 'saveState' && prop !== 'restoreState' &&
+                prop !== 'afterRestore' && prop !== 'beforeSave' &&
                 typeof presenter[prop] === 'function') {
               console.log(`adding listener for ${evt.tag}.${prop}`);
               presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] =
@@ -113,6 +114,11 @@ module.exports = (appPresenter) =>
           };
 
           presenter.init();
+
+          if (presenter.restoreState &&
+              typeof presenter.restoreState === 'function') {
+            presenter.restoreState();
+          }
         }
       }
     });
@@ -120,15 +126,22 @@ module.exports = (appPresenter) =>
     DeviceEventEmitter.addListener('onDestroyView', (evt) => {
       const presenter = activePresenters[evt.tag];
       if (presenter) {
+
+        if (presenter.saveState &&
+            typeof presenter.saveState === 'function') {
+          presenter.saveState(evt.permanent);
+        }
+
         presenter.destroy();
 
         // auto cleanup event listeners for presenter based on prop names
         // TODO - clean this code up
         for (var prop in presenter) {
           if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
-              prop !== 'sub' && prop !== 'unsub' && prop !== 'pause' &&
-              prop !== 'resume' && prop !== 'saveState' &&
-              prop !== 'restoreState' &&
+              prop !== 'sub' && prop !== 'unsub' &&
+              prop !== 'pause' && prop !== 'resume' &&
+              prop !== 'saveState' && prop !== 'restoreState' &&
+              prop !== 'afterRestore' && prop !== 'beforeSave' &&
               typeof presenter[prop] === 'function') {
             presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
               console.log(`removing listener for ${evt.tag}.${prop}`);

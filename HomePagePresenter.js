@@ -14,13 +14,13 @@ function HomePagePresenter() {
     this.unsub('buttonClickedActionSub');
     this.sub('buttonClickedActionSub',
       this.view.sendObs({ setButtonColor: '#0000FF' })
-      .flatMap(() => timer(1000))
+      .flatMap(() => timer(500))
       .flatMap(() => this.view.sendObs({ setButtonColor: '#00FF00' }))
-      .flatMap(() => timer(1000))
+      .flatMap(() => timer(500))
       .flatMap(() => this.view.sendObs({ setButtonColor: '#FF00FF' }))
-      .flatMap(() => timer(1000))
+      .flatMap(() => timer(500))
       .flatMap(() => this.view.sendObs({ setImageUrl: 'https://vinli-public.s3.amazonaws.com/app-catalog/home-connect/home-icon.png' }))
-      .flatMap(() => timer(1000))
+      .flatMap(() => timer(500))
       .flatMap(() => this.net.fetchJsonObs('https://auth.vin.li/api/v1/config'))
       .flatMap((json) => this.nav.recvJsonObs(json))
       .flatMap(() => Observable.throw('Test Error!'))
