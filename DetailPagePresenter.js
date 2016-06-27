@@ -2,6 +2,11 @@
 
 function DetailPagePresenter() {
 
+  this.labelClicked = () => {
+    console.log('DetailPagePresenter labelClicked');
+    this.nav.navigate(this.nav.DETAIL_PAGE, this.tagExtras + 'x', 'meta');
+  };
+
   this.goBackClicked = () => {
     console.log('DetailPagePresenter goBackClicked');
     this.nav.goBack();

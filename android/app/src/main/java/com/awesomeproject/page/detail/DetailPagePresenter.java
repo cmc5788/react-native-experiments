@@ -5,4 +5,6 @@ import com.awesomeproject.JSArgProcessor;
 public interface DetailPagePresenter extends JSArgProcessor {
 
   void goBackClicked();
+
+  void labelClicked();
 }

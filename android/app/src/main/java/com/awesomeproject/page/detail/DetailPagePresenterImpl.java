@@ -23,6 +23,11 @@ public class DetailPagePresenterImpl implements DetailPagePresenter {
   }
 
   @Override
+  public void labelClicked() {
+    eventDispatcher.dispatch(String.format("%s.labelClicked", view.navTag()), null);
+  }
+
+  @Override
   public void processJsArgs(@NonNull ReadableMap args) {
     if (args.hasKey("setButtonColor")) {
       view.setButtonColor(Color.parseColor(args.getString("setButtonColor")));

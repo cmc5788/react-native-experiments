@@ -116,6 +116,7 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
             .id(LABEL_ID)
             .wrapContent()
             .text("I am a Detail Page")
+            .onClick(labelClicked)
         )
 
         .child(
@@ -134,6 +135,13 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
     .applyOnto(this);
     // @formatter:on
   }
+
+  private final View.OnClickListener labelClicked = new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      presenter.labelClicked();
+    }
+  };
 
   private final View.OnClickListener goBackClicked = new View.OnClickListener() {
     @Override

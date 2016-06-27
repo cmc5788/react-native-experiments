@@ -27,10 +27,38 @@ module.exports = (appPresenter) =>
 
     DeviceEventEmitter.addListener('onAppResume', (evt) => {
       if (appPresenter.resume) appPresenter.resume();
+      for (var p in activePresenters) {
+        if (activePresenters[p] &&
+            activePresenters[p].resume &&
+            typeof activePresenters[p].resume === 'function') {
+          activePresenters[p].resume();
+        }
+      }
+      for (var p in activePresenters) {
+        if (activePresenters[p] &&
+            activePresenters[p].restoreState &&
+            typeof activePresenters[p].restoreState === 'function') {
+          activePresenters[p].restoreState();
+        }
+      }
     });
 
     DeviceEventEmitter.addListener('onAppPause', (evt) => {
       if (appPresenter.pause) appPresenter.pause();
+      for (var p in activePresenters) {
+        if (activePresenters[p] &&
+            activePresenters[p].pause &&
+            typeof activePresenters[p].pause === 'function') {
+          activePresenters[p].pause();
+        }
+      }
+      for (var p in activePresenters) {
+        if (activePresenters[p] &&
+            activePresenters[p].saveState &&
+            typeof activePresenters[p].saveState === 'function') {
+          activePresenters[p].saveState();
+        }
+      }
     });
 
     DeviceEventEmitter.addListener('onGoBack', (evt) => {
@@ -60,7 +88,9 @@ module.exports = (appPresenter) =>
           // TODO - clean this code up
           for (var prop in presenter) {
             if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
-                prop !== 'sub' && prop !== 'unsub' &&
+                prop !== 'sub' && prop !== 'unsub' && prop !== 'pause' &&
+                prop !== 'resume' && prop !== 'saveState' &&
+                prop !== 'restoreState' &&
                 typeof presenter[prop] === 'function') {
               console.log(`adding listener for ${evt.tag}.${prop}`);
               presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] =
@@ -96,7 +126,9 @@ module.exports = (appPresenter) =>
         // TODO - clean this code up
         for (var prop in presenter) {
           if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
-              prop !== 'sub' && prop !== 'unsub' &&
+              prop !== 'sub' && prop !== 'unsub' && prop !== 'pause' &&
+              prop !== 'resume' && prop !== 'saveState' &&
+              prop !== 'restoreState' &&
               typeof presenter[prop] === 'function') {
             presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
               console.log(`removing listener for ${evt.tag}.${prop}`);

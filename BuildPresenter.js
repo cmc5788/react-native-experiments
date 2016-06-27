@@ -41,5 +41,18 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
   makeObservablesFromFuncs(presenter.nav);
   makeObservablesFromFuncs(presenter.net);
 
+  presenter.state = { };
+
+  presenter.saveState = () => {
+    nav.saveState(presenter.tag, JSON.stringify(presenter.state))
+      .then(() => console.log(`state saved for ${presenter.tag}`));
+  };
+
+  presenter.restoreState = () => {
+    nav.restoreState(presenter.tag)
+      .then((state) => { presenter.state = (state && JSON.parse(state)) || presenter.state; })
+      .then(() => console.log(`state restored for ${presenter.tag}`));
+  };
+
   return presenter;
 };

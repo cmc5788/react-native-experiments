@@ -2,6 +2,7 @@ package com.awesomeproject;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
@@ -20,9 +21,11 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -111,8 +114,8 @@ public class MyNavigator extends MyReactModule implements Navigator {
   private static final String TAG = "MyNavigator";
 
   @NonNull
-  private static SharedPreferences prefs(@NonNull MainActivity activity) {
-    return activity.getSharedPreferences(TAG, Context.MODE_PRIVATE);
+  private static SharedPreferences prefs(@NonNull Context context) {
+    return context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
   }
 
   // -------------------
@@ -129,6 +132,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
   // -------------------
 
   private final LinkedList<String> stack = new LinkedList<>();
+  private final List<Animator> destroyAnims = new ArrayList<>();
   private boolean needsApplyStack;
   private boolean needsEmptyTag;
   private String emptyTag;
@@ -163,6 +167,60 @@ public class MyNavigator extends MyReactModule implements Navigator {
       constants.put(key, key);
     }
     return constants;
+  }
+
+  @ReactMethod
+  public void saveState(final String tag, final String state, final Promise p) {
+    if (tag == null) {
+      Log.e(TAG, "cannot saveState null tag.");
+      p.reject(new Throwable("cannot saveState null tag."));
+      return;
+    }
+
+    handler().post(new Runnable() {
+      @Override
+      public void run() {
+        _saveState(NavTag.parse(tag), state);
+        p.resolve(null);
+      }
+    });
+  }
+
+  private void _saveState(@NonNull NavTag tag, @Nullable String state) {
+    assertOnUiThread();
+
+    Log.d(TAG, String.format("_saveState %s %s", tag, state));
+    prefs(getReactApplicationContext()) //
+        .edit() //
+        .putString(String.format("%s_state", tag), state) //
+        .apply();
+  }
+
+  @ReactMethod
+  public void restoreState(final String tag, final Promise p) {
+    if (tag == null) {
+      Log.e(TAG, "cannot restoreState null tag.");
+      p.reject(new Throwable("cannot restoreState null tag."));
+      return;
+    }
+
+    handler().post(new Runnable() {
+      @Override
+      public void run() {
+        p.resolve(_restoreState(NavTag.parse(tag)));
+      }
+    });
+  }
+
+  private String _restoreState(@NonNull NavTag tag) {
+    assertOnUiThread();
+    MainActivity activity = activity();
+    if (activity == null || !activity.isUiInteractable()) {
+      throw new RuntimeException("bad _restoreState!");
+    }
+
+    Log.d(TAG, String.format("_restoreState %s", tag));
+    return prefs(activity).getString(String.format("%s_state", tag), null);
   }
 
   @Override
@@ -233,13 +291,10 @@ public class MyNavigator extends MyReactModule implements Navigator {
       return false;
     }
 
-    NavTag poppedTag = NavTag.parse(stack.remove(stack.size() - 1));
+    stack.remove(stack.size() - 1);
 
     if (stack.isEmpty()) {
-      NavigableView oldTopView = findFirstNavigableView();
-      if (oldTopView != null && oldTopView.navTag().equals(poppedTag)) {
-        dispatchDestroy(poppedTag);
-      }
+      dispatchDestroyAllNavigableViews();
       handler().post(new Runnable() {
         @Override
         public void run() {
@@ -403,8 +458,10 @@ public class MyNavigator extends MyReactModule implements Navigator {
       return;
     }
 
+    // TODO what if the stack changed by more than one item at a time?
+
     NavTag topTag = NavTag.parse(stack.get(stack.size() - 1));
-    final NavigableView oldTopView = findFirstNavigableView();
+    final NavigableView oldTopView = findLastNavigableView();
     if (oldTopView != null && oldTopView.navTag().equals(topTag)) {
       // No need to navigate; already there.
       return;
@@ -436,20 +493,27 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
       // TODO - pull animation logic from injects; don't assume simple crossfade
 
-      root.disable();
       newTopView.setAlpha(0f);
-      newTopView.animate().alpha(1f).setListener(new AnimatorListenerAdapter() {
+      ObjectAnimator oa = ObjectAnimator.ofFloat(newTopView, View.ALPHA, 0f, 1f);
+      oa.setDuration(300);
+      oa.addListener(new AnimatorListenerAdapter() {
         @Override
-        public void onAnimationEnd(Animator animation) {
-          newTopView.animate().setListener(null);
-
-          root.viewGroup().removeView(oldView);
-
+        public void onAnimationEnd(Animator a) {
           // TODO - onDestroyView, does it make sense here?
+          destroyAnims.remove(a);
+          root.viewGroup().removeView(oldView);
           dispatchDestroy(oldTopView.navTag());
           root.enable();
+
+          Log.e(TAG, "ROOT CHILD COUNT " + root.viewGroup().getChildCount());
         }
       });
+      for (Animator a : new ArrayList<>(destroyAnims)) {
+        a.end();
+      }
+      root.disable();
+      destroyAnims.add(oa);
+      oa.start();
 
       // ----
       // TODO - old synchronous transitions, stable but wrong
@@ -472,14 +536,32 @@ public class MyNavigator extends MyReactModule implements Navigator {
   }
 
   @Nullable
-  private NavigableView findFirstNavigableView() {
+  private NavigableView findLastNavigableView() {
+    int i = findLastNavigableViewIndex();
+    if (i != -1) {
+      return (NavigableView) root.viewGroup().getChildAt(i);
+    }
+    return null;
+  }
+
+  private int findLastNavigableViewIndex() {
+    for (int i = root.viewGroup().getChildCount() - 1; i >= 0; i--) {
+      View child = root.viewGroup().getChildAt(i);
+      if (child instanceof NavigableView) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private int dispatchDestroyAllNavigableViews() {
     for (int i = 0; i < root.viewGroup().getChildCount(); i++) {
       View child = root.viewGroup().getChildAt(i);
       if (child instanceof NavigableView) {
-        return (NavigableView) child;
+        dispatchDestroy(((NavigableView) child).navTag());
       }
     }
-    return null;
+    return -1;
   }
 
   private void dispatchInit(@NonNull NavTag tag) {
