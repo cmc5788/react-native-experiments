@@ -61,7 +61,7 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
 
   presenter.restoreState = () => {
     if (presenter.state.___saved) {
-      return new Promise((resolve) => { resolve(); })
+      return;
     }
     nav.restoreState(presenter.tag)
       .then((state) => {
