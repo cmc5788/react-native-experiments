@@ -37,17 +37,39 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
   presenter.nav = nav;
   presenter.net = net;
 
+  presenter.view.state = { };
+
+  presenter.view.sendState = (key, val) => {
+    const sendObj = { };
+    sendObj[key] = val;
+    return new Promise((resolve) => {
+      presenter.view.state[`sendState___${key}`] = val;
+      resolve();
+    })
+    .then(() => presenter.view.send(sendObj));
+  };
+
+  presenter.view.restoreSentState = () => {
+    let sendObj;
+    for (var stateProp in presenter.view.state) {
+      if (stateProp.startsWith('sendState___')) {
+        sendObj = sendObj || { };
+        sendObj[stateProp.substring('sendState___'.length)] =
+          presenter.view.state[stateProp];
+      }
+    }
+    sendObj && presenter.view.send(sendObj);
+  };
+
   makeObservablesFromFuncs(presenter.view);
   makeObservablesFromFuncs(presenter.nav);
   makeObservablesFromFuncs(presenter.net);
 
-  presenter.state = { };
-
   presenter.saveState = (permanentlyDestroying) => {
-    presenter.state.___saved = true;
+    presenter.view.state.___saved = true;
     new Promise((resolve) => {
       if (permanentlyDestroying) {
-        presenter.state = { };
+        presenter.view.state = { };
       } else
       if (presenter.beforeSave &&
           typeof presenter.beforeSave === 'function') {
@@ -55,19 +77,19 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
       }
       resolve();
     })
-    .then(() => nav.saveState(presenter.tag, JSON.stringify(presenter.state)))
+    .then(() => nav.saveState(presenter.tag, JSON.stringify(presenter.view.state)))
     .then(() => console.log(`state saved for ${presenter.tag}`));
   };
 
   presenter.restoreState = () => {
-    if (presenter.state.___saved) {
+    if (presenter.view.state.___saved) {
       return;
     }
     nav.restoreState(presenter.tag)
       .then((state) => {
         const restoredState = state && JSON.parse(state);
         if (restoredState) {
-          presenter.state = restoredState;
+          presenter.view.state = restoredState;
         }
         if (presenter.afterRestore &&
             typeof presenter.afterRestore === 'function') {

@@ -27,11 +27,11 @@ function DetailPagePresenter() {
 
   this.beforeSave = () => {
     console.log('DetailPagePresenter beforeSave');
-    this.state.blah = this.tagExtras;
+    this.view.state.blah = this.tagExtras;
   };
 
   this.afterRestore = () => {
-    console.log(`DetailPagePresenter afterRestore ${this.state.blah}`);
+    console.log(`DetailPagePresenter afterRestore ${this.view.state.blah}`);
   };
 }
 
