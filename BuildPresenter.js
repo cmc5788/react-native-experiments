@@ -51,6 +51,7 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
       if (presenter.beforeSave &&
           typeof presenter.beforeSave === 'function') {
         presenter.beforeSave();
+        presenter.state.___saved = true;
       }
       resolve();
     })
@@ -59,6 +60,9 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
   };
 
   presenter.restoreState = () => {
+    if (presenter.state.___saved) {
+      return new Promise((resolve) => { resolve(); })
+    }
     nav.restoreState(presenter.tag)
       .then((state) => {
         const restoredState = state && JSON.parse(state);
