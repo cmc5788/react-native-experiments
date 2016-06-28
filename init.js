@@ -22,6 +22,23 @@ module.exports = (appPresenter) =>
     const ignoreNextDestroy = { };
 
     const onAppInit = (evt) => {
+      Navigator.restoreViewStates().then((states) => {
+        if (states) {
+          for (var stateProp in states) {
+            states[stateProp] = JSON.parse(states[stateProp]);
+          }
+          window.___globalStates = states;
+        }
+        window.___globalStatesInitialized = true;
+        for (var p in activePresenters) {
+          if (activePresenters[p] &&
+              activePresenters[p].restoreState &&
+              typeof activePresenters[p].restoreState === 'function') {
+            activePresenters[p].restoreState();
+          }
+        }
+      });
+
       if (!appPresenter.emptyView) throw new Error('emptyView required.');
       Navigator.empty(appPresenter.emptyView);
       if (appPresenter.init) appPresenter.init();
@@ -36,13 +53,6 @@ module.exports = (appPresenter) =>
           activePresenters[p].resume();
         }
       }
-      for (var p in activePresenters) {
-        if (activePresenters[p] &&
-            activePresenters[p].restoreState &&
-            typeof activePresenters[p].restoreState === 'function') {
-          activePresenters[p].restoreState();
-        }
-      }
     };
 
     const onAppPause = (evt) => {
@@ -53,6 +63,11 @@ module.exports = (appPresenter) =>
           activePresenters[p].saveState();
         }
       }
+      const states = window.___globalStates || (window.___globalStates = { });
+      for (var stateProp in states) {
+        states[stateProp] = JSON.stringify(states[stateProp]);
+      }
+      Navigator.saveViewStates(states);
       if (appPresenter.pause) appPresenter.pause();
       for (var p in activePresenters) {
         if (activePresenters[p] &&

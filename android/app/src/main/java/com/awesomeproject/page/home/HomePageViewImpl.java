@@ -281,11 +281,16 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
   }
 
   @Override
-  public void setImageUrl(@NonNull String url) {
-    Picasso.with(getContext())
-        .load(url)
-        .fit()
-        .centerInside()
-        .into((ImageView) findViewById(IMAGE_ID));
+  public void setImageUrl(@NonNull final String url) {
+    findViewById(IMAGE_ID).post(new Runnable() {
+      @Override
+      public void run() {
+        Picasso.with(getContext())
+            .load(url)
+            .fit()
+            .centerInside()
+            .into((ImageView) findViewById(IMAGE_ID));
+      }
+    });
   }
 }

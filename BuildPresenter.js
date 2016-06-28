@@ -84,7 +84,7 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
 
   presenter.saveState = (permanentlyDestroying) => {
     presenter.___viewStateSaved = true;
-    new Promise((resolve) => {
+    return new Promise((resolve) => {
       if (permanentlyDestroying) {
         presenter.view.state = { };
       } else
@@ -92,28 +92,27 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
           typeof presenter.beforeSave === 'function') {
         presenter.beforeSave();
       }
-      resolve(nav.saveState(
-        presenter.tag, JSON.stringify(presenter.view.state)));
+      const states = window.___globalStates || (window.___globalStates = { });
+      states[presenter.tag] = presenter.view.state;
+      resolve();
     })
     .then(() => console.log(`state saved for ${presenter.tag}`));
   };
 
   presenter.restoreState = () => {
-    if (presenter.___viewStateSaved) {
-      return;
+    if (!window.___globalStatesInitialized || presenter.___viewStateSaved) {
+      return new Promise((resolve) => { resolve(); });
     }
-    nav.restoreState(presenter.tag)
-      .then((state) => {
-        const restoredState = state && JSON.parse(state);
-        if (restoredState) {
-          presenter.view.state = restoredState;
-        }
-        if (presenter.afterRestore &&
-            typeof presenter.afterRestore === 'function') {
-          presenter.afterRestore();
-        }
-      })
-      .then(() => console.log(`state restored for ${presenter.tag}`));
+    return new Promise((resolve) => {
+      const states = window.___globalStates || (window.___globalStates = { });
+      presenter.view.state = states[presenter.tag] || presenter.view.state;
+      if (presenter.afterRestore &&
+          typeof presenter.afterRestore === 'function') {
+        presenter.afterRestore();
+      }
+      resolve();
+    })
+    .then(() => console.log(`state restored for ${presenter.tag}`));
   };
 
   return presenter;

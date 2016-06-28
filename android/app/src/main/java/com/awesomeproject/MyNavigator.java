@@ -18,6 +18,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
@@ -170,53 +171,59 @@ public class MyNavigator extends MyReactModule implements Navigator {
   }
 
   @ReactMethod
-  public void saveState(final String tag, final String state, final Promise p) {
-    if (tag == null) {
-      Log.e(TAG, "cannot saveState null tag.");
-      p.reject(new Throwable("cannot saveState null tag."));
+  public void saveViewStates(final ReadableMap states, final Promise p) {
+    if (states == null) {
+      Log.e(TAG, "cannot saveViewStates null states.");
+      p.reject(new Throwable("cannot saveViewStates null states."));
       return;
     }
 
     handler().post(new Runnable() {
       @Override
       public void run() {
-        _saveState(NavTag.parse(tag), state);
+        _saveViewStates(states);
         p.resolve(null);
       }
     });
   }
 
-  private void _saveState(@NonNull NavTag tag, @Nullable String state) {
+  private void _saveViewStates(@NonNull ReadableMap states) {
     assertOnUiThread();
 
-    Log.d(TAG, String.format("_saveState %s %s", tag, state));
-    prefs(getReactApplicationContext()) //
-        .edit() //
-        .putString(String.format("%s_state", tag), state) //
-        .apply();
+    Log.d(TAG, "_saveViewStates");
+
+    SharedPreferences.Editor edit = prefs(getReactApplicationContext()).edit();
+    for (ReadableMapKeySetIterator i = states.keySetIterator(); i.hasNextKey(); ) {
+      String k = i.nextKey();
+      edit = edit.putString(String.format("%s_state", k), states.getString(k));
+    }
+    edit.apply();
   }
 
   @ReactMethod
-  public void restoreState(final String tag, final Promise p) {
-    if (tag == null) {
-      Log.e(TAG, "cannot restoreState null tag.");
-      p.reject(new Throwable("cannot restoreState null tag."));
-      return;
-    }
-
+  public void restoreViewStates(final Promise p) {
     handler().post(new Runnable() {
       @Override
       public void run() {
-        p.resolve(_restoreState(NavTag.parse(tag)));
+        p.resolve(_restoreViewStates());
       }
     });
   }
 
-  private String _restoreState(@NonNull NavTag tag) {
+  @NonNull
+  private WritableMap _restoreViewStates() {
     assertOnUiThread();
 
-    Log.d(TAG, String.format("_restoreState %s", tag));
-    return prefs(getReactApplicationContext()).getString(String.format("%s_state", tag), null);
+    Log.d(TAG, "_restoreViewStates");
+
+    WritableMap wm = Arguments.createMap();
+    for (Map.Entry<String, ?> e : prefs(getReactApplicationContext()).getAll().entrySet()) {
+      String k = e.getKey();
+      if (k.endsWith("_state")) {
+        wm.putString(k.substring(0, k.length() - "_state".length()), (String) e.getValue());
+      }
+    }
+    return wm;
   }
 
   @Override
