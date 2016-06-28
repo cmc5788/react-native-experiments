@@ -39,26 +39,38 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
 
   presenter.view.state = { };
 
+  presenter.___sendStateCtr = 0;
+
   presenter.view.sendState = (key, val) => {
     const sendObj = { };
     sendObj[key] = val;
     return new Promise((resolve) => {
-      presenter.view.state[`sendState___${key}`] = val;
+      const ctr = presenter.___sendStateCtr++;
+      presenter.view.state[`${ctr}___sendState___${key}`] = val;
       resolve();
     })
     .then(() => presenter.view.send(sendObj));
   };
 
   presenter.view.restoreSentState = () => {
-    let sendObj;
+    const sentStates = [ ];
     for (var stateProp in presenter.view.state) {
-      if (stateProp.startsWith('sendState___')) {
-        sendObj = sendObj || { };
-        sendObj[stateProp.substring('sendState___'.length)] =
-          presenter.view.state[stateProp];
+      if (stateProp.contains('___sendState___')) {
+        const prefixStart = stateProp.indexOf('___sendState___');
+        const prefixEnd = prefixStart + '___sendState___'.length;
+        sentStates.push({
+          index: parseInt(stateProp.substring(0, prefixStart)),
+          key: stateProp.substring(prefixEnd),
+          val: presenter.view.state[stateProp]
+        });
       }
     }
-    sendObj && presenter.view.send(sendObj);
+    sentStates.length && presenter.view.sendBatch(
+      sentStates.sort((a, b) => a.index - b.index).map((v) => {
+        const o = { };
+        o[v.key] = v.val;
+        return o;
+      }));
   };
 
   makeObservablesFromFuncs(presenter.view);
@@ -66,7 +78,7 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
   makeObservablesFromFuncs(presenter.net);
 
   presenter.saveState = (permanentlyDestroying) => {
-    presenter.view.state.___saved = true;
+    presenter.___viewStateSaved = true;
     new Promise((resolve) => {
       if (permanentlyDestroying) {
         presenter.view.state = { };
@@ -77,12 +89,13 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
       }
       resolve();
     })
-    .then(() => nav.saveState(presenter.tag, JSON.stringify(presenter.view.state)))
+    .then(() => nav.saveState(
+      presenter.tag, JSON.stringify(presenter.view.state)))
     .then(() => console.log(`state saved for ${presenter.tag}`));
   };
 
   presenter.restoreState = () => {
-    if (presenter.view.state.___saved) {
+    if (presenter.___viewStateSaved) {
       return;
     }
     nav.restoreState(presenter.tag)

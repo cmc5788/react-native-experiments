@@ -389,7 +389,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
     prefs(activity) //
         .edit() //
-        .remove("stack") //
+        .clear() //
         .apply();
 
     stack.clear();
