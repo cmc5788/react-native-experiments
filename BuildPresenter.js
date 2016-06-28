@@ -49,6 +49,8 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
       sendStates.push(sendObj);
 
       // remove duplicated work...
+      // this only makes sense if view state sends are all idempotent.
+      // need to think about this more, and whether or not it will work.
       for (let i=0; i<sendStates.length; i++) {
         let restartOuter = false;
         for (let j=i+1; j<=sendStates.length; j++) {
