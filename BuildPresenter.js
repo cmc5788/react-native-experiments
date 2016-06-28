@@ -1,11 +1,12 @@
 'use strict';
 
+import _ from 'lodash';
 import Rx from 'rxjs';
 import nav from './MyNavigator';
 import net from './net';
 
 const makeObservablesFromFuncs = (obj) => {
-  for (var prop in obj) {
+  for (let prop in obj) {
     if (obj[prop] && typeof obj[prop] === 'function') {
       const func = obj[prop];
       obj[`${prop}Obs`] = function() {
@@ -46,6 +47,23 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
       const sendObj = { };
       sendObj[key] = val;
       sendStates.push(sendObj);
+
+      // remove duplicated work...
+      for (let i=0; i<sendStates.length; i++) {
+        let restartOuter = false;
+        for (let j=i+1; j<=sendStates.length; j++) {
+          const slcLen = j - i;
+          const slc1 = sendStates.slice(i, j);
+          const slc2 = sendStates.slice(j, j + slcLen);
+          if (_.isEqual(slc1, slc2)) {
+            sendStates.splice(i, slcLen);
+            restartOuter = true;
+            break;
+          }
+        }
+        if (restartOuter) i = -1;
+      }
+
       resolve(presenter.view.send(sendObj));
     });
   };
