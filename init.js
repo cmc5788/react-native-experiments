@@ -19,13 +19,15 @@ module.exports = (appPresenter) =>
 
     const activePresenters = { };
 
-    DeviceEventEmitter.addListener('onAppInit', (evt) => {
+    const ignoreNextDestroy = { };
+
+    const onAppInit = (evt) => {
       if (!appPresenter.emptyView) throw new Error('emptyView required.');
       Navigator.empty(appPresenter.emptyView);
       if (appPresenter.init) appPresenter.init();
-    });
+    };
 
-    DeviceEventEmitter.addListener('onAppResume', (evt) => {
+    const onAppResume = (evt) => {
       if (appPresenter.resume) appPresenter.resume();
       for (var p in activePresenters) {
         if (activePresenters[p] &&
@@ -41,9 +43,9 @@ module.exports = (appPresenter) =>
           activePresenters[p].restoreState();
         }
       }
-    });
+    };
 
-    DeviceEventEmitter.addListener('onAppPause', (evt) => {
+    const onAppPause = (evt) => {
       for (var p in activePresenters) {
         if (activePresenters[p] &&
             activePresenters[p].saveState &&
@@ -59,9 +61,9 @@ module.exports = (appPresenter) =>
           activePresenters[p].pause();
         }
       }
-    });
+    };
 
-    DeviceEventEmitter.addListener('onGoBack', (evt) => {
+    const onGoBack = (evt) => {
       if (appPresenter.back && appPresenter.back()) return;
       for (var p in activePresenters) {
         if (activePresenters[p] &&
@@ -72,12 +74,62 @@ module.exports = (appPresenter) =>
         }
       }
       Navigator.goBack();
-    });
+    };
 
-    DeviceEventEmitter.addListener('onInitView', (evt) => {
+    const onDestroyView = (evt) => {
+      if (ignoreNextDestroy.tag) {
+        if (evt.tag === ignoreNextDestroy.tag) {
+          ignoreNextDestroy.tag = null;
+          return;
+        }
+        throw Error(
+          `expected onDestroyView ${ignoreNextDestroy.tag}, got ${evt.tag}`);
+      }
+      const presenter = activePresenters[evt.tag];
+      if (presenter) {
+
+        if (presenter.saveState &&
+            typeof presenter.saveState === 'function') {
+          presenter.saveState(evt.permanent);
+        }
+
+        presenter.destroy();
+
+        // auto cleanup event listeners for presenter based on prop names
+        // TODO - clean this code up
+        for (var prop in presenter) {
+          if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
+              prop !== 'sub' && prop !== 'unsub' &&
+              prop !== 'pause' && prop !== 'resume' &&
+              prop !== 'saveState' && prop !== 'restoreState' &&
+              prop !== 'afterRestore' && prop !== 'beforeSave' &&
+              typeof presenter[prop] === 'function') {
+            presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
+              console.log(`removing listener for ${evt.tag}.${prop}`);
+            presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
+              presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`].remove();
+            presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
+              presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`]
+              .subscriber.removeAllSubscriptions(`${evt.tag}.${prop}`);
+            presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
+              (presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] = null);
+          }
+        }
+
+        activePresenters[evt.tag] = null;
+      }
+    };
+
+    const onInitView = (evt) => {
       if (appPresenter.viewPresenters) {
         if (appPresenter.viewPresenters[evt.tagBase]) {
           const presenterCtor = appPresenter.viewPresenters[evt.tagBase]();
+
+          if (activePresenters[evt.tag]) {
+            onDestroyView(evt);
+            ignoreNextDestroy.tag = evt.tag;
+          }
+
           activePresenters[evt.tag] = BuildPresenter(
             presenterCtor, evt.tag, evt.tagBase, evt.tagExtras,
             ViewEventSender(evt.tag));
@@ -121,40 +173,14 @@ module.exports = (appPresenter) =>
           }
         }
       }
-    });
+    };
 
-    DeviceEventEmitter.addListener('onDestroyView', (evt) => {
-      const presenter = activePresenters[evt.tag];
-      if (presenter) {
-
-        if (presenter.saveState &&
-            typeof presenter.saveState === 'function') {
-          presenter.saveState(evt.permanent);
-        }
-
-        presenter.destroy();
-
-        // auto cleanup event listeners for presenter based on prop names
-        // TODO - clean this code up
-        for (var prop in presenter) {
-          if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
-              prop !== 'sub' && prop !== 'unsub' &&
-              prop !== 'pause' && prop !== 'resume' &&
-              prop !== 'saveState' && prop !== 'restoreState' &&
-              prop !== 'afterRestore' && prop !== 'beforeSave' &&
-              typeof presenter[prop] === 'function') {
-            presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
-              console.log(`removing listener for ${evt.tag}.${prop}`);
-            presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
-              presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`].remove();
-            presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
-              (presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] = null);
-          }
-        }
-
-        activePresenters[evt.tag] = null;
-      }
-    });
+    DeviceEventEmitter.addListener('onAppInit', onAppInit);
+    DeviceEventEmitter.addListener('onAppResume', onAppResume);
+    DeviceEventEmitter.addListener('onAppPause', onAppPause);
+    DeviceEventEmitter.addListener('onGoBack', onGoBack);
+    DeviceEventEmitter.addListener('onInitView', onInitView);
+    DeviceEventEmitter.addListener('onDestroyView', onDestroyView);
   }
 
 });

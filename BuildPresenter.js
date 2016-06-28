@@ -42,35 +42,40 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
   presenter.___sendStateCtr = 0;
 
   presenter.view.sendState = (key, val) => {
-    const sendObj = { };
-    sendObj[key] = val;
     return new Promise((resolve) => {
       const ctr = presenter.___sendStateCtr++;
       presenter.view.state[`${ctr}___sendState___${key}`] = val;
-      resolve();
-    })
-    .then(() => presenter.view.send(sendObj));
+      const sendObj = { };
+      sendObj[key] = val;
+      resolve(presenter.view.send(sendObj));
+    });
   };
 
   presenter.view.restoreSentState = () => {
-    const sentStates = [ ];
-    for (var stateProp in presenter.view.state) {
-      if (stateProp.contains('___sendState___')) {
-        const prefixStart = stateProp.indexOf('___sendState___');
-        const prefixEnd = prefixStart + '___sendState___'.length;
-        sentStates.push({
-          index: parseInt(stateProp.substring(0, prefixStart)),
-          key: stateProp.substring(prefixEnd),
-          val: presenter.view.state[stateProp]
-        });
+    return new Promise((resolve) => {
+      const sentStates = [ ];
+      for (var stateProp in presenter.view.state) {
+        if (stateProp.contains('___sendState___')) {
+          const prefixStart = stateProp.indexOf('___sendState___');
+          const prefixEnd = prefixStart + '___sendState___'.length;
+          sentStates.push({
+            index: parseInt(stateProp.substring(0, prefixStart)),
+            key: stateProp.substring(prefixEnd),
+            val: presenter.view.state[stateProp]
+          });
+        }
       }
-    }
-    sentStates.length && presenter.view.sendBatch(
-      sentStates.sort((a, b) => a.index - b.index).map((v) => {
-        const o = { };
-        o[v.key] = v.val;
-        return o;
-      }));
+      if (sentStates.length) {
+        resolve(presenter.view.sendBatch(
+          sentStates.sort((a, b) => a.index - b.index).map((v) => {
+            const o = { };
+            o[v.key] = v.val;
+            return o;
+          })));
+      } else {
+        resolve();
+      }
+    });
   };
 
   makeObservablesFromFuncs(presenter.view);
@@ -87,10 +92,9 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
           typeof presenter.beforeSave === 'function') {
         presenter.beforeSave();
       }
-      resolve();
+      resolve(nav.saveState(
+        presenter.tag, JSON.stringify(presenter.view.state)));
     })
-    .then(() => nav.saveState(
-      presenter.tag, JSON.stringify(presenter.view.state)))
     .then(() => console.log(`state saved for ${presenter.tag}`));
   };
 

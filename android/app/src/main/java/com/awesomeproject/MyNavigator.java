@@ -214,14 +214,9 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
   private String _restoreState(@NonNull NavTag tag) {
     assertOnUiThread();
-    MainActivity activity = activity();
-    if (activity == null || !activity.isUiInteractable()) {
-      Log.i(TAG, "Aborting restoreState: activity dead, dying, or dormant.");
-      return null;
-    }
 
     Log.d(TAG, String.format("_restoreState %s", tag));
-    return prefs(activity).getString(String.format("%s_state", tag), null);
+    return prefs(getReactApplicationContext()).getString(String.format("%s_state", tag), null);
   }
 
   @Override
