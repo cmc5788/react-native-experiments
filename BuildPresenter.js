@@ -39,39 +39,22 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
 
   presenter.view.state = { };
 
-  presenter.___sendStateCtr = 0;
-
   presenter.view.sendState = (key, val) => {
     return new Promise((resolve) => {
-      const ctr = presenter.___sendStateCtr++;
-      presenter.view.state[`${ctr}___sendState___${key}`] = val;
+      const sendStates = presenter.view.state.___sendStates ||
+        (presenter.view.state.___sendStates = [ ]);
       const sendObj = { };
       sendObj[key] = val;
+      sendStates.push(sendObj);
       resolve(presenter.view.send(sendObj));
     });
   };
 
   presenter.view.restoreSentState = () => {
     return new Promise((resolve) => {
-      const sentStates = [ ];
-      for (var stateProp in presenter.view.state) {
-        if (stateProp.contains('___sendState___')) {
-          const prefixStart = stateProp.indexOf('___sendState___');
-          const prefixEnd = prefixStart + '___sendState___'.length;
-          sentStates.push({
-            index: parseInt(stateProp.substring(0, prefixStart)),
-            key: stateProp.substring(prefixEnd),
-            val: presenter.view.state[stateProp]
-          });
-        }
-      }
-      if (sentStates.length) {
-        resolve(presenter.view.sendBatch(
-          sentStates.sort((a, b) => a.index - b.index).map((v) => {
-            const o = { };
-            o[v.key] = v.val;
-            return o;
-          })));
+      const sendStates = presenter.view.state.___sendStates;
+      if (sendStates && sendStates.length) {
+        resolve(presenter.view.sendBatch(sendStates));
       } else {
         resolve();
       }
@@ -106,17 +89,6 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
     return new Promise((resolve) => {
       const states = window.___globalStates || (window.___globalStates = { });
       presenter.view.state = states[presenter.tag] || presenter.view.state;
-
-      let highestIndex = 0;
-      for (var stateProp in presenter.view.state) {
-        if (stateProp.contains('___sendState___')) {
-          const index = parseInt(stateProp.substring(
-            0, stateProp.indexOf('___sendState___')));
-          if (index >= highestIndex) highestIndex = index + 1;
-        }
-      }
-      presenter.___sendStateCtr = highestIndex;
-
       if (presenter.afterRestore &&
           typeof presenter.afterRestore === 'function') {
         presenter.afterRestore();
