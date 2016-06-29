@@ -51,19 +51,18 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
       // remove duplicated work...
       // this only makes sense if view state sends are all idempotent.
       // need to think about this more, and whether or not it will work.
-      for (let i=0; i<sendStates.length; i++) {
+      for (let i=sendStates.length-1; i>=0; i--) {
         let restartOuter = false;
-        for (let j=i+1; j<=sendStates.length; j++) {
-          const slcLen = j - i;
-          const slc1 = sendStates.slice(i, j);
-          const slc2 = sendStates.slice(j, j + slcLen);
-          if (_.isEqual(slc1, slc2)) {
-            sendStates.splice(i, slcLen);
+        const stateOuter = sendStates[i];
+        for (let j=i-1; j>=0; j--) {
+          const stateInner = sendStates[j];
+          if (_.isEqual(stateInner, stateOuter)) {
+            sendStates.splice(j, 1);
             restartOuter = true;
             break;
           }
         }
-        if (restartOuter) i = -1;
+        if (restartOuter) i = sendStates.length;
       }
 
       resolve(presenter.view.send(sendObj));
