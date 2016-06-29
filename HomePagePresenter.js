@@ -25,7 +25,7 @@ function HomePagePresenter() {
       .flatMap((json) => this.nav.recvJsonObs(json))
       .flatMap(() => Observable.throw('Test Error!'))
       .catch((error) => Observable.of(console.log(error)))
-      .flatMap(() => this.nav.navigateObs(this.nav.DETAIL_PAGE, 'HALLO', 'meta')),
+      .flatMap(() => this.nav.navigateObs(this.nav.DETAIL_PAGE, 'HALLO', { hello: 'world' })),
         success => console.log(`buttonClicked success`),
         err => console.log(err)
       );

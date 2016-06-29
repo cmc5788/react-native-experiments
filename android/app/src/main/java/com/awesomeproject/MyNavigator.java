@@ -267,7 +267,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
     }
 
     stack.add(target);
-    applyStack();
+    applyStack(meta);
   }
 
   @ReactMethod
@@ -449,6 +449,10 @@ public class MyNavigator extends MyReactModule implements Navigator {
   }
 
   private void applyStack() {
+    applyStack(null);
+  }
+
+  private void applyStack(@Nullable String meta) {
     assertOnUiThread();
 
     if (root == null) {
@@ -482,7 +486,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
     // Dispatch the event. TODO - need before and after anim events?
 
-    dispatchInit(topTag);
+    dispatchInit(topTag, meta);
 
     Log.e(TAG, "APPLY STACK: " + Arrays.toString(stack.toArray()));
 
@@ -577,11 +581,12 @@ public class MyNavigator extends MyReactModule implements Navigator {
     return false;
   }
 
-  private void dispatchInit(@NonNull NavTag tag) {
+  private void dispatchInit(@NonNull NavTag tag, @Nullable String meta) {
     WritableMap args = Arguments.createMap();
     args.putString("tag", tag.toString());
     args.putString("tagBase", tag.base());
     args.putString("tagExtras", tag.extras());
+    if (meta != null) args.putString("meta", meta);
     eventDispatcher.dispatch("onInitView", args);
   }
 

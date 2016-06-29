@@ -31,7 +31,7 @@ function DetailPagePresenter() {
   };
 
   this.afterRestore = () => {
-    console.log(`DetailPagePresenter afterRestore ${this.view.state.blah}`);
+    console.log(`DetailPagePresenter afterRestore ${JSON.stringify(this.view.state)}`);
   };
 }
 

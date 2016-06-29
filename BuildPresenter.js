@@ -29,7 +29,7 @@ const makeObservablesFromFuncs = (obj) => {
   }
 };
 
-module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
+module.exports = (presenterFunc, tag, tagBase, tagExtras, meta, view) => {
   const presenter = new presenterFunc();
   presenter.tag = tag;
   presenter.tagBase = tagBase;
@@ -38,7 +38,7 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
   presenter.nav = nav;
   presenter.net = net;
 
-  presenter.view.state = { };
+  presenter.view.state = { meta: meta ? JSON.parse(meta) : null };
 
   presenter.view.sendState = (key, val) => {
     return new Promise((resolve) => {
@@ -95,7 +95,7 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
         presenter.beforeSave();
       }
       const states = window.___globalStates || (window.___globalStates = { });
-      states[presenter.tag] = presenter.view.state;
+      states[presenter.tag] = _.cloneDeep(presenter.view.state);
       resolve();
     })
     .then(() => console.log(`state saved for ${presenter.tag}`));
@@ -107,7 +107,11 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
     }
     return new Promise((resolve) => {
       const states = window.___globalStates || (window.___globalStates = { });
-      presenter.view.state = states[presenter.tag] || presenter.view.state;
+      const savedState = states[presenter.tag];
+      const curMeta = presenter.view.state.meta;
+      presenter.view.state = (savedState && _.cloneDeep(savedState)) ||
+        presenter.view.state;
+      curMeta && (presenter.view.state.meta = curMeta);
       if (presenter.afterRestore &&
           typeof presenter.afterRestore === 'function') {
         presenter.afterRestore();

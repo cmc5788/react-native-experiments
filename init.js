@@ -146,7 +146,7 @@ module.exports = (appPresenter) =>
           }
 
           activePresenters[evt.tag] = BuildPresenter(
-            presenterCtor, evt.tag, evt.tagBase, evt.tagExtras,
+            presenterCtor, evt.tag, evt.tagBase, evt.tagExtras, evt.meta,
             ViewEventSender(evt.tag));
 
           const presenter = activePresenters[evt.tag];
