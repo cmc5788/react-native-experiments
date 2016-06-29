@@ -23,7 +23,7 @@ import com.awesomeproject.layout.scrollview.ScrollViews;
 import com.awesomeproject.layout.space.Spaces;
 import com.awesomeproject.layout.textview.TextViews;
 import com.awesomeproject.layout.view.Views;
-import com.awesomeproject.util.ViewUtil;
+import com.awesomeproject.util.ViewUtil.BackoffPolicy;
 import com.facebook.react.bridge.ReadableMap;
 import com.squareup.picasso.Picasso;
 
@@ -35,6 +35,9 @@ import static com.awesomeproject.layout.LayoutParams.CENTER_IN_PARENT;
 import static com.awesomeproject.layout.LayoutParams.LEFT_OF;
 import static com.awesomeproject.layout.LayoutParams.RIGHT_OF;
 import static com.awesomeproject.layout.LayoutParams.WEIGHT;
+import static com.awesomeproject.util.ViewUtil.ViewAction;
+import static com.awesomeproject.util.ViewUtil.ViewPredicate;
+import static com.awesomeproject.util.ViewUtil.predicatedAction;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class HomePageViewImpl extends ScrollView implements HomePageView {
@@ -283,11 +286,19 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
 
   @Override
   public void setImageUrl(@NonNull final String url) {
-    ViewUtil.dimRequiredAction((ImageView) findViewById(IMAGE_ID), //
-        new LoadUrlAction(url), LoadUrlAction.class, 5, 5, 3, 250);
+    predicatedAction((ImageView) findViewById(IMAGE_ID), //
+        LoadUrlAction.class, new LoadUrlAction(url), new LoadUrlPredicate(), //
+        BackoffPolicy.LINEAR, 250, 3);
   }
 
-  private static class LoadUrlAction implements ViewUtil.ViewAction<ImageView> {
+  private static final class LoadUrlPredicate implements ViewPredicate<ImageView> {
+    @Override
+    public boolean isViewPredicateTrue(@NonNull ImageView iv) {
+      return iv.getWidth() > 5 && iv.getHeight() > 5;
+    }
+  }
+
+  private static class LoadUrlAction implements ViewAction<ImageView> {
     @NonNull private final String url;
 
     private LoadUrlAction(@NonNull String url) {

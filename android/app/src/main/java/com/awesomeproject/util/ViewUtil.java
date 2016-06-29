@@ -14,10 +14,35 @@ public class ViewUtil {
     void performViewAction(@NonNull V v);
   }
 
-  public static <V extends View> void dimRequiredAction(@NonNull V v, //
-      @NonNull final ViewAction<? super V> action, @NonNull final Object token, //
-      final int minWidth, final int minHeight, //
-      final int maxTries, final int backoffMult) {
+  public interface ViewPredicate<V extends View> {
+    boolean isViewPredicateTrue(@NonNull V v);
+  }
+
+  public enum BackoffPolicy {
+    LINEAR, EXPONENTIAL;
+
+    int apply(int count, int backoff) {
+      switch (this) {
+        case LINEAR:
+          return backoff * count;
+        case EXPONENTIAL:
+          if (count == 0) return 0;
+          int amount = backoff;
+          for (int i = 1; i < count; i++) {
+            amount *= 2;
+          }
+          return amount;
+        default:
+          throw new UnsupportedOperationException();
+      }
+    }
+  }
+
+  public static <V extends View> void predicatedAction(@NonNull V v, //
+      @NonNull final Object token, //
+      @NonNull final ViewAction<? super V> action, //
+      @NonNull final ViewPredicate<? super V> predicate, //
+      @NonNull final BackoffPolicy backoffPolicy, final int backoffAmt, final int backoffTries) {
     final AtomicInteger tries = new AtomicInteger();
     final WeakReference<V> vRef = new WeakReference<>(v);
     new Runnable() {
@@ -26,10 +51,11 @@ public class ViewUtil {
         handler().removeCallbacksAndMessages(token);
         V v = vRef.get();
         if (v == null) return;
-        if (v.getWidth() < minWidth || v.getHeight() < minHeight) {
+        if (!predicate.isViewPredicateTrue(v)) {
           int t = tries.getAndIncrement();
-          if (t < maxTries) {
-            handler().postAtTime(this, token, SystemClock.uptimeMillis() + (t * backoffMult));
+          if (t < backoffTries) {
+            handler().postAtTime(this, token,
+                SystemClock.uptimeMillis() + backoffPolicy.apply(t, backoffAmt));
           }
           return;
         }
