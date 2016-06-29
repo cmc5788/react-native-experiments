@@ -288,7 +288,7 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
   public void setImageUrl(@NonNull final String url) {
     predicatedAction((ImageView) findViewById(IMAGE_ID), //
         LoadUrlAction.class, new LoadUrlAction(url), new LoadUrlPredicate(), //
-        BackoffPolicy.LINEAR, 250, 3);
+        BackoffPolicy.EXPONENTIAL, 100, 6);
   }
 
   private static final class LoadUrlPredicate implements ViewPredicate<ImageView> {
