@@ -38,7 +38,7 @@ public class ViewUtil {
     }
   }
 
-  public static <V extends View> void predicatedAction(@NonNull V v, //
+  public static <V extends View> void predicatedViewAction(@NonNull V v, //
       @NonNull final Object token, //
       @NonNull final ViewAction<? super V> action, //
       @NonNull final ViewPredicate<? super V> predicate, //

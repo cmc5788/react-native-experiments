@@ -37,7 +37,7 @@ import static com.awesomeproject.layout.LayoutParams.RIGHT_OF;
 import static com.awesomeproject.layout.LayoutParams.WEIGHT;
 import static com.awesomeproject.util.ViewUtil.ViewAction;
 import static com.awesomeproject.util.ViewUtil.ViewPredicate;
-import static com.awesomeproject.util.ViewUtil.predicatedAction;
+import static com.awesomeproject.util.ViewUtil.predicatedViewAction;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class HomePageViewImpl extends ScrollView implements HomePageView {
@@ -286,7 +286,7 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
 
   @Override
   public void setImageUrl(@NonNull final String url) {
-    predicatedAction((ImageView) findViewById(IMAGE_ID), //
+    predicatedViewAction((ImageView) findViewById(IMAGE_ID), //
         LoadUrlAction.class, new LoadUrlAction(url), new LoadUrlPredicate(), //
         BackoffPolicy.EXPONENTIAL, 100, 6);
   }
