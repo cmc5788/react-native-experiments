@@ -23,6 +23,7 @@ import com.awesomeproject.layout.scrollview.ScrollViews;
 import com.awesomeproject.layout.space.Spaces;
 import com.awesomeproject.layout.textview.TextViews;
 import com.awesomeproject.layout.view.Views;
+import com.awesomeproject.util.ViewUtil;
 import com.facebook.react.bridge.ReadableMap;
 import com.squareup.picasso.Picasso;
 
@@ -282,15 +283,24 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
 
   @Override
   public void setImageUrl(@NonNull final String url) {
-    findViewById(IMAGE_ID).post(new Runnable() {
-      @Override
-      public void run() {
-        Picasso.with(getContext())
-            .load(url)
-            .fit()
-            .centerInside()
-            .into((ImageView) findViewById(IMAGE_ID));
-      }
-    });
+    ViewUtil.dimRequiredAction((ImageView) findViewById(IMAGE_ID), //
+        new LoadUrlAction(url), LoadUrlAction.class, 5, 5, 3, 250);
+  }
+
+  private static class LoadUrlAction implements ViewUtil.ViewAction<ImageView> {
+    @NonNull private final String url;
+
+    private LoadUrlAction(@NonNull String url) {
+      this.url = url;
+    }
+
+    @Override
+    public void performViewAction(@NonNull ImageView iv) {
+      Picasso.with(iv.getContext()) //
+          .load(url) //
+          .fit() //
+          .centerInside() //
+          .into(iv);
+    }
   }
 }
