@@ -56,7 +56,7 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
         const stateOuter = sendStates[i];
         for (let j=i-1; j>=0; j--) {
           const stateInner = sendStates[j];
-          if (_.isEqual(stateInner, stateOuter)) {
+          if (_.head(_.keys(stateInner)) === _.head(_.keys(stateOuter))) {
             sendStates.splice(j, 1);
             restartOuter = true;
             break;
