@@ -6,6 +6,7 @@ import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.NativeModuleCallExceptionHandler;
 import com.facebook.react.bridge.NotThreadSafeBridgeIdleDebugListener;
 import com.facebook.react.devsupport.DevSupportManager;
+import com.facebook.react.devsupport.RedBoxHandler;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.uimanager.UIImplementationProvider;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public abstract class LiteReactInstanceManager extends ReactInstanceManager {
     protected @Nullable JSCConfig mJSCConfig;
     protected @Nullable Activity mCurrentActivity;
     protected @Nullable DefaultHardwareBackBtnHandler mDefaultHardwareBackBtnHandler;
+    protected @Nullable RedBoxHandler mRedBoxHandler;
 
     protected Builder() {
     }
@@ -148,6 +150,11 @@ public abstract class LiteReactInstanceManager extends ReactInstanceManager {
       return this;
     }
 
+    public Builder setRedBoxHandler(RedBoxHandler redBoxHandler) {
+      mRedBoxHandler = redBoxHandler;
+      return this;
+    }
+
     /**
      * Instantiates a new {@link ReactInstanceManagerImpl}.
      * Before calling {@code build}, the following must be called:
@@ -175,7 +182,7 @@ public abstract class LiteReactInstanceManager extends ReactInstanceManager {
           mDefaultHardwareBackBtnHandler, mJSBundleFile, mJSMainModuleName, mPackages,
           mUseDeveloperSupport, mBridgeIdleDebugListener,
           Assertions.assertNotNull(mInitialLifecycleState, "Initial lifecycle state was not set"),
-          mUIImplementationProvider, mNativeModuleCallExceptionHandler, mJSCConfig);
+          mUIImplementationProvider, mNativeModuleCallExceptionHandler, mJSCConfig, mRedBoxHandler);
     }
   }
 }

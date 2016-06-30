@@ -227,4 +227,13 @@ public abstract class LiteAppCompatReactActivity extends AppCompatActivity
   public void invokeDefaultOnBackPressed() {
     super.onBackPressed();
   }
+
+  @Override
+  public void onNewIntent(Intent intent) {
+    if (mReactInstanceManager != null) {
+      mReactInstanceManager.onNewIntent(intent);
+    } else {
+      super.onNewIntent(intent);
+    }
+  }
 }
