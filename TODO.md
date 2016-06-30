@@ -21,3 +21,5 @@
 10. Splash screen utilities - something purely native that can be shown while app is warming up, JS layer is loading.
 
 11. Pull in custom view transitions in native code
+
+12. Collapse init and afterRestore?
