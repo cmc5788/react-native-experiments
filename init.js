@@ -24,13 +24,13 @@ module.exports = (appPresenter) =>
     const onAppInit = (evt) => {
       Navigator.restoreViewStates().then((states) => {
         if (states) {
-          for (var stateProp in states) {
+          for (let stateProp in states) {
             states[stateProp] = JSON.parse(states[stateProp]);
           }
           window.___globalStates = states;
         }
         window.___globalStatesInitialized = true;
-        for (var p in activePresenters) {
+        for (let p in activePresenters) {
           if (activePresenters[p] &&
               activePresenters[p].restoreState &&
               typeof activePresenters[p].restoreState === 'function') {
@@ -46,7 +46,7 @@ module.exports = (appPresenter) =>
 
     const onAppResume = (evt) => {
       if (appPresenter.resume) appPresenter.resume();
-      for (var p in activePresenters) {
+      for (let p in activePresenters) {
         if (activePresenters[p] &&
             activePresenters[p].resume &&
             typeof activePresenters[p].resume === 'function') {
@@ -56,7 +56,7 @@ module.exports = (appPresenter) =>
     };
 
     const onAppPause = (evt) => {
-      for (var p in activePresenters) {
+      for (let p in activePresenters) {
         if (activePresenters[p] &&
             activePresenters[p].saveState &&
             typeof activePresenters[p].saveState === 'function') {
@@ -64,12 +64,12 @@ module.exports = (appPresenter) =>
         }
       }
       const states = window.___globalStates || (window.___globalStates = { });
-      for (var stateProp in states) {
+      for (let stateProp in states) {
         states[stateProp] = JSON.stringify(states[stateProp]);
       }
       Navigator.saveViewStates(states);
       if (appPresenter.pause) appPresenter.pause();
-      for (var p in activePresenters) {
+      for (let p in activePresenters) {
         if (activePresenters[p] &&
             activePresenters[p].pause &&
             typeof activePresenters[p].pause === 'function') {
@@ -80,7 +80,7 @@ module.exports = (appPresenter) =>
 
     const onGoBack = (evt) => {
       if (appPresenter.back && appPresenter.back()) return;
-      for (var p in activePresenters) {
+      for (let p in activePresenters) {
         if (activePresenters[p] &&
             activePresenters[p].back &&
             typeof activePresenters[p].back === 'function' &&
@@ -112,8 +112,9 @@ module.exports = (appPresenter) =>
 
         // auto cleanup event listeners for presenter based on prop names
         // TODO - clean this code up
-        for (var prop in presenter) {
-          if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
+        for (let prop in presenter) {
+          if (prop !== 'init' && prop !== 'destroy' &&
+              prop !== 'otherCreate' && prop !== 'back' &&
               prop !== 'sub' && prop !== 'unsub' &&
               prop !== 'pause' && prop !== 'resume' &&
               prop !== 'saveState' && prop !== 'restoreState' &&
@@ -145,16 +146,26 @@ module.exports = (appPresenter) =>
             ignoreNextDestroy.tag = evt.tag;
           }
 
-          activePresenters[evt.tag] = BuildPresenter(
-            presenterCtor, evt.tag, evt.tagBase, evt.tagExtras, evt.meta,
+          const presenter = activePresenters[evt.tag] = BuildPresenter(
+            presenterCtor, evt.tag, evt.tagBase, evt.tagExtras,
             ViewEventSender(evt.tag));
 
-          const presenter = activePresenters[evt.tag];
+          // Give every other active presenter a chance to know that this one
+          // was created, possibly pass it some information before init.
+          for (let prop in activePresenters) {
+            const activePresenter = activePresenters[prop];
+            if (activePresenter && activePresenter !== presenter &&
+                activePresenter.otherCreate &&
+                typeof activePresenter.otherCreate === 'function') {
+              activePresenter.otherCreate(presenter);
+            }
+          }
 
           // auto register event listeners for presenter based on prop names
           // TODO - clean this code up
-          for (var prop in presenter) {
-            if (prop !== 'init' && prop !== 'destroy' && prop !== 'back' &&
+          for (let prop in presenter) {
+            if (prop !== 'init' && prop !== 'destroy' &&
+                prop !== 'otherCreate' && prop !== 'back' &&
                 prop !== 'sub' && prop !== 'unsub' &&
                 prop !== 'pause' && prop !== 'resume' &&
                 prop !== 'saveState' && prop !== 'restoreState' &&

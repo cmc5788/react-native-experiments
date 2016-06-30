@@ -1,7 +1,7 @@
 package com.awesomeproject.contract;
 
 public interface Navigator {
-  void navigate(String target, String extras, String meta);
+  void navigate(String target, String extras);
 
   // TODO set(target, dir, meta)
 

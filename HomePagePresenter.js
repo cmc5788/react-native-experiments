@@ -25,7 +25,7 @@ function HomePagePresenter() {
       .flatMap((json) => this.nav.recvJsonObs(json))
       .flatMap(() => Observable.throw('Test Error!'))
       .catch((error) => Observable.of(console.log(error)))
-      .flatMap(() => this.nav.navigateObs(this.nav.DETAIL_PAGE, 'HALLO', { hello: 'world' })),
+      .flatMap(() => this.nav.navigateObs(this.nav.DETAIL_PAGE, 'HALLO')),
         success => console.log(`buttonClicked success`),
         err => console.log(err)
       );
@@ -51,6 +51,14 @@ function HomePagePresenter() {
   this.afterRestore = () => {
     console.log('HomePagePresenter afterRestore');
     this.view.restoreSentState();
+  };
+
+  this.otherCreate = (other) => {
+    console.log('HomePagePresenter otherCreate');
+    if (other.tagBase === this.nav.DETAIL_PAGE &&
+        other.tagExtras === 'HALLO') {
+      other.initFromHome();
+    }
   };
 }
 

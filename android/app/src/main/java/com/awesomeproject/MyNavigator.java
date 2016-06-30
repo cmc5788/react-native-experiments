@@ -228,7 +228,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
   @Override
   @ReactMethod
-  public void navigate(final String target, final String extras, final String meta) {
+  public void navigate(final String target, final String extras) {
     if (target == null) {
       Log.e(TAG, "cannot navigate to null target.");
       return;
@@ -241,12 +241,12 @@ public class MyNavigator extends MyReactModule implements Navigator {
     handler().post(new Runnable() {
       @Override
       public void run() {
-        _navigate(fullTarget, meta);
+        _navigate(fullTarget);
       }
     });
   }
 
-  private void _navigate(final String target, final String meta) {
+  private void _navigate(final String target) {
     assertOnUiThread();
     MainActivity activity = activity();
     if (activity == null || !activity.isUiInteractable()) {
@@ -267,7 +267,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
     }
 
     stack.add(target);
-    applyStack(meta);
+    applyStack();
   }
 
   @ReactMethod
@@ -449,10 +449,6 @@ public class MyNavigator extends MyReactModule implements Navigator {
   }
 
   private void applyStack() {
-    applyStack(null);
-  }
-
-  private void applyStack(@Nullable String meta) {
     assertOnUiThread();
 
     if (root == null) {
@@ -486,7 +482,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
     // Dispatch the event. TODO - need before and after anim events?
 
-    dispatchInit(topTag, meta);
+    dispatchInit(topTag);
 
     Log.e(TAG, "APPLY STACK: " + Arrays.toString(stack.toArray()));
 
@@ -581,12 +577,11 @@ public class MyNavigator extends MyReactModule implements Navigator {
     return false;
   }
 
-  private void dispatchInit(@NonNull NavTag tag, @Nullable String meta) {
+  private void dispatchInit(@NonNull NavTag tag) {
     WritableMap args = Arguments.createMap();
     args.putString("tag", tag.toString());
     args.putString("tagBase", tag.base());
     args.putString("tagExtras", tag.extras());
-    if (meta != null) args.putString("meta", meta);
     eventDispatcher.dispatch("onInitView", args);
   }
 

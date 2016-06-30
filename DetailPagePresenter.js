@@ -2,9 +2,13 @@
 
 function DetailPagePresenter() {
 
+  this.initFromHome = () => {
+    this.fromHome = true;
+  };
+
   this.labelClicked = () => {
     console.log('DetailPagePresenter labelClicked');
-    this.nav.navigate(this.nav.DETAIL_PAGE, this.tagExtras + 'x', 'meta');
+    this.nav.navigate(this.nav.DETAIL_PAGE, this.tagExtras + 'x');
   };
 
   this.goBackClicked = () => {
@@ -14,7 +18,8 @@ function DetailPagePresenter() {
 
   this.init = () => {
     console.log('DetailPagePresenter init');
-    this.view.send({ setLabelText: this.tagExtras });
+    this.view.send({ setLabelText:
+      `${this.tagExtras} : ${this.fromHome ? 'from home' : 'not from home'}` });
   };
 
   this.back = () => {
