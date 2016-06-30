@@ -17,3 +17,5 @@
 8. Concept of scope other than "implicit singleton" for homebrew DI stuff. Useful for view-presenter relationship.
 
 9. Put DCL idiom into Scoped class instead of duplicating it for each Scoped
+
+10. Splash screen utilities - something purely native that can be shown while app is warming up, JS layer is loading.
