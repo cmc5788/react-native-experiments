@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.AppCompatImageView;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.awesomeproject.layout.ViewBuilder;
@@ -85,6 +86,6 @@ public class ImageViewBuilder extends ViewBuilder<ImageViewBuilder, ImageView>
   @NonNull
   @Override
   protected ImageView createView(ViewGroup root) {
-    return new ImageView(root.getContext());
+    return new AppCompatImageView(root.getContext());
   }
 }
