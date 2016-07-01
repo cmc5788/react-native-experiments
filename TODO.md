@@ -23,3 +23,5 @@
 11. Pull in custom view transitions in native code
 
 12. Collapse init and afterRestore?
+
+13. Ways to mask state where view is created and visible but waiting to get its first commands from JS. "Flickering"
