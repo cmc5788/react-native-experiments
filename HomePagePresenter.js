@@ -9,7 +9,6 @@ function HomePagePresenter() {
 
   this.init = () => {
     console.log('HomePagePresenter init');
-    console.log(`GLOBAL STATES ${JSON.stringify(window.___globalStates)}`)
   };
 
   this.save = () => {
