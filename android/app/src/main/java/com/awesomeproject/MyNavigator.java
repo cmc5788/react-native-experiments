@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import com.awesomeproject.contract.Navigator;
 import com.awesomeproject.util.StrUtil;
 import com.facebook.react.bridge.Arguments;
@@ -493,6 +494,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
       newTopView.setAlpha(0f);
       ObjectAnimator oa = ObjectAnimator.ofFloat(newTopView, View.ALPHA, 0f, 1f);
       oa.setDuration(300);
+      oa.setInterpolator(new DecelerateInterpolator());
       oa.addListener(new AnimatorListenerAdapter() {
         @Override
         public void onAnimationEnd(Animator a) {
@@ -533,8 +535,8 @@ public class MyNavigator extends MyReactModule implements Navigator {
     } else {
       newTopView.setAlpha(0f);
       ObjectAnimator oa = ObjectAnimator.ofFloat(newTopView, View.ALPHA, 0f, 1f);
-      oa.setStartDelay(100);
-      oa.setDuration(300);
+      oa.setDuration(500);
+      oa.setInterpolator(new DecelerateInterpolator());
       oa.addListener(new AnimatorListenerAdapter() {
         @Override
         public void onAnimationEnd(Animator a) {
