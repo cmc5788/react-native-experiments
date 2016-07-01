@@ -89,7 +89,6 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
 
   private void init() {
     setId(ID);
-    buildLayout();
   }
 
   @Override
@@ -130,7 +129,8 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
     // @formatter:on
   }
 
-  private void buildLayout() {
+  @Override
+  public void buildLayout() {
     // @formatter:off
     ScrollViews.buildWithInnerLinear()
         .matchParent()
@@ -271,13 +271,6 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
     // @formatter:on
   }
 
-  private final OnClickListener onBtnClick = new OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      presenter.buttonClicked();
-    }
-  };
-
   @Override
   public void setButtonColor(@ColorInt int color) {
     findViewById(TEXT_ID).setBackgroundColor(color);
@@ -288,8 +281,15 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
   public void setImageUrl(@NonNull final String url) {
     predicatedViewAction((ImageView) findViewById(IMAGE_ID), //
         LoadUrlAction.class, new LoadUrlAction(url), new LoadUrlPredicate(), //
-        BackoffPolicy.EXPONENTIAL, 100, 6);
+        BackoffPolicy.EXPONENTIAL, 10, 10);
   }
+
+  private final OnClickListener onBtnClick = new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      presenter.buttonClicked();
+    }
+  };
 
   private static final class LoadUrlPredicate implements ViewPredicate<ImageView> {
     @Override

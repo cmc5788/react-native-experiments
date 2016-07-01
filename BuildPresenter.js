@@ -122,7 +122,7 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
           typeof presenter.init === 'function') {
         presenter.init();
       }
-      resolve();
+      resolve(presenter.view.send({ ___ackInit: true }));
     })
     .then(() => console.log(`state restored for ${presenter.tag}`));
   };

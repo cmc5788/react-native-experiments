@@ -35,11 +35,11 @@ import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class MyNavigator extends MyReactModule implements Navigator {
 
-  public interface ViewFactory<V extends View & NavigableView> {
+  public interface ViewFactory<V extends View & NavTaggable> {
     V createView(@NonNull ViewGroup parent, @NonNull NavTag tag);
   }
 
-  public interface NavigableView {
+  public interface NavTaggable {
     @NonNull
     NavTag navTag();
   }
@@ -457,7 +457,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
     // TODO what if the stack changed by more than one item at a time?
 
     NavTag topTag = NavTag.parse(stack.get(stack.size() - 1));
-    final NavigableView oldTopView = findLastNavigableView();
+    final NavTaggable oldTopView = findLastNavigableView();
     if (oldTopView != null && oldTopView.navTag().equals(topTag)) {
       // No need to navigate; already there.
       return;
@@ -508,6 +508,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
       for (Animator a : new ArrayList<>(destroyAnims)) {
         a.end();
       }
+      if (!destroyAnims.isEmpty()) throw new RuntimeException("not all anims ended.");
       root.disable();
       destroyAnims.add(oa);
       oa.start();
@@ -529,14 +530,33 @@ public class MyNavigator extends MyReactModule implements Navigator {
       //}
       //
       //dispatchDestroy(oldTopTag);
+    } else {
+      newTopView.setAlpha(0f);
+      ObjectAnimator oa = ObjectAnimator.ofFloat(newTopView, View.ALPHA, 0f, 1f);
+      oa.setStartDelay(100);
+      oa.setDuration(300);
+      oa.addListener(new AnimatorListenerAdapter() {
+        @Override
+        public void onAnimationEnd(Animator a) {
+          destroyAnims.remove(a);
+          root.enable();
+        }
+      });
+      for (Animator a : new ArrayList<>(destroyAnims)) {
+        a.end();
+      }
+      if (!destroyAnims.isEmpty()) throw new RuntimeException("not all anims ended.");
+      root.disable();
+      destroyAnims.add(oa);
+      oa.start();
     }
   }
 
   @Nullable
-  private NavigableView findLastNavigableView() {
+  private NavTaggable findLastNavigableView() {
     int i = findLastNavigableViewIndex();
     if (i != -1) {
-      return (NavigableView) root.viewGroup().getChildAt(i);
+      return (NavTaggable) root.viewGroup().getChildAt(i);
     }
     return null;
   }
@@ -544,7 +564,7 @@ public class MyNavigator extends MyReactModule implements Navigator {
   private int findLastNavigableViewIndex() {
     for (int i = root.viewGroup().getChildCount() - 1; i >= 0; i--) {
       View child = root.viewGroup().getChildAt(i);
-      if (child instanceof NavigableView) {
+      if (child instanceof NavTaggable) {
         return i;
       }
     }
@@ -554,8 +574,8 @@ public class MyNavigator extends MyReactModule implements Navigator {
   private int dispatchDestroyAllNavigableViews(boolean permanent) {
     for (int i = 0; i < root.viewGroup().getChildCount(); i++) {
       View child = root.viewGroup().getChildAt(i);
-      if (child instanceof NavigableView) {
-        dispatchDestroy(((NavigableView) child).navTag(), permanent);
+      if (child instanceof NavTaggable) {
+        dispatchDestroy(((NavTaggable) child).navTag(), permanent);
       }
     }
     return -1;

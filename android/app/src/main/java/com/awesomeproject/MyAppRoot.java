@@ -72,7 +72,7 @@ public class MyAppRoot extends FrameLayout
     TextView tv;
     addView(tv = new TextView(getContext()));
     tv.setLayoutParams(new LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER));
-    tv.setText("I am an empty root view.\nYou shouldn't see me.");
+    tv.setText("I am an empty root view.");
 
     navigator.setRoot(this);
     eventReceiver.setViewEventTarget(this);

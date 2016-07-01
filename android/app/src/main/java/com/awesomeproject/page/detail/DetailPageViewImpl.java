@@ -70,7 +70,6 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
 
   private void init() {
     setId(ID);
-    buildLayout();
   }
 
   @Override
@@ -102,7 +101,8 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
   // -----
   // REAL CODE ... ?
 
-  private void buildLayout() {
+  @Override
+  public void buildLayout() {
     // @formatter:off
     ScrollViews.buildWithInnerLinear()
         .matchParent()
@@ -136,6 +136,16 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
     // @formatter:on
   }
 
+  @Override
+  public void setButtonColor(@ColorInt int color) {
+    findViewById(BUTTON_ID).setBackgroundColor(color);
+  }
+
+  @Override
+  public void setLabelText(@NonNull CharSequence text) {
+    ((TextView) findViewById(LABEL_ID)).setText(text);
+  }
+
   private final View.OnClickListener labelClicked = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
@@ -149,14 +159,4 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
       presenter.goBackClicked();
     }
   };
-
-  @Override
-  public void setButtonColor(@ColorInt int color) {
-    findViewById(BUTTON_ID).setBackgroundColor(color);
-  }
-
-  @Override
-  public void setLabelText(@NonNull CharSequence text) {
-    ((TextView) findViewById(LABEL_ID)).setText(text);
-  }
 }
