@@ -40,6 +40,8 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
 
   presenter.view.state = { };
 
+  // TODO option to simplify state stack less aggressively, using whole object
+  // equality instead of keys only?
   presenter.view.sendState = (key, val) => {
     return new Promise((resolve) => {
       const sendStates = presenter.view.state.___sendStates ||
@@ -69,7 +71,7 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
     });
   };
 
-  presenter.view.restoreSentState = () => {
+  presenter.view.___restoreSentStates = () => {
     return new Promise((resolve) => {
       const sendStates = presenter.view.state.___sendStates;
       if (sendStates && sendStates.length) {
@@ -84,15 +86,17 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
   makeObservablesFromFuncs(presenter.nav);
   makeObservablesFromFuncs(presenter.net);
 
-  presenter.saveState = (permanentlyDestroying) => {
-    presenter.___viewStateSaved = true;
+  presenter.___save = (permanentlyDestroying) => {
+    if (!presenter.___restored) {
+      return new Promise((resolve) => { resolve(); });
+    }
     return new Promise((resolve) => {
       if (permanentlyDestroying) {
         presenter.view.state = { };
       } else
-      if (presenter.beforeSave &&
-          typeof presenter.beforeSave === 'function') {
-        presenter.beforeSave();
+      if (presenter.save &&
+          typeof presenter.save === 'function') {
+        presenter.save();
       }
       const states = window.___globalStates || (window.___globalStates = { });
       states[presenter.tag] = _.cloneDeep(presenter.view.state);
@@ -101,18 +105,22 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
     .then(() => console.log(`state saved for ${presenter.tag}`));
   };
 
-  presenter.restoreState = () => {
-    if (!window.___globalStatesInitialized || presenter.___viewStateSaved) {
+  presenter.___restore = () => {
+    if (!window.___globalStatesInitialized) {
       return new Promise((resolve) => { resolve(); });
     }
+    presenter.___restored = true;
     return new Promise((resolve) => {
       const states = window.___globalStates || (window.___globalStates = { });
       const savedState = states[presenter.tag];
       presenter.view.state = (savedState && _.cloneDeep(savedState)) ||
         presenter.view.state;
-      if (presenter.afterRestore &&
-          typeof presenter.afterRestore === 'function') {
-        presenter.afterRestore();
+      if (_.get(presenter, 'view.state.___sendStates.length')) {
+        presenter.view.___restoreSentStates();
+      }
+      if (presenter.init &&
+          typeof presenter.init === 'function') {
+        presenter.init();
       }
       resolve();
     })

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import {
   DeviceEventEmitter,
@@ -21,24 +22,21 @@ module.exports = (appPresenter) =>
 
     const ignoreNextDestroy = { };
 
-    const onAppInit = (evt) => {
-      Navigator.restoreViewStates().then((states) => {
-        if (states) {
-          for (let stateProp in states) {
-            states[stateProp] = JSON.parse(states[stateProp]);
-          }
-          window.___globalStates = states;
+    const onAppInit = (states) => {
+      if (states) {
+        for (let stateProp in states) {
+          states[stateProp] = JSON.parse(states[stateProp]);
         }
-        window.___globalStatesInitialized = true;
-        for (let p in activePresenters) {
-          if (activePresenters[p] &&
-              activePresenters[p].restoreState &&
-              typeof activePresenters[p].restoreState === 'function') {
-            activePresenters[p].restoreState();
-          }
+        window.___globalStates = states;
+      }
+      window.___globalStatesInitialized = true;
+      for (let p in activePresenters) {
+        if (activePresenters[p] &&
+            activePresenters[p].___restore &&
+            typeof activePresenters[p].___restore === 'function') {
+          activePresenters[p].___restore();
         }
-      });
-
+      }
       if (!appPresenter.emptyView) throw new Error('emptyView required.');
       Navigator.empty(appPresenter.emptyView);
       if (appPresenter.init) appPresenter.init();
@@ -58,16 +56,17 @@ module.exports = (appPresenter) =>
     const onAppPause = (evt) => {
       for (let p in activePresenters) {
         if (activePresenters[p] &&
-            activePresenters[p].saveState &&
-            typeof activePresenters[p].saveState === 'function') {
-          activePresenters[p].saveState();
+            activePresenters[p].___save &&
+            typeof activePresenters[p].___save === 'function') {
+          activePresenters[p].___save();
         }
       }
       const states = window.___globalStates || (window.___globalStates = { });
-      for (let stateProp in states) {
-        states[stateProp] = JSON.stringify(states[stateProp]);
+      const statesStrs = _.cloneDeep(states);
+      for (let stateProp in statesStrs) {
+        statesStrs[stateProp] = JSON.stringify(statesStrs[stateProp]);
       }
-      Navigator.saveViewStates(states);
+      Navigator.saveViewStates(statesStrs);
       if (appPresenter.pause) appPresenter.pause();
       for (let p in activePresenters) {
         if (activePresenters[p] &&
@@ -103,22 +102,24 @@ module.exports = (appPresenter) =>
       const presenter = activePresenters[evt.tag];
       if (presenter) {
 
-        if (presenter.saveState &&
-            typeof presenter.saveState === 'function') {
-          presenter.saveState(evt.permanent);
+        if (presenter.___save &&
+            typeof presenter.___save === 'function') {
+          presenter.___save(evt.permanent);
         }
 
-        presenter.destroy();
+        if (presenter.destroy &&
+            typeof presenter.destroy === 'function') {
+          presenter.destroy();
+        }
 
         // auto cleanup event listeners for presenter based on prop names
         // TODO - clean this code up
         for (let prop in presenter) {
-          if (prop !== 'init' && prop !== 'destroy' &&
+          if (prop !== 'init' && prop !== 'save' && prop !== 'destroy' &&
               prop !== 'otherCreate' && prop !== 'back' &&
               prop !== 'sub' && prop !== 'unsub' &&
               prop !== 'pause' && prop !== 'resume' &&
-              prop !== 'saveState' && prop !== 'restoreState' &&
-              prop !== 'afterRestore' && prop !== 'beforeSave' &&
+              prop !== '___save' && prop !== '___restore' &&
               typeof presenter[prop] === 'function') {
             presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] &&
               console.log(`removing listener for ${evt.tag}.${prop}`);
@@ -164,12 +165,11 @@ module.exports = (appPresenter) =>
           // auto register event listeners for presenter based on prop names
           // TODO - clean this code up
           for (let prop in presenter) {
-            if (prop !== 'init' && prop !== 'destroy' &&
+            if (prop !== 'init' && prop !== 'save' && prop !== 'destroy' &&
                 prop !== 'otherCreate' && prop !== 'back' &&
                 prop !== 'sub' && prop !== 'unsub' &&
                 prop !== 'pause' && prop !== 'resume' &&
-                prop !== 'saveState' && prop !== 'restoreState' &&
-                prop !== 'afterRestore' && prop !== 'beforeSave' &&
+                prop !== '___save' && prop !== '___restore' &&
                 typeof presenter[prop] === 'function') {
               console.log(`adding listener for ${evt.tag}.${prop}`);
               presenter[`${prop}_DEVICE_EVENT_SUBSCRIPTION`] =
@@ -191,11 +191,9 @@ module.exports = (appPresenter) =>
             console.log(`${prop} subscribed.`);
           };
 
-          presenter.init();
-
-          if (presenter.restoreState &&
-              typeof presenter.restoreState === 'function') {
-            presenter.restoreState();
+          if (presenter.___restore &&
+              typeof presenter.___restore === 'function') {
+            presenter.___restore();
           }
         }
       }

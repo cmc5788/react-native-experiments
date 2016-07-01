@@ -170,6 +170,25 @@ public class MyNavigator extends MyReactModule implements Navigator {
     return constants;
   }
 
+  public void dispatchAppInit() {
+    assertOnUiThread();
+    MainActivity activity = activity();
+    if (activity == null) {
+      Log.e(TAG, "Aborting init: activity dead, dying, or dormant.");
+      return;
+    }
+
+    WritableMap wm = Arguments.createMap();
+    for (Map.Entry<String, ?> e : prefs(activity).getAll().entrySet()) {
+      String k = e.getKey();
+      if (k.endsWith("_state")) {
+        wm.putString(k.substring(0, k.length() - "_state".length()), (String) e.getValue());
+      }
+    }
+
+    eventDispatcher.dispatch("onAppInit", wm);
+  }
+
   @ReactMethod
   public void saveViewStates(final ReadableMap states, final Promise p) {
     if (states == null) {
@@ -198,32 +217,6 @@ public class MyNavigator extends MyReactModule implements Navigator {
       edit = edit.putString(String.format("%s_state", k), states.getString(k));
     }
     edit.apply();
-  }
-
-  @ReactMethod
-  public void restoreViewStates(final Promise p) {
-    handler().post(new Runnable() {
-      @Override
-      public void run() {
-        p.resolve(_restoreViewStates());
-      }
-    });
-  }
-
-  @NonNull
-  private WritableMap _restoreViewStates() {
-    assertOnUiThread();
-
-    Log.d(TAG, "_restoreViewStates");
-
-    WritableMap wm = Arguments.createMap();
-    for (Map.Entry<String, ?> e : prefs(getReactApplicationContext()).getAll().entrySet()) {
-      String k = e.getKey();
-      if (k.endsWith("_state")) {
-        wm.putString(k.substring(0, k.length() - "_state".length()), (String) e.getValue());
-      }
-    }
-    return wm;
   }
 
   @Override

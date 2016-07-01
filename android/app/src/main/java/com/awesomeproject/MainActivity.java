@@ -99,7 +99,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
       } else {
         throw new IllegalStateException("onReactContextInitialized called twice.");
       }
-      myEventDispatcher.dispatch("onAppInit", null);
+      myReactPackage.navigator().dispatchAppInit();
     }
   };
 
