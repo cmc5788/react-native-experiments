@@ -2,7 +2,7 @@
 
 1. Base view/presenter classes or utils
 
-2. Do we need a way to mark a presenter/view pair as destroyed / disabled?
+2. ~~Do we need a way to mark a presenter/view pair as destroyed / disabled?~~
 
 3. ~~Clean up concept of view "tags", too much duplication.~~
 
@@ -12,7 +12,7 @@
 
 6. ~~Clean up nav transitions to handle passing params. Passed params should be become a part of saved view state ^^^~~
 
-7. Decide if nav "forward, backward, replace" (shamelessly stolen from Flow) are useful concepts. Can they be simplified to simply "transition anim" vs "no transition anim"?
+7. ~~Decide if nav "forward, backward, replace" (shamelessly stolen from Flow) are useful concepts. Can they be simplified to simply "transition anim" vs "no transition anim"?~~
 
 8. Concept of scope other than "implicit singleton" for homebrew DI stuff. Useful for view-presenter relationship.
 
@@ -24,4 +24,6 @@
 
 12. ~~Collapse init and afterRestore?~~
 
-13. Ways to mask state where view is created and visible but waiting to get its first commands from JS. "Flickering"
+13. ~~Ways to mask state where view is created and visible but waiting to get its first commands from JS. "Flickering"~~
+
+14. Bulk navigations, setting entire new nav state instead of one modification at a time
