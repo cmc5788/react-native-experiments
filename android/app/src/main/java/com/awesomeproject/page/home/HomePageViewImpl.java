@@ -62,17 +62,20 @@ public class HomePageViewImpl extends ProperlyRestoringScrollView implements Hom
 
   public HomePageViewImpl(Context context, AttributeSet attrs) {
     super(context, attrs);
+    if (!isInEditMode()) throw new RuntimeException("no inflated instances.");
     init();
   }
 
   public HomePageViewImpl(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
+    if (!isInEditMode()) throw new RuntimeException("no inflated instances.");
     init();
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   public HomePageViewImpl(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
+    if (!isInEditMode()) throw new RuntimeException("no inflated instances.");
     init();
   }
 

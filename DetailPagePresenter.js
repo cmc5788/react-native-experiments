@@ -1,11 +1,17 @@
 'use strict';
 
+import _ from 'lodash';
+
 function DetailPagePresenter() {
 
   this.init = () => {
     console.log(`DetailPagePresenter init ${JSON.stringify(this.view.state)}`);
-    this.view.send({ setLabelText:
-      `${this.tagExtras} : ${this.fromHome ? 'from home' : 'not from home'}` });
+
+    this.view.sendBatch([
+      { setLabelText: `${this.tagExtras} : ` +
+        `${this.fromHome ? 'from home' : 'not from home'}` },
+      { setButtonText: 'COLLAPSE NAV STACK' }
+    ]);
   };
 
   this.save = () => {
@@ -14,6 +20,7 @@ function DetailPagePresenter() {
 
   this.destroy = () => {
     console.log('DetailPagePresenter destroy');
+    this.unsub('collapseStackSub');
   };
 
   this.back = () => {
@@ -29,9 +36,19 @@ function DetailPagePresenter() {
     this.nav.navigate(this.nav.DETAIL_PAGE, `${this.tagExtras}x`);
   };
 
-  this.goBackClicked = () => {
-    console.log('DetailPagePresenter goBackClicked');
-    this.nav.goBack();
+  this.buttonClicked = () => {
+    console.log('DetailPagePresenter buttonClicked');
+
+    if (_.get(this, 'collapseStackSub.isUnsubscribed', true)) {
+      this.sub('collapseStackSub',
+        this.nav.stackObs().flatMap(stack => this.nav.setStackObs(
+          _.concat(_.remove(
+            stack, s => _.startsWith(s, this.nav.HOME_PAGE)),
+            this.tag))),
+          success => console.log(`collapseStackSub success`),
+          err => console.log(err)
+        );
+    }
   };
 }
 

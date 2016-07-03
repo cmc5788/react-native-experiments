@@ -22,8 +22,10 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
@@ -302,6 +304,58 @@ public class MyNavigator extends MyReactModule implements Navigator {
     }
 
     stack.add(target);
+    applyStack();
+  }
+
+  @ReactMethod
+  public void setStack(final ReadableArray stack) {
+    if (stack == null) {
+      Log.e(TAG, "cannot setStack to null.");
+      return;
+    }
+
+    final List<String> newStack = new ArrayList<>();
+    for (int i = 0; i < stack.size(); i++) {
+      ReadableType rt = stack.getType(i);
+      if (rt == ReadableType.Array) {
+        ReadableArray arr = stack.getArray(i);
+        if (arr.size() == 1) {
+          newStack.add(NavTag.parse(arr.getString(0)).toString());
+        } else if (arr.size() == 2) {
+          String target = arr.getString(0);
+          String extras = arr.getString(1);
+          newStack.add(new NavTag(target, extras == null
+              ? ""
+              : extras).toString());
+        }
+      } else if (rt == ReadableType.String) {
+        newStack.add(NavTag.parse(stack.getString(i)).toString());
+      }
+    }
+
+    handler().post(new Runnable() {
+      @Override
+      public void run() {
+        _setStack(newStack);
+      }
+    });
+  }
+
+  private void _setStack(final List<String> newStack) {
+    assertOnUiThread();
+
+    if (newStack.isEmpty()) {
+      throw new IllegalStateException("cannot set empty nav stack.");
+    }
+
+    MainActivity activity = activity();
+    if (activity == null || !activity.isUiInteractable()) {
+      Log.i(TAG, "Aborting setStack: activity dead, dying, or dormant.");
+      return;
+    }
+
+    stack.clear();
+    stack.addAll(newStack);
     applyStack();
   }
 

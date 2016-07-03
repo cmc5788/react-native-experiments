@@ -51,6 +51,7 @@ public class DetailPageViewImpl extends ProperlyRestoringScrollView implements D
 
   public DetailPageViewImpl(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
+    if (!isInEditMode()) throw new RuntimeException("no inflated instances.");
     init();
   }
 
@@ -58,6 +59,7 @@ public class DetailPageViewImpl extends ProperlyRestoringScrollView implements D
   public DetailPageViewImpl(Context context, AttributeSet attrs, int defStyleAttr,
       int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
+    if (!isInEditMode()) throw new RuntimeException("no inflated instances.");
     init();
   }
 
@@ -119,8 +121,8 @@ public class DetailPageViewImpl extends ProperlyRestoringScrollView implements D
             .topMarginDp(32)
             .paddingDp(12)
             .bgColorInt(Color.LTGRAY)
-            .text("<-- Go Back")
-            .onClick(goBackClicked)
+            .editMode().text("Edit Mode Button Text")
+            .onClick(buttonClicked)
         )
 
         .child(Spaces.vSpace(1))
@@ -135,6 +137,11 @@ public class DetailPageViewImpl extends ProperlyRestoringScrollView implements D
   }
 
   @Override
+  public void setButtonText(@NonNull CharSequence text) {
+    ((TextView) findViewById(R.id.detail_page_button)).setText(text);
+  }
+
+  @Override
   public void setLabelText(@NonNull CharSequence text) {
     ((TextView) findViewById(R.id.detail_page_label)).setText(text);
   }
@@ -146,10 +153,10 @@ public class DetailPageViewImpl extends ProperlyRestoringScrollView implements D
     }
   };
 
-  private final View.OnClickListener goBackClicked = new View.OnClickListener() {
+  private final View.OnClickListener buttonClicked = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      presenter.goBackClicked();
+      presenter.buttonClicked();
     }
   };
 }

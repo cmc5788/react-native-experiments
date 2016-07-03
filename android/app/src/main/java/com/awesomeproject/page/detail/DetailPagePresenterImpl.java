@@ -18,8 +18,8 @@ public class DetailPagePresenterImpl implements DetailPagePresenter {
   }
 
   @Override
-  public void goBackClicked() {
-    eventDispatcher.dispatch(String.format("%s.goBackClicked", view.navTag()), null);
+  public void buttonClicked() {
+    eventDispatcher.dispatch(String.format("%s.buttonClicked", view.navTag()), null);
   }
 
   @Override
@@ -31,6 +31,11 @@ public class DetailPagePresenterImpl implements DetailPagePresenter {
   public void processJsArgs(@NonNull ReadableMap args) {
     if (args.hasKey("setButtonColor")) {
       view.setButtonColor(Color.parseColor(args.getString("setButtonColor")));
+      return;
+    }
+
+    if (args.hasKey("setButtonText")) {
+      view.setButtonText(args.getString("setButtonText"));
       return;
     }
 

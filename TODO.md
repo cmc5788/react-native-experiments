@@ -29,3 +29,5 @@
 14. Bulk navigations, setting entire new nav state instead of one modification at a time
 
 15. ~~Native view state save/restore independent of JS (with sparse parcelabel arrs etc)~~ (Done - native sparse parcelable arrs tracked in native code, persisted to saved state bundle across activity insts. native hierarchy restored after first round of commands sent in JS init.)
+
+16. Support for sibling & child VPs, as in adapterview, recyclerview
