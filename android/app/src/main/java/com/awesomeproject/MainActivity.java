@@ -88,6 +88,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
     public void onReactContextInitialized(ReactContext context) {
       Log.d(TAG, String.format("onReactContextInitialized(%d)", MainActivity.this.hashCode()));
       if (!navigatorRestored) {
+        myReactPackage.navigator().dispatchAppInit();
         if (savedState != null) {
           myReactPackage.navigator().restoreHierarchy(savedState);
           myReactPackage.navigator().restore();
@@ -101,7 +102,6 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
       } else {
         throw new IllegalStateException("onReactContextInitialized called twice.");
       }
-      myReactPackage.navigator().dispatchAppInit();
     }
   };
 
