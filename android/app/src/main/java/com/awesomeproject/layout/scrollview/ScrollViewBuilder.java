@@ -50,7 +50,7 @@ public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView
   @NonNull
   @Override
   protected ScrollView createView(ViewGroup root) {
-    return new ProperlyRestoringScrollView(root.getContext());
+    return new LateRestoreScrollView(root.getContext());
   }
 
   @NonNull

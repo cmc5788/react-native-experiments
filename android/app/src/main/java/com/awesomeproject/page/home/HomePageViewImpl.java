@@ -18,7 +18,7 @@ import com.awesomeproject.layout.imageview.ImageViewBuilder;
 import com.awesomeproject.layout.imageview.ImageViews;
 import com.awesomeproject.layout.linearlayout.LinearLayouts;
 import com.awesomeproject.layout.relativelayout.RelativeLayouts;
-import com.awesomeproject.layout.scrollview.ProperlyRestoringScrollView;
+import com.awesomeproject.layout.scrollview.LateRestoreScrollView;
 import com.awesomeproject.layout.scrollview.ScrollViews;
 import com.awesomeproject.layout.space.Spaces;
 import com.awesomeproject.layout.textview.TextViews;
@@ -39,7 +39,7 @@ import static com.awesomeproject.util.ViewUtil.ViewPredicate;
 import static com.awesomeproject.util.ViewUtil.predicatedViewAction;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class HomePageViewImpl extends ProperlyRestoringScrollView implements HomePageView {
+public class HomePageViewImpl extends LateRestoreScrollView implements HomePageView {
 
   // -----
   // BOILERPLATE ... stuff we can abstract away later

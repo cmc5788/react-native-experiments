@@ -9,22 +9,22 @@ import android.util.AttributeSet;
 import android.widget.ScrollView;
 
 /** ScrollView modified to restore scroll state if being restored after the first layout pass. */
-public class ProperlyRestoringScrollView extends ScrollView {
+public class LateRestoreScrollView extends ScrollView {
 
-  public ProperlyRestoringScrollView(Context context) {
+  public LateRestoreScrollView(Context context) {
     super(context);
   }
 
-  public ProperlyRestoringScrollView(Context context, AttributeSet attrs) {
+  public LateRestoreScrollView(Context context, AttributeSet attrs) {
     super(context, attrs);
   }
 
-  public ProperlyRestoringScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
+  public LateRestoreScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  public ProperlyRestoringScrollView(Context context, AttributeSet attrs, int defStyleAttr,
+  public LateRestoreScrollView(Context context, AttributeSet attrs, int defStyleAttr,
       int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
   }
@@ -64,7 +64,7 @@ public class ProperlyRestoringScrollView extends ScrollView {
 
     @Override
     public String toString() {
-      return "ProperlyRestoringScrollView.SavedState{" + Integer.toHexString(
+      return "LateRestoreScrollView.SavedState{" + Integer.toHexString(
           System.identityHashCode(this)) + " scrollPosition=" + scrollPosition + "}";
     }
 

@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 import com.awesomeproject.MyNavigator.NavTag;
 import com.awesomeproject.R;
-import com.awesomeproject.layout.scrollview.ProperlyRestoringScrollView;
+import com.awesomeproject.layout.scrollview.LateRestoreScrollView;
 import com.awesomeproject.layout.scrollview.ScrollViews;
 import com.awesomeproject.layout.space.Spaces;
 import com.awesomeproject.layout.textview.TextViews;
@@ -22,7 +22,7 @@ import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class DetailPageViewImpl extends ProperlyRestoringScrollView implements DetailPageView {
+public class DetailPageViewImpl extends LateRestoreScrollView implements DetailPageView {
 
   // -----
   // BOILERPLATE ... stuff we can abstract away later
