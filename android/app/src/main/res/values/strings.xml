@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">AwesomeProject</string>
+
+  <string name="app_name">
+    AwesomeProject
+  </string>
+
+  <string name="collapse_nav_stack">
+    Collapse Nav Stack
+  </string>
+
 </resources>

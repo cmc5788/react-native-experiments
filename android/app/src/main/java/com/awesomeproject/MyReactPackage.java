@@ -14,6 +14,7 @@ public class MyReactPackage implements ReactPackage {
 
   private MyNavigator navigator;
   private JSEventReceiver eventReceiver;
+  private JSContent content;
 
   private void injectDepsWithReactContext(ReactApplicationContext reactContext) {
     MyInjector inject = MyApp.injector(reactContext);
@@ -22,6 +23,7 @@ public class MyReactPackage implements ReactPackage {
     }
     navigator = inject.navigatorFor(this, reactContext);
     eventReceiver = inject.eventReceiverFor(this, reactContext);
+    content = inject.contentFor(this, reactContext);
   }
 
   public MyReactPackage() {
@@ -43,10 +45,16 @@ public class MyReactPackage implements ReactPackage {
     return eventReceiver;
   }
 
+  @NonNull
+  public JSContent content() {
+    if (content == null) throw new NullPointerException("content is null.");
+    return content;
+  }
+
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
     injectDepsWithReactContext(reactContext);
-    return Arrays.<NativeModule>asList(navigator, eventReceiver);
+    return Arrays.<NativeModule>asList(navigator, eventReceiver, content);
   }
 
   @Override

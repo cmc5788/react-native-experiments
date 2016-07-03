@@ -10,7 +10,7 @@ function DetailPagePresenter() {
     this.view.sendBatch([
       { setLabelText: `${this.tagExtras} : ` +
         `${this.fromHome ? 'from home' : 'not from home'}` },
-      { setButtonText: 'COLLAPSE NAV STACK' }
+      { setButtonText: this.content.collapse_nav_stack }
     ]);
   };
 

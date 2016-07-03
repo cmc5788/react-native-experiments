@@ -24,8 +24,10 @@ public interface MyInjector {
 
   MyNavigator navigatorFor(MyReactPackage reactPackage, ReactApplicationContext reactAppContext);
 
-  JSEventReceiver eventReceiverFor( //
-      MyReactPackage reactPackage, ReactApplicationContext reactAppContext);
+  JSEventReceiver eventReceiverFor(MyReactPackage reactPackage,
+      ReactApplicationContext reactAppContext);
+
+  JSContent contentFor(MyReactPackage reactPackage, ReactApplicationContext reactAppContext);
 
   MyNavigator navigatorFor(MyAppRoot appRoot);
 

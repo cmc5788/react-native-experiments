@@ -42,7 +42,7 @@ public class DetailPagePresenterImpl implements DetailPagePresenter {
     }
 
     if (args.hasKey("setButtonText")) {
-      view.setButtonText(args.getString("setButtonText"));
+      view.setButtonText(args.getInt("setButtonText"));
       return;
     }
 

@@ -35,6 +35,7 @@ public class MyApp extends Application implements MyInjector {
   private volatile Scoped<MyReactPackage> reactPackage;
   private volatile Scoped<MyNavigator> myNavigator;
   private volatile Scoped<JSEventReceiver> eventReceiver;
+  private volatile Scoped<JSContent> content;
   private volatile Scoped<JSEventDispatcher> eventDispatcher;
 
   @NonNull
@@ -71,6 +72,12 @@ public class MyApp extends Application implements MyInjector {
   public JSEventReceiver eventReceiverFor(MyReactPackage reactPackage,
       ReactApplicationContext reactAppContext) {
     return _eventReceiver(reactAppContext);
+  }
+
+  @Override
+  public JSContent contentFor(MyReactPackage reactPackage,
+      ReactApplicationContext reactAppContext) {
+    return _content(reactAppContext);
   }
 
   @Override
@@ -155,6 +162,22 @@ public class MyApp extends Application implements MyInjector {
       }
     }
     return er.val;
+  }
+
+  private JSContent _content(ReactApplicationContext reactAppContext) {
+    Scoped<JSContent> c = content;
+    if (c == null || c.scope != scopeCounter) {
+      synchronized (this) {
+        c = content;
+        if (c == null || c.scope != scopeCounter) {
+          if (reactAppContext == null) {
+            throw new IllegalStateException("cannot init content without reactAppContext");
+          }
+          content = c = new Scoped<>(new JSContent(reactAppContext), scopeCounter);
+        }
+      }
+    }
+    return c.val;
   }
 
   private JSEventDispatcher _eventDispatcher(LiteReactInstanceManager instMgr) {
