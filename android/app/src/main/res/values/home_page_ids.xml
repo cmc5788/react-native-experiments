@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <item type="id"
+      name="home_page"/>
+
+  <item type="id"
+      name="home_page_text"/>
+
+  <item type="id"
+      name="home_page_image"/>
+
+  <item type="id"
+      name="home_page_text_center_anchor"/>
+
+  <item type="id"
+      name="home_page_text_left_anchor"/>
+
+  <item type="id"
+      name="home_page_text_right_anchor"/>
+
+</resources>

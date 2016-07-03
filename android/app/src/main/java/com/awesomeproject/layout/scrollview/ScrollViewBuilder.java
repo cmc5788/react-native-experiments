@@ -8,8 +8,8 @@ import com.awesomeproject.layout.ViewBuilder;
 import java.util.Collections;
 import java.util.Set;
 
-public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView> implements
-    ScrollViews.ScrollViewProps<ScrollViewBuilder> {
+public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView>
+    implements ScrollViews.ScrollViewProps<ScrollViewBuilder> {
 
   private static class FillViewportProp extends Prop<ScrollView, Boolean> {
     private static final String NAME = "FILL_VIEWPORT";
@@ -50,7 +50,7 @@ public class ScrollViewBuilder extends ViewBuilder<ScrollViewBuilder, ScrollView
   @NonNull
   @Override
   protected ScrollView createView(ViewGroup root) {
-    return new ScrollView(root.getContext());
+    return new ProperlyRestoringScrollView(root.getContext());
   }
 
   @NonNull

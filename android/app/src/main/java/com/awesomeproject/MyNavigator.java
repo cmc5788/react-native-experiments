@@ -5,15 +5,19 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import com.awesomeproject.contract.Navigator;
 import com.awesomeproject.util.StrUtil;
+import com.awesomeproject.util.ViewUtil.ViewAction;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -23,8 +27,11 @@ import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +39,7 @@ import java.util.Map;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.awesomeproject.util.StrUtil.serializableToStr;
+import static com.awesomeproject.util.ViewUtil.onNextLayout;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
 public class MyNavigator extends MyReactModule implements Navigator {
@@ -134,18 +142,19 @@ public class MyNavigator extends MyReactModule implements Navigator {
   // -------------------
 
   private final LinkedList<String> stack = new LinkedList<>();
+  private final Map<String, SparseArray<Parcelable>> hierarchyStates = new HashMap<>();
   private final List<Animator> destroyAnims = new ArrayList<>();
   private boolean needsApplyStack;
   private boolean needsEmptyTag;
   private String emptyTag;
-  private DisableableViewGroup root;
+  private JSRoot root;
 
   public MyNavigator(ReactApplicationContext reactAppContext) {
     super(reactAppContext);
     injectDeps();
   }
 
-  /*package*/ void setRoot(@NonNull DisableableViewGroup root) {
+  /*package*/ void setRoot(@NonNull JSRoot root) {
     assertOnUiThread();
     if (this.root != null) {
       throw new IllegalStateException("must only set appRoot once.");
@@ -169,6 +178,38 @@ public class MyNavigator extends MyReactModule implements Navigator {
       constants.put(key, key);
     }
     return constants;
+  }
+
+  void saveHierarchy(@NonNull Bundle b) {
+    assertOnUiThread();
+
+    if (!stack.isEmpty()) {
+      NavTag topTag = NavTag.parse(stack.get(stack.size() - 1));
+      for (int i = root.viewGroup().getChildCount() - 1; i >= 0; i--) {
+        View child = root.viewGroup().getChildAt(i);
+        if (child instanceof NavTaggable && ((NavTaggable) child).navTag().equals(topTag)) {
+          SparseArray<Parcelable> state = new SparseArray<>();
+          child.saveHierarchyState(state);
+          hierarchyStates.put(topTag.toString(), state);
+        }
+      }
+    }
+
+    Bundle bb = new Bundle();
+    for (Map.Entry<String, SparseArray<Parcelable>> e : hierarchyStates.entrySet()) {
+      bb.putSparseParcelableArray(e.getKey(), e.getValue());
+    }
+    b.putBundle(String.format("%s_hierarchy", TAG), bb);
+  }
+
+  void restoreHierarchy(@NonNull Bundle b) {
+    assertOnUiThread();
+    Bundle bb = b.getBundle(String.format("%s_hierarchy", TAG));
+    if (bb != null) {
+      for (String k : bb.keySet()) {
+        hierarchyStates.put(k, bb.getSparseParcelableArray(k));
+      }
+    }
   }
 
   public void dispatchAppInit() {
@@ -471,6 +512,16 @@ public class MyNavigator extends MyReactModule implements Navigator {
 
     final View newTopView = viewFactory.createView(root.viewGroup(), topTag);
 
+    newTopView.setVisibility(View.INVISIBLE);
+    List<ViewAction<View>> actions = new ArrayList<>();
+    actions.add(new MakeVisibleAction());
+    SparseArray<Parcelable> state = hierarchyStates.get(topTag.toString());
+    if (state != null) {
+      hierarchyStates.remove(topTag.toString());
+      actions.add(new RestoreHierarchyOnceAction(state));
+    }
+    root.setAckInitListener(topTag.toString(), new AckInitActionTrigger(newTopView, actions));
+
     root.viewGroup().addView( //
         newTopView, -1, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
 
@@ -487,6 +538,20 @@ public class MyNavigator extends MyReactModule implements Navigator {
       final boolean navBack = !isInStack(oldTopView.navTag());
       final View oldView = (View) oldTopView;
 
+      final Runnable saveOldHierarchy = new Runnable() {
+        @Override
+        public void run() {
+          if (navBack) {
+            hierarchyStates.remove(oldTopView.navTag().toString());
+          } else {
+            SparseArray<Parcelable> oldState = new SparseArray<>();
+            oldView.saveHierarchyState(oldState);
+            hierarchyStates.put(oldTopView.navTag().toString(), oldState);
+          }
+        }
+      };
+      saveOldHierarchy.run();
+
       // ----
 
       // TODO - pull animation logic from injects; don't assume simple crossfade
@@ -500,6 +565,9 @@ public class MyNavigator extends MyReactModule implements Navigator {
         public void onAnimationEnd(Animator a) {
           // TODO - onDestroyView, does it make sense here?
           destroyAnims.remove(a);
+
+          saveOldHierarchy.run();
+
           root.viewGroup().removeView(oldView);
           dispatchDestroy(oldTopView.navTag(), navBack);
           root.enable();
@@ -607,5 +675,47 @@ public class MyNavigator extends MyReactModule implements Navigator {
     args.putString("tagExtras", tag.extras());
     args.putBoolean("permanent", permanent);
     eventDispatcher.dispatch("onDestroyView", args);
+  }
+
+  private static class RestoreHierarchyOnceAction implements ViewAction<View> {
+    SparseArray<Parcelable> state;
+
+    RestoreHierarchyOnceAction(@NonNull SparseArray<Parcelable> state) {
+      this.state = state;
+    }
+
+    @Override
+    public void performViewAction(@NonNull View v) {
+      if (state != null) {
+        v.restoreHierarchyState(state);
+        state = null;
+      }
+    }
+  }
+
+  private static class MakeVisibleAction implements ViewAction<View> {
+    @Override
+    public void performViewAction(@NonNull View v) {
+      if (v.getVisibility() != View.VISIBLE) {
+        v.setVisibility(View.VISIBLE);
+      }
+    }
+  }
+
+  private static class AckInitActionTrigger implements AckInitListener {
+    final WeakReference<View> vRef;
+    final Collection<ViewAction<View>> actions;
+
+    private AckInitActionTrigger(@NonNull View v, @NonNull Collection<ViewAction<View>> actions) {
+      this.vRef = new WeakReference<>(v);
+      this.actions = actions;
+    }
+
+    @Override
+    public void onAckInit(@NonNull AckInitDispatcher dispatcher) {
+      dispatcher.removeCurrentAckInitListener();
+      View v = vRef.get();
+      if (v != null) onNextLayout(v, actions);
+    }
   }
 }

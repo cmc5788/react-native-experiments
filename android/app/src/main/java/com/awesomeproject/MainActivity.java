@@ -32,7 +32,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   private LiteReactInstanceManager reactInstanceManager;
   private boolean isPausedOrPausing;
   private boolean navigatorRestored;
-  private boolean createdWithSavedState;
+  private Bundle savedState;
 
   @Override
   public boolean isUiInteractable() {
@@ -76,7 +76,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   @Override
   public void onCreate(Bundle savedState) {
     Log.d(TAG, String.format("onCreate(%d) savedInstanceState=%s", hashCode(), savedState));
-    createdWithSavedState = savedState != null;
+    this.savedState = savedState;
     beginNewScopeAndInjectReactPackage();
     super.onCreate(savedState);
     reactInstanceManager.addReactInstanceEventListener(reactInstanceEventListener);
@@ -88,8 +88,10 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
     public void onReactContextInitialized(ReactContext context) {
       Log.d(TAG, String.format("onReactContextInitialized(%d)", MainActivity.this.hashCode()));
       if (!navigatorRestored) {
-        if (createdWithSavedState) {
+        if (savedState != null) {
+          myReactPackage.navigator().restoreHierarchy(savedState);
           myReactPackage.navigator().restore();
+          savedState = null;
         } else {
           myReactPackage.navigator().clear();
         }
@@ -109,6 +111,14 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
     super.onResume();
     isPausedOrPausing = false;
     myEventDispatcher.dispatch("onAppResume", null);
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    if (outState != null) {
+      myReactPackage.navigator().saveHierarchy(outState);
+    }
   }
 
   @Override

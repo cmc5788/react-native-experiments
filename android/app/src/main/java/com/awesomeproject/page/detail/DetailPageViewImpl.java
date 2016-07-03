@@ -9,27 +9,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import com.awesomeproject.MyNavigator.NavTag;
+import com.awesomeproject.R;
+import com.awesomeproject.layout.scrollview.ProperlyRestoringScrollView;
 import com.awesomeproject.layout.scrollview.ScrollViews;
 import com.awesomeproject.layout.space.Spaces;
 import com.awesomeproject.layout.textview.TextViews;
-import com.awesomeproject.layout.view.Views;
 import com.facebook.react.bridge.ReadableMap;
 
 import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class DetailPageViewImpl extends ScrollView implements DetailPageView {
-
-  // -----
-  // STATICS
-
-  public static final int ID = Views.generateViewId();
-  public static final int LABEL_ID = Views.generateViewId();
-  public static final int BUTTON_ID = Views.generateViewId();
+public class DetailPageViewImpl extends ProperlyRestoringScrollView implements DetailPageView {
 
   // -----
   // BOILERPLATE ... stuff we can abstract away later
@@ -69,7 +62,8 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
   }
 
   private void init() {
-    setId(ID);
+    setId(R.id.detail_page);
+    buildLayout();
   }
 
   @Override
@@ -77,7 +71,7 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
     assertOnUiThread();
     // Making sure that React isn't setting this. Have to be a bit
     // defensive since it likes to go rogue setting IDs elsewhere.
-    if (id != ID) throw new IllegalArgumentException("not my id!");
+    if (id != R.id.detail_page) throw new IllegalArgumentException("not my id!");
     super.setId(id);
   }
 
@@ -101,8 +95,7 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
   // -----
   // REAL CODE ... ?
 
-  @Override
-  public void buildLayout() {
+  private void buildLayout() {
     // @formatter:off
     ScrollViews.buildWithInnerLinear()
         .matchParent()
@@ -113,7 +106,7 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
 
         .child(
             TextViews.build()
-            .id(LABEL_ID)
+            .id(R.id.detail_page_label)
             .wrapContent()
             .text("I am a Detail Page")
             .onClick(labelClicked)
@@ -121,7 +114,7 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
 
         .child(
             TextViews.build()
-            .id(BUTTON_ID)
+            .id(R.id.detail_page_button)
             .wrapContent()
             .topMarginDp(32)
             .paddingDp(12)
@@ -138,12 +131,12 @@ public class DetailPageViewImpl extends ScrollView implements DetailPageView {
 
   @Override
   public void setButtonColor(@ColorInt int color) {
-    findViewById(BUTTON_ID).setBackgroundColor(color);
+    findViewById(R.id.detail_page_button).setBackgroundColor(color);
   }
 
   @Override
   public void setLabelText(@NonNull CharSequence text) {
-    ((TextView) findViewById(LABEL_ID)).setText(text);
+    ((TextView) findViewById(R.id.detail_page_label)).setText(text);
   }
 
   private final View.OnClickListener labelClicked = new View.OnClickListener() {

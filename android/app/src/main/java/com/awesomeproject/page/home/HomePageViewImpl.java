@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import com.awesomeproject.CustomTextView;
 import com.awesomeproject.MyNavigator.NavTag;
@@ -19,10 +18,10 @@ import com.awesomeproject.layout.imageview.ImageViewBuilder;
 import com.awesomeproject.layout.imageview.ImageViews;
 import com.awesomeproject.layout.linearlayout.LinearLayouts;
 import com.awesomeproject.layout.relativelayout.RelativeLayouts;
+import com.awesomeproject.layout.scrollview.ProperlyRestoringScrollView;
 import com.awesomeproject.layout.scrollview.ScrollViews;
 import com.awesomeproject.layout.space.Spaces;
 import com.awesomeproject.layout.textview.TextViews;
-import com.awesomeproject.layout.view.Views;
 import com.awesomeproject.util.ViewUtil.BackoffPolicy;
 import com.facebook.react.bridge.ReadableMap;
 import com.squareup.picasso.Picasso;
@@ -40,17 +39,7 @@ import static com.awesomeproject.util.ViewUtil.ViewPredicate;
 import static com.awesomeproject.util.ViewUtil.predicatedViewAction;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class HomePageViewImpl extends ScrollView implements HomePageView {
-
-  // -----
-  // STATICS
-
-  public static final int ID = Views.generateViewId();
-  private static final int TEXT_ID = Views.generateViewId();
-  private static final int IMAGE_ID = Views.generateViewId();
-  private static final int TEXT_CENTER_ANCHOR = Views.generateViewId();
-  private static final int TEXT_LEFT_ANCHOR = Views.generateViewId();
-  private static final int TEXT_RIGHT_ANCHOR = Views.generateViewId();
+public class HomePageViewImpl extends ProperlyRestoringScrollView implements HomePageView {
 
   // -----
   // BOILERPLATE ... stuff we can abstract away later
@@ -88,7 +77,8 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
   }
 
   private void init() {
-    setId(ID);
+    setId(R.id.home_page);
+    buildLayout();
   }
 
   @Override
@@ -96,7 +86,7 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
     assertOnUiThread();
     // Making sure that React isn't setting this. Have to be a bit
     // defensive since it likes to go rogue setting IDs elsewhere.
-    if (id != ID) throw new IllegalArgumentException("not my id!");
+    if (id != R.id.home_page) throw new IllegalArgumentException("not my id!");
     super.setId(id);
   }
 
@@ -129,8 +119,7 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
     // @formatter:on
   }
 
-  @Override
-  public void buildLayout() {
+  private void buildLayout() {
     // @formatter:off
     ScrollViews.buildWithInnerLinear()
         .matchParent()
@@ -147,7 +136,7 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
           LinearLayouts.buildRow()
           .gravity(CENTER)
 
-          .child(imageCell(Color.MAGENTA).id(IMAGE_ID))
+          .child(imageCell(Color.MAGENTA).id(R.id.home_page_image))
           .child(imageCell(Color.GREEN))
           .child(imageCell(Color.BLUE))
           .child(imageCell(Color.RED))
@@ -169,7 +158,7 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
 
         .child(
             TextViews.build()
-            .id(TEXT_ID)
+            .id(R.id.home_page_text)
             .wrapWidth()
             .heightFlexPct(1f).editMode().heightDp(128)
             .gravity(CENTER)
@@ -224,21 +213,21 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
                 .wrapContent()
                 .gravity(CENTER)
                 .layout(ALIGN_PARENT_LEFT, true)
-                .layout(LEFT_OF, TEXT_LEFT_ANCHOR)
+                .layout(LEFT_OF, R.id.home_page_text_left_anchor)
                 .text("COL ??")
             )
 
             .child(
                 TextViews.build()
-                .id(TEXT_LEFT_ANCHOR)
+                .id(R.id.home_page_text_left_anchor)
                 .wrapContent()
-                .layout(LEFT_OF, TEXT_CENTER_ANCHOR)
+                .layout(LEFT_OF, R.id.home_page_text_center_anchor)
                 .text("COL A")
             )
 
             .child(
                 TextViews.build()
-                .id(TEXT_CENTER_ANCHOR)
+                .id(R.id.home_page_text_center_anchor)
                 .editMode().bgColorInt(Color.MAGENTA)
                 .bgColorInt(Color.CYAN)
                 .wrapContent()
@@ -249,9 +238,9 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
 
             .child(
                 TextViews.build()
-                .id(TEXT_RIGHT_ANCHOR)
+                .id(R.id.home_page_text_right_anchor)
                 .wrapContent()
-                .layout(RIGHT_OF, TEXT_CENTER_ANCHOR)
+                .layout(RIGHT_OF, R.id.home_page_text_center_anchor)
                 .text("COL C")
             )
 
@@ -260,12 +249,12 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
                 .wrapContent()
                 .gravity(CENTER)
                 .layout(ALIGN_PARENT_RIGHT, true)
-                .layout(RIGHT_OF, TEXT_RIGHT_ANCHOR)
+                .layout(RIGHT_OF, R.id.home_page_text_right_anchor)
                 .text("COL !!")
             )
         )
 
-        .child(Spaces.vSpace(1))
+        .child(Spaces.vSpace(1).bottomMarginDp(768))
 
     .applyOnto(this);
     // @formatter:on
@@ -273,13 +262,13 @@ public class HomePageViewImpl extends ScrollView implements HomePageView {
 
   @Override
   public void setButtonColor(@ColorInt int color) {
-    findViewById(TEXT_ID).setBackgroundColor(color);
-    TextViews.build().widthDp(256).applyOnto((TextView) findViewById(TEXT_ID));
+    findViewById(R.id.home_page_text).setBackgroundColor(color);
+    TextViews.build().widthDp(256).applyOnto((TextView) findViewById(R.id.home_page_text));
   }
 
   @Override
   public void setImageUrl(@NonNull final String url) {
-    predicatedViewAction((ImageView) findViewById(IMAGE_ID), //
+    predicatedViewAction((ImageView) findViewById(R.id.home_page_image), //
         LoadUrlAction.class, new LoadUrlAction(url), new LoadUrlPredicate(), //
         BackoffPolicy.EXPONENTIAL, 10, 10);
   }

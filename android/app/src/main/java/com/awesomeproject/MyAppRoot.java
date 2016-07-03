@@ -14,18 +14,19 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
 import com.facebook.react.bridge.ReadableMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class MyAppRoot extends FrameLayout
-    implements JSViewEventTarget, DisableableViewGroup<MyAppRoot> {
+public class MyAppRoot extends FrameLayout implements JSRoot<MyAppRoot> {
 
   // We have to use this bizarre "ID tracking" system since React wants to assign view IDs to
   // certain views based on its own internal logic. This should be safe for now; eventually we
   // should determine how to avoid being a part of React's view system entirely so that this is
   // no longer necessary.
-  private static int ID = R.id.initial_app_root_id;
+  private static int ID = R.id.initial_app_root;
 
   public static int ID() {
     assertOnUiThread();
@@ -35,6 +36,9 @@ public class MyAppRoot extends FrameLayout
   private MyNavigator navigator;
   private JSEventReceiver eventReceiver;
   private boolean disabled;
+
+  private Map<String, AckInitListener> ackInitListeners = new HashMap<>();
+  private String currentAckInitListenerKey;
 
   private void injectDeps() {
     navigator = MyApp.injector(getContext()).navigatorFor(this);
@@ -87,6 +91,15 @@ public class MyAppRoot extends FrameLayout
 
   @Override
   public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
+    if (ackInitListeners != null && args != null && args.hasKey("___ackInit")) {
+      AckInitListener listener = ackInitListeners.get(viewTag);
+      if (listener != null) {
+        currentAckInitListenerKey = viewTag;
+        listener.onAckInit(this);
+        currentAckInitListenerKey = null;
+      }
+      return;
+    }
     for (int i = 0; i < getChildCount(); i++) {
       View child = getChildAt(i);
       if (child instanceof JSViewEventTarget && //
@@ -119,5 +132,18 @@ public class MyAppRoot extends FrameLayout
   @Override
   public MyAppRoot viewGroup() {
     return this;
+  }
+
+  @Override
+  public void setAckInitListener(@NonNull String viewTag, @Nullable AckInitListener listener) {
+    this.ackInitListeners.put(viewTag, listener);
+  }
+
+  @Override
+  public void removeCurrentAckInitListener() {
+    if (currentAckInitListenerKey == null || //
+        ackInitListeners.remove(currentAckInitListenerKey) == null) {
+      throw new IllegalStateException("No current listener.");
+    }
   }
 }
