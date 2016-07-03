@@ -10,8 +10,7 @@ public final class HomePageViewImplFactory implements ViewFactory<HomePageViewIm
   @Override
   public HomePageViewImpl createView(@NonNull ViewGroup parent, @NonNull NavTag tag) {
     HomePageViewImpl impl = new HomePageViewImpl(parent.getContext());
-    impl.setNavTag(tag);
-    impl.setPresenter(MyApp.injector(impl.getContext()).presenterFor(impl));
+    impl.setPresenter(MyApp.injector(impl.getContext()).presenterFor(impl, tag));
     return impl;
   }
 }

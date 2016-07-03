@@ -27,12 +27,7 @@ public class DetailPageViewImpl extends ProperlyRestoringScrollView implements D
   // -----
   // BOILERPLATE ... stuff we can abstract away later
 
-  private NavTag tag;
   private DetailPagePresenter presenter;
-
-  /*package*/ void setNavTag(@NonNull NavTag tag) {
-    this.tag = tag;
-  }
 
   /*package*/ void setPresenter(@NonNull DetailPagePresenter presenter) {
     this.presenter = presenter;
@@ -79,19 +74,18 @@ public class DetailPageViewImpl extends ProperlyRestoringScrollView implements D
 
   @Override
   public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
-    if (args != null) presenter.processJsArgs(args);
+    presenter.receiveViewEvent(viewTag, args);
   }
 
   @Override
   public boolean respondsToTag(@NonNull String viewTag) {
-    if (tag == null) throw new NullPointerException();
-    return tag.equals(NavTag.parse(viewTag));
+    return presenter.respondsToTag(viewTag);
   }
 
   @NonNull
   @Override
   public NavTag navTag() {
-    return tag;
+    return presenter.navTag();
   }
 
   // -----

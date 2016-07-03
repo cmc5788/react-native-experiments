@@ -44,12 +44,7 @@ public class HomePageViewImpl extends ProperlyRestoringScrollView implements Hom
   // -----
   // BOILERPLATE ... stuff we can abstract away later
 
-  private NavTag tag;
   private HomePagePresenter presenter;
-
-  /*package*/ void setNavTag(@NonNull NavTag tag) {
-    this.tag = tag;
-  }
 
   /*package*/ void setPresenter(@NonNull HomePagePresenter presenter) {
     this.presenter = presenter;
@@ -95,19 +90,18 @@ public class HomePageViewImpl extends ProperlyRestoringScrollView implements Hom
 
   @Override
   public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
-    if (args != null) presenter.processJsArgs(args);
+    presenter.receiveViewEvent(viewTag, args);
   }
 
   @Override
   public boolean respondsToTag(@NonNull String viewTag) {
-    return tag.equals(NavTag.parse(viewTag));
+    return presenter.respondsToTag(viewTag);
   }
 
   @NonNull
   @Override
   public NavTag navTag() {
-    if (tag == null) throw new NullPointerException();
-    return tag;
+    return presenter.navTag();
   }
 
   // -----

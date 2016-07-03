@@ -10,8 +10,7 @@ public final class DetailPageViewImplFactory implements ViewFactory<DetailPageVi
   @Override
   public DetailPageViewImpl createView(@NonNull ViewGroup parent, @NonNull NavTag tag) {
     DetailPageViewImpl impl = new DetailPageViewImpl(parent.getContext());
-    impl.setNavTag(tag);
-    impl.setPresenter(MyApp.injector(impl.getContext()).presenterFor(impl));
+    impl.setPresenter(MyApp.injector(impl.getContext()).presenterFor(impl, tag));
     return impl;
   }
 }

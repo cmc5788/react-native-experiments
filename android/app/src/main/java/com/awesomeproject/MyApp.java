@@ -3,6 +3,7 @@ package com.awesomeproject;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import com.awesomeproject.MyNavigator.NavTag;
 import com.awesomeproject.MyNavigator.ViewFactory;
 import com.awesomeproject.page.detail.DetailPagePresenter;
 import com.awesomeproject.page.detail.DetailPagePresenterImpl;
@@ -98,13 +99,14 @@ public class MyApp extends Application implements MyInjector {
   }
 
   @Override
-  public DetailPagePresenter presenterFor(DetailPageViewImpl detailPageView) {
-    return new DetailPagePresenterImpl(_eventDispatcher(null), detailPageView);
+  public DetailPagePresenter presenterFor(DetailPageViewImpl detailPageView,
+      @NonNull NavTag navTag) {
+    return new DetailPagePresenterImpl(_eventDispatcher(null), detailPageView, navTag);
   }
 
   @Override
-  public HomePagePresenter presenterFor(HomePageViewImpl homePageView) {
-    return new HomePagePresenterImpl(_eventDispatcher(null), homePageView);
+  public HomePagePresenter presenterFor(HomePageViewImpl homePageView, @NonNull NavTag navTag) {
+    return new HomePagePresenterImpl(_eventDispatcher(null), homePageView, navTag);
   }
 
   // Lazy init scoped injectables with DCL

@@ -1,5 +1,7 @@
 package com.awesomeproject;
 
+import android.support.annotation.NonNull;
+import com.awesomeproject.MyNavigator.NavTag;
 import com.awesomeproject.page.detail.DetailPagePresenter;
 import com.awesomeproject.page.detail.DetailPageViewImpl;
 import com.awesomeproject.page.home.HomePagePresenter;
@@ -33,7 +35,7 @@ public interface MyInjector {
 
   JSEventDispatcher eventDispatcherFor(MyNavigator navigator);
 
-  DetailPagePresenter presenterFor(DetailPageViewImpl detailPageView);
+  DetailPagePresenter presenterFor(DetailPageViewImpl detailPageView, @NonNull NavTag navTag);
 
-  HomePagePresenter presenterFor(HomePageViewImpl homePageView);
+  HomePagePresenter presenterFor(HomePageViewImpl homePageView, @NonNull NavTag navTag);
 }
