@@ -137,6 +137,16 @@ public class DetailPageViewImpl extends LateRestoreScrollView implements DetailP
   }
 
   @Override
+  public void setButtonText(@NonNull CharSequence text) {
+    ((TextView) findViewById(R.id.detail_page_button)).setText(text);
+  }
+
+  @Override
+  public void setLabelText(@StringRes int text) {
+    ((TextView) findViewById(R.id.detail_page_label)).setText(text);
+  }
+
+  @Override
   public void setLabelText(@NonNull CharSequence text) {
     ((TextView) findViewById(R.id.detail_page_label)).setText(text);
   }

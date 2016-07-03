@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import com.awesomeproject.JSEventDispatcher;
 import com.awesomeproject.MyNavigator.NavTag;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 
 public class DetailPagePresenterImpl implements DetailPagePresenter {
 
@@ -42,12 +43,22 @@ public class DetailPagePresenterImpl implements DetailPagePresenter {
     }
 
     if (args.hasKey("setButtonText")) {
-      view.setButtonText(args.getInt("setButtonText"));
+      ReadableType rt = args.getType("setButtonText");
+      if (rt == ReadableType.Number) {
+        view.setButtonText(args.getInt("setButtonText"));
+      } else if (rt == ReadableType.String) {
+        view.setButtonText(args.getString("setButtonText"));
+      }
       return;
     }
 
     if (args.hasKey("setLabelText")) {
-      view.setLabelText(args.getString("setLabelText"));
+      ReadableType rt = args.getType("setLabelText");
+      if (rt == ReadableType.Number) {
+        view.setLabelText(args.getInt("setLabelText"));
+      } else if (rt == ReadableType.String) {
+        view.setLabelText(args.getString("setLabelText"));
+      }
       //return;
     }
   }

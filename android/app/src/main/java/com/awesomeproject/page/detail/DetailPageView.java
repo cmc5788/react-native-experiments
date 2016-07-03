@@ -12,5 +12,9 @@ public interface DetailPageView extends NavTaggable, JSViewEventTarget {
 
   void setButtonText(@StringRes int text);
 
+  void setButtonText(@NonNull CharSequence text);
+
+  void setLabelText(@StringRes int text);
+
   void setLabelText(@NonNull CharSequence text);
 }
