@@ -154,15 +154,24 @@ public class HomePageViewImpl extends LateRestoreScrollView implements HomePageV
         .child(Spaces.vSpace(1))
 
         .child(
-            TextViews.build()
-            .id(R.id.home_page_text)
-            .wrapWidth()
-            .heightFlexPct(1f).editMode().heightDp(128)
-            .gravity(CENTER)
-            .vPaddingDp(14).hPaddingDp(10)
-            .bgColorInt(Color.LTGRAY)
-            .text("I am just some text")
-            .onClick(onBtnClick)
+          LinearLayouts.buildRow()
+          .gravity(CENTER)
+
+          .child(Spaces.hSpace(1))
+
+          .child(
+              TextViews.build()
+              .id(R.id.home_page_text)
+              .wrapWidth()
+              .heightFlexPct(1f).editMode().heightDp(128)
+              .gravity(CENTER)
+              .vPaddingDp(14).hPaddingDp(10)
+              .bgColorInt(Color.LTGRAY)
+              .text("I am just some text")
+              .onClick(onBtnClick)
+          )
+
+          .child(Spaces.hSpace(1))
         )
 
         .child(Spaces.vSpace(1))
@@ -259,8 +268,15 @@ public class HomePageViewImpl extends LateRestoreScrollView implements HomePageV
 
   @Override
   public void setButtonColor(@ColorInt int color) {
-    findViewById(R.id.home_page_text).setBackgroundColor(color);
-    TextViews.build().widthDp(256).applyOnto((TextView) findViewById(R.id.home_page_text));
+    TextView tv = (TextView) findViewById(R.id.home_page_text);
+    tv.setBackgroundColor(color);
+    // @formatter:off
+    TextViews.build()
+        .parent(LinearLayouts.build())
+        .width(0).layout(WEIGHT, 3f)
+        .height(tv.getHeight())
+        .applyOnto(tv);
+    // @formatter:on
   }
 
   @Override

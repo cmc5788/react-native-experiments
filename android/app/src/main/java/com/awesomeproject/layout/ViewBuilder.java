@@ -602,6 +602,15 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     return (VB) this;
   }
 
+  public VB parent(ViewBuilder parent) {
+    this.parent = parent;
+    if (layoutProps == null) layoutProps = new HashSet<>();
+    //noinspection unchecked
+    parent.provideLayoutPropsToChild(layoutProps);
+    //noinspection unchecked
+    return (VB) this;
+  }
+
   public VB tag(@NonNull String tag) {
     this.tag = tag;
     //noinspection unchecked
@@ -1207,8 +1216,6 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
     private final int max;
     private final float pct;
 
-    private boolean flexApplied;
-
     SameDimPreDrawListener(ViewTreeObserver vto, View v, //
         boolean widthFlex, int min, int max, float pct) {
       vtoRef = new WeakReference<>(vto);
@@ -1258,20 +1265,20 @@ public abstract class ViewBuilder<VB extends ViewBuilder<?, V>, V extends View> 
           int w = Math.round(v.getHeight() * pct);
           if (min != 0) w = Math.max(w, min);
           if (max != 0) w = Math.min(w, max);
+          if (lp.width == w) return true;
           lp.width = w;
           flexed = true;
         } else if (heightFlex && v.getWidth() != 0) {
           int h = Math.round(v.getWidth() * pct);
           if (min != 0) h = Math.max(h, min);
           if (max != 0) h = Math.min(h, max);
+          if (lp.height == h) return true;
           lp.height = h;
           flexed = true;
         }
         if (flexed) {
-          boolean wasApplied = flexApplied;
-          flexApplied = true;
           v.requestLayout();
-          return wasApplied;
+          return false;
         }
       }
 
