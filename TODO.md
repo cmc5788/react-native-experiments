@@ -26,7 +26,7 @@
 
 13. ~~Ways to mask state where view is created and visible but waiting to get its first commands from JS. "Flickering"~~ (Done - delay visibility of native layout until JS layer acks init.)
 
-14. Bulk navigations, setting entire new nav state instead of one modification at a time
+14. ~~Bulk navigations, setting entire new nav state instead of one modification at a time~~ (setStack added)
 
 15. ~~Native view state save/restore independent of JS (with sparse parcelabel arrs etc)~~ (Done - native sparse parcelable arrs tracked in native code, persisted to saved state bundle across activity insts. native hierarchy restored after first round of commands sent in JS init.)
 
