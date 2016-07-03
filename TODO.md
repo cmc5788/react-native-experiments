@@ -32,4 +32,4 @@
 
 16. Support for sibling & child VPs, as in adapterview, recyclerview
 
-17. Support for localizable content access thru JS
+17. ~~Support for localizable content access thru JS~~ (proof of concept added in JSContent)
