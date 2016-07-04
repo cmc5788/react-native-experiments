@@ -132,8 +132,13 @@ public class DetailPageViewImpl extends LateRestoreScrollView implements DetailP
   }
 
   @Override
-  public void setButtonText(@StringRes int text) {
-    ((TextView) findViewById(R.id.detail_page_button)).setText(text);
+  public void setButtonText(@StringRes int text, String... args) {
+    if (args.length > 0) {
+      ((TextView) findViewById(R.id.detail_page_button)).setText( //
+          getResources().getString(text, args));
+    } else {
+      ((TextView) findViewById(R.id.detail_page_button)).setText(text);
+    }
   }
 
   @Override
@@ -142,8 +147,13 @@ public class DetailPageViewImpl extends LateRestoreScrollView implements DetailP
   }
 
   @Override
-  public void setLabelText(@StringRes int text) {
-    ((TextView) findViewById(R.id.detail_page_label)).setText(text);
+  public void setLabelText(@StringRes int text, String... args) {
+    if (args.length > 0) {
+      ((TextView) findViewById(R.id.detail_page_label)).setText( //
+          getResources().getString(text, args));
+    } else {
+      ((TextView) findViewById(R.id.detail_page_label)).setText(text);
+    }
   }
 
   @Override

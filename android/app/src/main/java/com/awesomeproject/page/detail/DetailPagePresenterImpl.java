@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.awesomeproject.JSEventDispatcher;
 import com.awesomeproject.MyNavigator.NavTag;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 
@@ -48,6 +49,17 @@ public class DetailPagePresenterImpl implements DetailPagePresenter {
         view.setButtonText(args.getInt("setButtonText"));
       } else if (rt == ReadableType.String) {
         view.setButtonText(args.getString("setButtonText"));
+      } else if (rt == ReadableType.Array) {
+        ReadableArray arr = args.getArray("setButtonText");
+        if (arr.size() == 1) {
+          view.setButtonText(arr.getInt(0));
+        } else {
+          String[] strArgs = new String[arr.size() - 1];
+          for (int i = 1; i < arr.size(); i++) {
+            strArgs[i - 1] = arr.getString(i);
+          }
+          view.setButtonText(arr.getInt(0), strArgs);
+        }
       }
       return;
     }
@@ -58,6 +70,17 @@ public class DetailPagePresenterImpl implements DetailPagePresenter {
         view.setLabelText(args.getInt("setLabelText"));
       } else if (rt == ReadableType.String) {
         view.setLabelText(args.getString("setLabelText"));
+      } else if (rt == ReadableType.Array) {
+        ReadableArray arr = args.getArray("setLabelText");
+        if (arr.size() == 1) {
+          view.setLabelText(arr.getInt(0));
+        } else {
+          String[] strArgs = new String[arr.size() - 1];
+          for (int i = 1; i < arr.size(); i++) {
+            strArgs[i - 1] = arr.getString(i);
+          }
+          view.setLabelText(arr.getInt(0), strArgs);
+        }
       }
       //return;
     }

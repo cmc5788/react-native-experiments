@@ -8,4 +8,12 @@
     Collapse Nav Stack
   </string>
 
+  <string name="x_from_home">
+    %s : from home
+  </string>
+
+  <string name="x_not_from_home">
+    %s : not from home
+  </string>
+
 </resources>

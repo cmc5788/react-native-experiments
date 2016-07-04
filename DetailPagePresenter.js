@@ -8,8 +8,10 @@ function DetailPagePresenter() {
     console.log(`DetailPagePresenter init ${JSON.stringify(this.view.state)}`);
 
     this.view.sendBatch([
-      { setLabelText: `${this.tagExtras} : ` +
-        `${this.fromHome ? 'from home' : 'not from home'}` },
+      { setLabelText: [ this.fromHome ?
+        this.content.x_from_home :
+        this.content.x_not_from_home,
+        this.tagExtras ] },
       { setButtonText: this.content.collapse_nav_stack }
     ]);
   };
