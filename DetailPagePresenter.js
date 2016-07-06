@@ -8,11 +8,16 @@ function DetailPagePresenter() {
     console.log(`DetailPagePresenter init ${JSON.stringify(this.view.state)}`);
 
     this.view.sendBatch([
-      { setLabelText: [ this.fromHome ?
-        this.content.x_from_home :
-        this.content.x_not_from_home,
-        this.tagExtras ] },
-      { setButtonText: this.content.collapse_nav_stack }
+      {
+        setLabelText: {
+          id: this.fromHome ?
+            this.content.x_from_home :
+            this.content.x_not_from_home,
+          args: [ this.tagExtras ]
+        }
+      },
+      { setButtonText: { id: this.content.collapse_nav_stack } },
+      { setButtonColor: '#00FF00' },
     ]);
   };
 

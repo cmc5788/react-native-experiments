@@ -1,6 +1,6 @@
 # TODO
 
-1. Base view/presenter classes or utils
+1. ~~Base view/presenter classes or utils~~
 
 2. ~~Do we need a way to mark a presenter/view pair as destroyed / disabled?~~ (So far no need)
 

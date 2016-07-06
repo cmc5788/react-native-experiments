@@ -1,55 +1,37 @@
 package com.awesomeproject.page.home;
 
-import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import com.awesomeproject.JSEventDispatcher;
 import com.awesomeproject.MyNavigator.NavTag;
-import com.facebook.react.bridge.ReadableMap;
+import com.awesomeproject.page.JSPagePresenterImplBase;
+import java.util.Arrays;
 
-public class HomePagePresenterImpl implements HomePagePresenter {
-
-  private final JSEventDispatcher eventDispatcher;
-  private final HomePageView view;
-  private final NavTag tag;
+public class HomePagePresenterImpl //
+    extends JSPagePresenterImplBase<HomePageView> implements HomePagePresenter {
 
   public HomePagePresenterImpl( //
       @NonNull JSEventDispatcher eventDispatcher, //
       @NonNull HomePageView view, //
       @NonNull NavTag tag) {
-    this.eventDispatcher = eventDispatcher;
-    this.view = view;
-    this.tag = tag;
+    super(eventDispatcher, view, tag);
+
+    registerSetters(Arrays.asList( //
+        new JsSetter1<Integer>("setButtonColor", JS_TO_CLR) {
+          @Override
+          public void set(Integer color) {
+            view().setButtonColor(color);
+          }
+        }, //
+        new JsSetter1<String>("setImageUrl", JS_TO_STR) {
+          @Override
+          public void set(String url) {
+            view().setImageUrl(url);
+          }
+        }));
   }
 
   @Override
   public void buttonClicked() {
-    eventDispatcher.dispatch(String.format("%s.buttonClicked", view.navTag()), null);
-  }
-
-  @Override
-  public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
-    if (args == null) return;
-
-    if (args.hasKey("setButtonColor")) {
-      view.setButtonColor(Color.parseColor(args.getString("setButtonColor")));
-      return;
-    }
-
-    if (args.hasKey("setImageUrl")) {
-      view.setImageUrl(args.getString("setImageUrl"));
-      //return;
-    }
-  }
-
-  @Override
-  public boolean respondsToTag(@NonNull String viewTag) {
-    return tag.equals(NavTag.parse(viewTag));
-  }
-
-  @NonNull
-  @Override
-  public NavTag navTag() {
-    return tag;
+    dispatchToJs("buttonClicked");
   }
 }

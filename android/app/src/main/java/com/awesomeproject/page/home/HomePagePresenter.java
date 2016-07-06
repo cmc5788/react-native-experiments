@@ -1,9 +1,8 @@
 package com.awesomeproject.page.home;
 
-import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
-import com.awesomeproject.MyNavigator.NavTaggable;
+import com.awesomeproject.page.JSPagePresenter;
 
-public interface HomePagePresenter extends NavTaggable, JSViewEventTarget {
+public interface HomePagePresenter extends JSPagePresenter {
 
   void buttonClicked();
 }

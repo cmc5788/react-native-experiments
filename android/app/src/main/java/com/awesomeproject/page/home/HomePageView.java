@@ -2,10 +2,9 @@ package com.awesomeproject.page.home;
 
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
-import com.awesomeproject.JSEventReceiver.JSViewEventTarget;
-import com.awesomeproject.MyNavigator.NavTaggable;
+import com.awesomeproject.page.JSPageView;
 
-public interface HomePageView extends NavTaggable, JSViewEventTarget {
+public interface HomePageView extends JSPageView {
 
   void setButtonColor(@ColorInt int color);
 

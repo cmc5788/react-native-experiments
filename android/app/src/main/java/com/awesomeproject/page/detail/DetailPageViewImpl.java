@@ -1,38 +1,24 @@
 package com.awesomeproject.page.detail;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Build;
 import android.support.annotation.ColorInt;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
-import com.awesomeproject.MyNavigator.NavTag;
 import com.awesomeproject.R;
-import com.awesomeproject.layout.scrollview.LateRestoreScrollView;
 import com.awesomeproject.layout.scrollview.ScrollViews;
 import com.awesomeproject.layout.space.Spaces;
 import com.awesomeproject.layout.textview.TextViews;
-import com.facebook.react.bridge.ReadableMap;
+import com.awesomeproject.page.JSPageScrollViewImplBase;
 
 import static android.graphics.Color.WHITE;
 import static android.view.Gravity.CENTER;
-import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class DetailPageViewImpl extends LateRestoreScrollView implements DetailPageView {
-
-  // -----
-  // BOILERPLATE ... stuff we can abstract away later
-
-  private DetailPagePresenter presenter;
-
-  /*package*/ void setPresenter(@NonNull DetailPagePresenter presenter) {
-    this.presenter = presenter;
-  }
+public class DetailPageViewImpl //
+    extends JSPageScrollViewImplBase<DetailPagePresenter> implements DetailPageView {
 
   public DetailPageViewImpl(Context context) {
     super(context);
@@ -41,58 +27,16 @@ public class DetailPageViewImpl extends LateRestoreScrollView implements DetailP
 
   public DetailPageViewImpl(Context context, AttributeSet attrs) {
     super(context, attrs);
-    if (!isInEditMode()) throw new RuntimeException("no inflated instances.");
     init();
   }
 
-  public DetailPageViewImpl(Context context, AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
-    if (!isInEditMode()) throw new RuntimeException("no inflated instances.");
-    init();
-  }
-
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  public DetailPageViewImpl(Context context, AttributeSet attrs, int defStyleAttr,
-      int defStyleRes) {
-    super(context, attrs, defStyleAttr, defStyleRes);
-    if (!isInEditMode()) throw new RuntimeException("no inflated instances.");
-    init();
+  @IdRes
+  @Override
+  protected int rootId() {
+    return R.id.detail_page;
   }
 
   private void init() {
-    setId(R.id.detail_page);
-    buildLayout();
-  }
-
-  @Override
-  public void setId(int id) {
-    assertOnUiThread();
-    // Making sure that React isn't setting this. Have to be a bit
-    // defensive since it likes to go rogue setting IDs elsewhere.
-    if (id != R.id.detail_page) throw new IllegalArgumentException("not my id!");
-    super.setId(id);
-  }
-
-  @Override
-  public void receiveViewEvent(@NonNull String viewTag, @Nullable ReadableMap args) {
-    presenter.receiveViewEvent(viewTag, args);
-  }
-
-  @Override
-  public boolean respondsToTag(@NonNull String viewTag) {
-    return presenter.respondsToTag(viewTag);
-  }
-
-  @NonNull
-  @Override
-  public NavTag navTag() {
-    return presenter.navTag();
-  }
-
-  // -----
-  // REAL CODE ... ?
-
-  private void buildLayout() {
     // @formatter:off
     ScrollViews.buildWithInnerLinear()
         .matchParent()
@@ -132,46 +76,26 @@ public class DetailPageViewImpl extends LateRestoreScrollView implements DetailP
   }
 
   @Override
-  public void setButtonText(@StringRes int text, String... args) {
-    if (args.length > 0) {
-      ((TextView) findViewById(R.id.detail_page_button)).setText( //
-          getResources().getString(text, args));
-    } else {
-      ((TextView) findViewById(R.id.detail_page_button)).setText(text);
-    }
-  }
-
-  @Override
-  public void setButtonText(@NonNull CharSequence text) {
+  public void setButtonText(@NonNull String text) {
     ((TextView) findViewById(R.id.detail_page_button)).setText(text);
   }
 
   @Override
-  public void setLabelText(@StringRes int text, String... args) {
-    if (args.length > 0) {
-      ((TextView) findViewById(R.id.detail_page_label)).setText( //
-          getResources().getString(text, args));
-    } else {
-      ((TextView) findViewById(R.id.detail_page_label)).setText(text);
-    }
-  }
-
-  @Override
-  public void setLabelText(@NonNull CharSequence text) {
+  public void setLabelText(@NonNull String text) {
     ((TextView) findViewById(R.id.detail_page_label)).setText(text);
   }
 
   private final View.OnClickListener labelClicked = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      presenter.labelClicked();
+      presenter().labelClicked();
     }
   };
 
   private final View.OnClickListener buttonClicked = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      presenter.buttonClicked();
+      presenter().buttonClicked();
     }
   };
 }
