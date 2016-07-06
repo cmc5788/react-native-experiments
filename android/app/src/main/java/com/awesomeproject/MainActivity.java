@@ -11,21 +11,16 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
 
   public static final String TAG = "MainActivity";
 
-  private MyReactNativeHost myReactNativeHost;
   private MyReactPackage myReactPackage;
   private LiteReactInstanceManager reactInstanceManager;
   private JSEventDispatcher myEventDispatcher;
 
-  private void beginNewScopeAndInjectReactPackage() {
+  private void beginNewScopeAndInjectDeps() {
     MyInjector inject = MyApp.injector(this);
     inject.beginNewScope();
-    myReactNativeHost = inject.reactNativeHostFor(this);
     myReactPackage = inject.reactPackageFor(this);
-  }
-
-  private void injectEventDispatcherWithInstanceManager() {
-    MyInjector inject = MyApp.injector(this);
-    reactInstanceManager = myReactNativeHost.getReactInstanceManager();
+    reactInstanceManager = //
+        (LiteReactInstanceManager) getReactNativeHost().getReactInstanceManager();
     myEventDispatcher = inject.eventDispatcherFor(this, reactInstanceManager);
   }
 
@@ -51,9 +46,8 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   public void onCreate(Bundle savedState) {
     Log.d(TAG, String.format("onCreate(%d) savedInstanceState=%s", hashCode(), savedState));
     this.savedState = savedState;
-    beginNewScopeAndInjectReactPackage();
+    beginNewScopeAndInjectDeps();
     super.onCreate(savedState);
-    injectEventDispatcherWithInstanceManager();
     reactInstanceManager.addReactInstanceEventListener(reactInstanceEventListener);
   }
 

@@ -53,11 +53,6 @@ public class MyApp extends Application implements MyInjector, ReactApplication {
 
   @Override
   public ReactNativeHost getReactNativeHost() {
-    return reactNativeHostFor(null);
-  }
-
-  @Override
-  public MyReactNativeHost reactNativeHostFor(MainActivity activity) {
     return _myReactNativeHost(_myReactPackage());
   }
 
