@@ -228,6 +228,21 @@ public abstract class JSPagePresenterImplBase<V extends JSPageView> implements J
           }
           return ctx.getString(map.getInt("id"));
         }
+        if (map.hasKey("id") && map.getType("id") == ReadableType.String) {
+          if (map.hasKey("args") && map.getType("args") == ReadableType.Array) {
+            ReadableArray arr = map.getArray("args");
+            String[] strArgs = new String[arr.size()];
+            for (int i = 0; i < arr.size(); i++) {
+              strArgs[i] = toNative(fromArr(arr), String.valueOf(i), ctx);
+            }
+            int strId = ctx.getResources().getIdentifier( //
+                map.getString("id"), "string", ctx.getPackageName());
+            return ctx.getString(strId, strArgs);
+          }
+          int strId = ctx.getResources().getIdentifier( //
+              map.getString("id"), "string", ctx.getPackageName());
+          return ctx.getString(strId);
+        }
       }
 
       if (rt == ReadableType.Array) {

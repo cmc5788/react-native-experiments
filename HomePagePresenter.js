@@ -9,7 +9,6 @@ function HomePagePresenter() {
 
   this.init = () => {
     console.log('HomePagePresenter init');
-    console.log(`CONTENT ID TEST ${this.content.app_name}`);
   };
 
   this.save = () => {

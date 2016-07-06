@@ -4,7 +4,6 @@ import _ from 'lodash';
 import Rx from 'rxjs';
 import nav from './MyNavigator';
 import net from './net';
-import content from './Content';
 
 const makeObservablesFromFuncs = (obj) => {
   for (let prop in obj) {
@@ -38,7 +37,6 @@ module.exports = (presenterFunc, tag, tagBase, tagExtras, view) => {
   presenter.view = view;
   presenter.nav = nav;
   presenter.net = net;
-  presenter.content = content;
 
   presenter.view.state = { };
 

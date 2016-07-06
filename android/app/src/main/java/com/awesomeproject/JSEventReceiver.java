@@ -59,9 +59,16 @@ public class JSEventReceiver extends MyReactModule {
         assertOnUiThread();
         if (viewEventTarget != null && viewTag != null && //
             viewEventTarget.respondsToTag(viewTag)) {
+          // Need to keep an eye on nanotime here to make sure that our method of sending JS
+          // commands down to the native views doesn't suffer from performance problems, especially
+          // when issuing batches of commands like this.
+          //long tm = System.nanoTime();
           for (int i = 0; i < args.size(); i++) {
             viewEventTarget.receiveViewEvent(viewTag, args.getMap(i));
           }
+          //tm = System.nanoTime() - tm;
+          //Log.e(TAG, "sendBatchToView " + viewTag + " took " + //
+          //    TimeUnit.NANOSECONDS.toMillis(tm) + "ms");
         }
         p.resolve(null);
       }
