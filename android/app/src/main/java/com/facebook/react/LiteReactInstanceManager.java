@@ -39,12 +39,13 @@ public abstract class LiteReactInstanceManager extends ReactInstanceManager {
     protected @Nullable Activity mCurrentActivity;
     protected @Nullable DefaultHardwareBackBtnHandler mDefaultHardwareBackBtnHandler;
     protected @Nullable RedBoxHandler mRedBoxHandler;
+    protected boolean mUseNewBridge;
 
     protected Builder() {
     }
 
     /**
-     * Sets a provider of {@link UIImplementation}.
+     * Sets a provider of {@link com.facebook.react.uimanager.UIImplementation}.
      * Uses default provider if null is passed.
      */
     public Builder setUIImplementationProvider(
@@ -150,8 +151,13 @@ public abstract class LiteReactInstanceManager extends ReactInstanceManager {
       return this;
     }
 
-    public Builder setRedBoxHandler(RedBoxHandler redBoxHandler) {
+    public Builder setRedBoxHandler(@Nullable RedBoxHandler redBoxHandler) {
       mRedBoxHandler = redBoxHandler;
+      return this;
+    }
+
+    public Builder setUseNewBridge() {
+      mUseNewBridge = true;
       return this;
     }
 
@@ -177,12 +183,23 @@ public abstract class LiteReactInstanceManager extends ReactInstanceManager {
         mUIImplementationProvider = new UIImplementationProvider();
       }
 
-      return new LiteReactInstanceManagerImpl(Assertions.assertNotNull(mApplication,
-          "Application property has not been set with this build"), mCurrentActivity,
-          mDefaultHardwareBackBtnHandler, mJSBundleFile, mJSMainModuleName, mPackages,
-          mUseDeveloperSupport, mBridgeIdleDebugListener,
-          Assertions.assertNotNull(mInitialLifecycleState, "Initial lifecycle state was not set"),
-          mUIImplementationProvider, mNativeModuleCallExceptionHandler, mJSCConfig, mRedBoxHandler);
+      if (mUseNewBridge) {
+        return new LiteXReactInstanceManagerImpl(Assertions.assertNotNull(mApplication,
+            "Application property has not been set with this builder"), mCurrentActivity,
+            mDefaultHardwareBackBtnHandler, mJSBundleFile, mJSMainModuleName, mPackages,
+            mUseDeveloperSupport, mBridgeIdleDebugListener,
+            Assertions.assertNotNull(mInitialLifecycleState, "Initial lifecycle state was not set"),
+            mUIImplementationProvider, mNativeModuleCallExceptionHandler, mJSCConfig,
+            mRedBoxHandler);
+      } else {
+        return new LiteReactInstanceManagerImpl(Assertions.assertNotNull(mApplication,
+            "Application property has not been set with this builder"), mCurrentActivity,
+            mDefaultHardwareBackBtnHandler, mJSBundleFile, mJSMainModuleName, mPackages,
+            mUseDeveloperSupport, mBridgeIdleDebugListener,
+            Assertions.assertNotNull(mInitialLifecycleState, "Initial lifecycle state was not set"),
+            mUIImplementationProvider, mNativeModuleCallExceptionHandler, mJSCConfig,
+            mRedBoxHandler);
+      }
     }
   }
 }

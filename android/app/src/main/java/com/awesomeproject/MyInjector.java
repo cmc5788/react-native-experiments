@@ -18,6 +18,8 @@ public interface MyInjector {
 
   // Injectable values
 
+  MyReactNativeHost reactNativeHostFor(MainActivity activity);
+
   MyReactPackage reactPackageFor(MainActivity activity);
 
   JSEventDispatcher eventDispatcherFor(MainActivity activity, LiteReactInstanceManager instMgr);

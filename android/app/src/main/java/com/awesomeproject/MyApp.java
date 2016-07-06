@@ -15,12 +15,14 @@ import com.awesomeproject.page.home.HomePageViewImpl;
 import com.awesomeproject.page.home.HomePageViewImplFactory;
 import com.awesomeproject.util.MapUtil;
 import com.facebook.react.LiteReactInstanceManager;
+import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactNativeHost;
 import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.Map;
 
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class MyApp extends Application implements MyInjector {
+public class MyApp extends Application implements MyInjector, ReactApplication {
 
   @NonNull
   public static MyInjector injector(@NonNull Context context) {
@@ -32,6 +34,7 @@ public class MyApp extends Application implements MyInjector {
   private volatile int scopeCounter;
 
   // Injectable scoped singletons
+  private volatile Scoped<MyReactNativeHost> reactNativeHost;
   private volatile Scoped<MyReactPackage> reactPackage;
   private volatile Scoped<MyNavigator> myNavigator;
   private volatile Scoped<JSEventReceiver> eventReceiver;
@@ -46,6 +49,16 @@ public class MyApp extends Application implements MyInjector {
   public void beginNewScope() {
     assertOnUiThread();
     scopeCounter++;
+  }
+
+  @Override
+  public ReactNativeHost getReactNativeHost() {
+    return reactNativeHostFor(null);
+  }
+
+  @Override
+  public MyReactNativeHost reactNativeHostFor(MainActivity activity) {
+    return _myReactNativeHost(_myReactPackage());
   }
 
   @NonNull
@@ -111,6 +124,20 @@ public class MyApp extends Application implements MyInjector {
 
   // Lazy init scoped injectables with DCL
   // TODO - too much boilerplate; put DCL idiom into Scoped impl instead, dropping immutability?
+
+  private MyReactNativeHost _myReactNativeHost(MyReactPackage reactPackage) {
+    Scoped<MyReactNativeHost> rnh = reactNativeHost;
+    if (rnh == null || rnh.scope != scopeCounter) {
+      synchronized (this) {
+        rnh = reactNativeHost;
+        if (rnh == null || rnh.scope != scopeCounter) {
+          reactNativeHost = rnh = new Scoped<>( //
+              new MyReactNativeHost(this, reactPackage), scopeCounter);
+        }
+      }
+    }
+    return rnh.val;
+  }
 
   private MyReactPackage _myReactPackage() {
     Scoped<MyReactPackage> mrp = reactPackage;

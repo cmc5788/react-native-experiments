@@ -5,31 +5,30 @@ import android.util.Log;
 import com.facebook.react.LiteAppCompatReactActivity;
 import com.facebook.react.LiteReactInstanceManager;
 import com.facebook.react.ReactInstanceManager.ReactInstanceEventListener;
-import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.shell.MainReactPackage;
-import java.util.Arrays;
-import java.util.List;
 
 public class MainActivity extends LiteAppCompatReactActivity implements UiInteractable {
 
   public static final String TAG = "MainActivity";
 
+  private MyReactNativeHost myReactNativeHost;
   private MyReactPackage myReactPackage;
+  private LiteReactInstanceManager reactInstanceManager;
   private JSEventDispatcher myEventDispatcher;
 
   private void beginNewScopeAndInjectReactPackage() {
     MyInjector inject = MyApp.injector(this);
     inject.beginNewScope();
+    myReactNativeHost = inject.reactNativeHostFor(this);
     myReactPackage = inject.reactPackageFor(this);
   }
 
-  private void injectEventDispatcherWithInstanceManager(LiteReactInstanceManager instMgr) {
+  private void injectEventDispatcherWithInstanceManager() {
     MyInjector inject = MyApp.injector(this);
-    myEventDispatcher = inject.eventDispatcherFor(this, instMgr);
+    reactInstanceManager = myReactNativeHost.getReactInstanceManager();
+    myEventDispatcher = inject.eventDispatcherFor(this, reactInstanceManager);
   }
 
-  private LiteReactInstanceManager reactInstanceManager;
   private boolean isPausedOrPausing;
   private boolean navigatorRestored;
   private Bundle savedState;
@@ -48,37 +47,13 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
     return "MainComponent";
   }
 
-  /**
-   * Returns whether dev mode should be enabled.
-   * This enables e.g. the dev menu.
-   */
-  @Override
-  protected boolean getUseDeveloperSupport() {
-    return BuildConfig.DEBUG;
-  }
-
-  /**
-   * A list of packages used by the app. If the app uses additional views
-   * or modules besides the default ones, add more packages here.
-   */
-  @Override
-  protected List<ReactPackage> getPackages() {
-    return Arrays.asList(myReactPackage, new MainReactPackage());
-  }
-
-  @Override
-  protected LiteReactInstanceManager createReactInstanceManager() {
-    reactInstanceManager = super.createReactInstanceManager();
-    injectEventDispatcherWithInstanceManager(reactInstanceManager);
-    return reactInstanceManager;
-  }
-
   @Override
   public void onCreate(Bundle savedState) {
     Log.d(TAG, String.format("onCreate(%d) savedInstanceState=%s", hashCode(), savedState));
     this.savedState = savedState;
     beginNewScopeAndInjectReactPackage();
     super.onCreate(savedState);
+    injectEventDispatcherWithInstanceManager();
     reactInstanceManager.addReactInstanceEventListener(reactInstanceEventListener);
   }
 
