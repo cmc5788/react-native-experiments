@@ -15,6 +15,8 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
 
   public static final String TAG = "MainActivity";
 
+  private static int createdActivityCount = 0;
+
   private MyReactNativeHost myReactNativeHost;
   private MyReactPackage myReactPackage;
   private LiteReactInstanceManager reactInstanceManager;
@@ -71,6 +73,11 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
 
   @Override
   public void onCreate(Bundle savedState) {
+    if (createdActivityCount != 0) {
+      throw new IllegalStateException( //
+          "Only one Activity instance may exist at a time. singleTask should be set - was it?");
+    }
+    createdActivityCount++;
     Log.d(TAG, String.format("onCreate(%d) savedInstanceState=%s", hashCode(), savedState));
     this.savedState = savedState;
     beginNewScopeAndInjectDeps();
@@ -159,6 +166,7 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
 
   @Override
   protected void onDestroy() {
+    createdActivityCount--;
     Log.d(TAG, String.format("onDestroy(%d)", hashCode()));
     super.onDestroy();
     reactInstanceManager.removeReactInstanceEventListener(reactInstanceEventListener);
