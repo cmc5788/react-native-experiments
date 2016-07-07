@@ -15,14 +15,12 @@ import com.awesomeproject.page.home.HomePageViewImpl;
 import com.awesomeproject.page.home.HomePageViewImplFactory;
 import com.awesomeproject.util.MapUtil;
 import com.facebook.react.LiteReactInstanceManager;
-import com.facebook.react.ReactApplication;
-import com.facebook.react.ReactNativeHost;
 import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.Map;
 
 import static com.facebook.react.bridge.UiThreadUtil.assertOnUiThread;
 
-public class MyApp extends Application implements MyInjector, ReactApplication {
+public class MyApp extends Application implements MyInjector {
 
   @NonNull
   public static MyInjector injector(@NonNull Context context) {
@@ -52,7 +50,7 @@ public class MyApp extends Application implements MyInjector, ReactApplication {
   }
 
   @Override
-  public ReactNativeHost getReactNativeHost() {
+  public MyReactNativeHost reactNativeHostFor(MainActivity activity) {
     return _myReactNativeHost(_myReactPackage());
   }
 

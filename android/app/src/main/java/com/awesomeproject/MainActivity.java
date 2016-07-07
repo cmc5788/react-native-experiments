@@ -1,16 +1,21 @@
 package com.awesomeproject;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Log;
 import com.facebook.react.LiteAppCompatReactActivity;
 import com.facebook.react.LiteReactInstanceManager;
 import com.facebook.react.ReactInstanceManager.ReactInstanceEventListener;
+import com.facebook.react.ReactNativeHost;
 import com.facebook.react.bridge.ReactContext;
 
 public class MainActivity extends LiteAppCompatReactActivity implements UiInteractable {
 
   public static final String TAG = "MainActivity";
 
+  private MyReactNativeHost myReactNativeHost;
   private MyReactPackage myReactPackage;
   private LiteReactInstanceManager reactInstanceManager;
   private JSEventDispatcher myEventDispatcher;
@@ -18,13 +23,16 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
   private void beginNewScopeAndInjectDeps() {
     MyInjector inject = MyApp.injector(this);
     inject.beginNewScope();
+    myReactNativeHost = inject.reactNativeHostFor(this);
     myReactPackage = inject.reactPackageFor(this);
-    reactInstanceManager = //
-        (LiteReactInstanceManager) getReactNativeHost().getReactInstanceManager();
+    reactInstanceManager = myReactNativeHost.getReactInstanceManager();
     myEventDispatcher = inject.eventDispatcherFor(this, reactInstanceManager);
   }
 
+  private final Handler handler = new Handler(Looper.myLooper());
+
   private boolean isPausedOrPausing;
+  private boolean initReactAppAfterResume;
   private boolean navigatorRestored;
   private Bundle savedState;
 
@@ -42,6 +50,25 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
     return "MainComponent";
   }
 
+  /**
+   * Do this because the super implementation from React is mindblowingly stupid, doesn't account
+   * for basic Android lifecycle concerns by failing to understand that Activity overlap may occur,
+   * (case where one Activity instance is created before the previous is destroyed). tldr; React
+   * shouldn't be grabbing its dependencies from the Application like it does.
+   */
+  @Override
+  protected ReactNativeHost getReactNativeHost() {
+    return myReactNativeHost;
+  }
+
+  /**
+   * See {@link #getReactNativeHost}
+   */
+  @Override
+  protected boolean getUseDeveloperSupport() {
+    return myReactNativeHost.getUseDeveloperSupport();
+  }
+
   @Override
   public void onCreate(Bundle savedState) {
     Log.d(TAG, String.format("onCreate(%d) savedInstanceState=%s", hashCode(), savedState));
@@ -55,37 +82,64 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
       reactInstanceEventListener = new ReactInstanceEventListener() {
     @Override
     public void onReactContextInitialized(ReactContext context) {
+      reactInstanceManager.removeReactInstanceEventListener(this);
       Log.d(TAG, String.format("onReactContextInitialized(%d)", MainActivity.this.hashCode()));
-      if (!navigatorRestored) {
-        myReactPackage.navigator().dispatchAppInit();
-        if (savedState != null) {
-          myReactPackage.navigator().restoreHierarchy(savedState);
-          myReactPackage.navigator().restore();
-          savedState = null;
-        } else {
-          myReactPackage.navigator().clear();
-        }
-        navigatorRestored = true;
-      } else if (BuildConfig.DEBUG) {
-        android.os.Process.killProcess(android.os.Process.myPid());
-      } else {
-        throw new IllegalStateException("onReactContextInitialized called twice.");
+      if (isPausedOrPausing) {
+        initReactAppAfterResume = true;
+        return;
       }
+      initReactApp();
     }
   };
+
+  private void initReactApp() {
+    if (!navigatorRestored) {
+      myReactPackage.navigator().dispatchAppInit();
+      if (savedState != null) {
+        myReactPackage.navigator().restoreHierarchy(savedState);
+        myReactPackage.navigator().restore();
+        savedState = null;
+      } else {
+        myReactPackage.navigator().clear();
+      }
+      navigatorRestored = true;
+    } else if (BuildConfig.DEBUG) {
+      android.os.Process.killProcess(android.os.Process.myPid());
+    } else {
+      throw new IllegalStateException("onReactContextInitialized called twice.");
+    }
+  }
 
   @Override
   protected void onResume() {
     Log.d(TAG, String.format("onResume(%d)", hashCode()));
     super.onResume();
     isPausedOrPausing = false;
-    myEventDispatcher.dispatch("onAppResume", null);
+    if (navigatorRestored) {
+      myEventDispatcher.dispatch("onAppResume", null);
+    }
+    if (initReactAppAfterResume) {
+      // FIXME
+      // This is hacky, but it works for now - when recovering from a situation where the
+      // ReactContext was initialized while the Activity was paused, event dispatch can be lost.
+      // To avoid this, for now, delay initializing the JS stack for a little while after resuming.
+      handler.removeCallbacksAndMessages(MainActivity.class);
+      handler.postAtTime(new Runnable() {
+        @Override
+        public void run() {
+          if (!isPausedOrPausing) {
+            initReactAppAfterResume = false;
+            initReactApp();
+          }
+        }
+      }, MainActivity.class, SystemClock.uptimeMillis() + 100);
+    }
   }
 
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    if (outState != null) {
+    if (outState != null && myReactPackage.navigatorReady() && navigatorRestored) {
       myReactPackage.navigator().saveHierarchy(outState);
     }
   }
@@ -97,7 +151,9 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
       myReactPackage.navigator().save();
     }
     isPausedOrPausing = true;
-    myEventDispatcher.dispatch("onAppPause", null);
+    if (navigatorRestored) {
+      myEventDispatcher.dispatch("onAppPause", null);
+    }
     super.onPause();
   }
 

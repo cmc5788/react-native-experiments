@@ -21,10 +21,16 @@ public class MyEventDispatcher implements JSEventDispatcher {
   @Override
   public void dispatch(@NonNull String name, @Nullable Object data) {
     LiteReactInstanceManager instMgr = instMgrRef.get();
-    if (instMgr == null) return;
+    if (instMgr == null) {
+      Log.e(TAG, "dispatch failed - null instMgr");
+      return;
+    }
     try {
       ReactContext rc = instMgr.getCurrentReactContext();
-      if (rc == null) return;
+      if (rc == null) {
+        Log.e(TAG, "dispatch failed - null instMgr.getCurrentReactContext()");
+        return;
+      }
       rc.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(name, data);
     } catch (Exception e) {
       Log.e(TAG, "emitEvent err", e);
