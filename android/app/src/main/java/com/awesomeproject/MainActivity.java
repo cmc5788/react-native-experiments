@@ -56,7 +56,8 @@ public class MainActivity extends LiteAppCompatReactActivity implements UiIntera
    * Do this because the super implementation from React is mindblowingly stupid, doesn't account
    * for basic Android lifecycle concerns by failing to understand that Activity overlap may occur,
    * (case where one Activity instance is created before the previous is destroyed). tldr; React
-   * shouldn't be grabbing its dependencies from the Application like it does.
+   * shouldn't be grabbing its dependencies from the Application like it does. It technically works
+   * for React as-written, but it is extremely fragile and will blow up frequently as-is.
    */
   @Override
   protected ReactNativeHost getReactNativeHost() {
